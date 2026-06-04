@@ -1,11 +1,5 @@
 """Strategy layer: base class and concrete trading strategies."""
 
-from strategies.base import Strategy, StrategyState
-from strategies.market_making import MarketMakingStrategy
-from strategies.ai_signals import AISignalsStrategy
-from strategies.whale_tracking import WhaleTrackingStrategy
-from strategies.cross_platform_arb import CrossPlatformArbStrategy
-
 __all__ = [
     "Strategy",
     "StrategyState",
@@ -14,3 +8,20 @@ __all__ = [
     "WhaleTrackingStrategy",
     "CrossPlatformArbStrategy",
 ]
+
+
+def __getattr__(name):
+    """Lazy import to avoid circular dependency chains."""
+    if name in __all__:
+        import importlib
+        module_map = {
+            "Strategy": "strategies.base",
+            "StrategyState": "strategies.base",
+            "MarketMakingStrategy": "strategies.market_making",
+            "AISignalsStrategy": "strategies.ai_signals",
+            "WhaleTrackingStrategy": "strategies.whale_tracking",
+            "CrossPlatformArbStrategy": "strategies.cross_platform_arb",
+        }
+        mod = importlib.import_module(module_map[name])
+        return getattr(mod, name)
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

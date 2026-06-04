@@ -1,14 +1,5 @@
 """Core layer: order lifecycle, execution, risk management, and portfolio tracking."""
 
-from core.order_state import OrderStore, OrderRecord, OrderState
-from core.risk import RiskManager
-from core.executor import OrderExecutor
-from core.paper_executor import PaperExecutor
-from core.orderbook import OrderBookManager
-from core.portfolio import PortfolioTracker
-from core.client import ClobClient
-from core.backtest import BacktestEngine
-
 __all__ = [
     "OrderStore",
     "OrderRecord",
@@ -21,3 +12,24 @@ __all__ = [
     "ClobClient",
     "BacktestEngine",
 ]
+
+
+def __getattr__(name):
+    """Lazy import to avoid circular dependency chains."""
+    if name in __all__:
+        import importlib
+        module_map = {
+            "OrderStore": "core.order_state",
+            "OrderRecord": "core.order_state",
+            "OrderState": "core.order_state",
+            "RiskManager": "core.risk",
+            "OrderExecutor": "core.executor",
+            "PaperExecutor": "core.paper_executor",
+            "OrderBookManager": "core.orderbook",
+            "PortfolioTracker": "core.portfolio",
+            "ClobClient": "core.client",
+            "BacktestEngine": "core.backtest",
+        }
+        mod = importlib.import_module(module_map[name])
+        return getattr(mod, name)
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
