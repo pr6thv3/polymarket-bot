@@ -1,0 +1,185 @@
+risk:
+  max_position_pct: 0.05
+  daily_loss_cap_pct: 0.10
+  halt_total_loss_pct: 0.40
+  min_profit_threshold_usd: 0.30
+  max_correlated_exposure_pct: 0.15
+
+taker_fees:
+  crypto: 0.018
+  sports: 0.0075
+  finance: 0.01
+  politics: 0.01
+  economics: 0.015
+  geopolitics: 0.0
+
+rebate_rates:
+  crypto: 0.20
+  sports: 0.25
+  finance: 0.50
+  politics: 0.25
+  economics: 0.25
+  geopolitics: 0.20
+
+strategies:
+  market_making:
+    enabled: true
+    min_spread_bps: 100
+    max_spread_bps: 400
+    base_spread_bps: 200
+    order_size_usd: 15.0
+    min_order_size_usd: 5.0
+    target_categories:
+      - geopolitics
+      - finance
+      - politics
+    holding_rewards:
+      enabled: true
+      min_days_to_resolution: 14
+      target_apy: 0.04
+    midpoint_move_threshold_bps: 50
+    cancel_stale_sec: 120
+    adverse_selection:
+      volatility_pause_threshold: 0.05
+      pause_duration_sec: 300
+      news_blackout_min: 30
+
+  cross_arb:
+    enabled: false
+    platforms:
+      - kalshi
+      - predictit
+    min_edge_usd: 0.03
+    max_leg_delay_ms: 500
+    execution_mode: favor_poly  # simultaneous, sequential, favor_poly
+    kalshi:
+      api_key: ""
+      api_secret: ""
+      base_url: "https://trading-api.kalshi.com/trade-api/v2"
+    market_mapping:
+      # Polymarket condition_id -> Kalshi ticker_symbol
+      # Populated automatically by the strategy's auto-mapper
+      auto_discover: true
+    position_limits:
+      max_single_arb_usd: 50.0
+      max_total_arb_exposure_pct: 0.20
+    cycle_interval_sec: 10.0
+    max_consecutive_errors: 5
+
+  whale_tracking:
+    enabled: false
+    min_win_rate: 0.60
+    min_profit_factor: 1.5
+    min_trade_count: 20
+    copy_delay_ms: 500
+    sources:
+      - polymarket_leaderboard
+      - dune_dashboard
+    position_sizing:
+      base_size_usd: 10.0
+      max_size_usd: 50.0
+      kelly_fraction: 0.25
+      scaling_win_streak: 1.2    # Multiply size per consecutive win
+      scaling_loss_streak: 0.6   # Multiply size per consecutive loss
+    stop_loss:
+      enabled: true
+      default_pct: 0.15
+      trailing: true
+      trailing_step_pct: 0.05
+    cooldown:
+      after_stop_loss_sec: 300
+      after_large_loss_sec: 600
+    aggregation:
+      min_whales_same_direction: 2
+      conflicting_signal_action: skip
+    cycle_interval_sec: 30.0
+    max_consecutive_errors: 10
+
+  ai_signals:
+    enabled: false
+    min_edge_vs_market: 0.05
+    min_signal_confidence: 0.60
+    max_position_per_signal_pct: 0.03
+    order_size_usd: 10.0
+    max_order_size_usd: 50.0
+    signal_decay_sec: 300
+    max_open_signals: 10
+    exit_on_signal_flip: true
+    stop_loss_pct: 0.15
+    take_profit_pct: 0.30
+    news_fetch_interval_sec: 60.0
+    signal_model_interval_sec: 30.0
+    cycle_interval_sec: 60.0
+    max_consecutive_errors: 10
+    target_categories:
+      - geopolitics
+      - politics
+      - economics
+      - finance
+    news_sources:
+      - rss
+      - webhook
+    llm:
+      provider: openai
+      model: gpt-4o
+      api_key_env: OPENAI_API_KEY
+      max_tokens: 500
+      temperature: 0.0
+
+execution:
+  rate_limit_per_min: 55
+  retry_max_attempts: 3
+  retry_backoff_base_sec: 2
+  dry_run: false
+  post_only_default: true
+  amend_timeout_sec: 2.0
+  pending_timeout_sec: 5.0
+  error_circuit_breaker:
+    threshold: 10
+    window_sec: 60
+    pause_sec: 300
+
+paper_trading:
+  slippage_bps: 3.0
+  fill_probability: 0.85
+  partial_fill_probability: 0.15
+  min_fill_pct: 0.5
+
+backtesting:
+  data_dir: "data/backtest/"
+  starting_capital: 1000.0
+  slippage_bps: 5.0
+  fill_latency_sec: 0.0
+
+scheduled_events: []
+  # - name: "US Market Open"
+  #   time: "14:30"
+  #   timezone: "UTC"
+  # - name: "Fed Rate Decision"
+  #   time: "2026-06-18T18:00:00Z"
+
+alerting:
+  telegram:
+    enabled: true
+    alerts:
+      - halt_triggered
+      - daily_loss_cap_hit
+      - large_fill
+      - connection_lost
+      - rebate_earned
+      - arb_opportunity
+      - whale_signal_detected
+      - ai_signal_detected
+    min_interval_sec: 30
+
+logging:
+  level: INFO
+  file: logs/bot.log
+  max_size_mb: 50
+  format: json
+
+metrics:
+  port: 9090
+
+monitoring:
+  health_check_sec: 30
