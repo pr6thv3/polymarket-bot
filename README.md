@@ -2,11 +2,12 @@
 
 Automated market-making bot for Polymarket prediction markets.
 
----
-
 ## Overview
 
-polymarket-bot is a multi-strategy algorithmic trading bot for [Polymarket](https://polymarket.com), the on-chain prediction market platform on Polygon. It trades via the Central Limit Order Book (CLOB) API using `py-clob-client`, targeting consistent income through market making, cross-platform arbitrage, AI/News signal trading, and whale tracking strategies.
+polymarket-bot is a multi-strategy trading system for Polymarket prediction markets.
+It provides automated market making, cross-platform arbitrage, whale tracking, and
+AI-driven signal trading — all with risk management, paper trading, and backtesting
+built in.
 
 **Status:** Phase 1–4 complete (407/407 tests passing), Phase 5 in progress.
 
@@ -14,137 +15,123 @@ polymarket-bot is a multi-strategy algorithmic trading bot for [Polymarket](http
 
 ```
 polymarket-bot/
-├── main.py                  # Orchestrator — strategy dispatch, lifecycle, CLI
-├── config.yaml              # All strategy, risk, execution, and alert config
-├── core/
-│   ├── order_state.py       # Order lifecycle tracking (OrderStore, OrderState)
-│   └── risk_manager.py      # Position limits, stop-loss, daily loss caps
-├── data/
-│   ├── market_scanner.py    # Scan, score, and rank Polymarket markets
-│   ├── news_fetcher.py      # Multi-source news/social data collector
-│   └── signal_model.py      # Ensemble probability model (news + features + momentum)
-├── strategies/
-│   ├── base.py              # Strategy ABC with error tracking and cycle management
-│   ├── market_making.py     # Spread capture with maker rebates + holding yield
-│   ├── ai_signals.py        # AI/News signal trading with position management
-│   └── whale_tracking.py    # Smart-money copy trading with dynamic sizing
-├── execution/
-│   ├── orderbook.py         # L2 orderbook management and mid-price computation
-│   └── clob_client.py       # CLOB REST + WebSocket API wrapper
-├── utils/
-│   ├── metrics.py           # Prometheus counters, histograms, and helpers
-│   ├── alerts.py            # Telegram alert dispatch
-│   └── logger.py            # Structured logging
-├── tests/
-│   ├── conftest.py          # Shared pytest fixtures
-│   ├── test_market_making.py
-│   ├── test_news_fetcher.py
-│   ├── test_signal_model.py
-│   └── test_ai_signals.py
-├── .env                     # API credentials (NEVER commit)
-├── .gitignore
-└── requirements.txt
+├── main.py                  # Entry point — strategy orchestrator
+├── config.yaml              # All runtime configuration
+├── core/                    # Infrastructure layer
+│   ├── client.py            # Polymarket CLOB client wrapper
+│   ├── executor.py          # Order execution + fill processing
+│   ├── order_state.py       # Order state machine (pending→open→filled/cancelled)
+│   ├── orderbook.py         # Order book snapshot + quoting
+│   ├── portfolio.py         # Position tracking + USDC accounting
+│   ├── risk.py              # Risk manager (position limits, halt, correlation)
+│   ├── paper_executor.py    # Paper trading engine (simulated fills)
+│   └── backtest.py          # Backtesting engine (historical replay)
+├── data/                    # Data + signal layer
+│   ├── market_scanner.py    # Market discovery, scoring, eligibility
+│   ├── news_fetcher.py      # RSS/webhook news ingestion + sentiment
+│   ├── signal_model.py      # Ensemble signal model (news, features, momentum)
+│   ├── whale_tracker.py     # Whale profiling + signal aggregation
+│   └── kalshi_client.py     # Kalshi API client (cross-arb)
+├── strategies/              # Strategy layer
+│   ├── base.py              # Strategy interface + lifecycle
+│   ├── market_making.py     # Market making with inventory skew
+│   ├── cross_platform_arb.py # Cross-platform arbitrage (Polymarket↔Kalshi)
+│   ├── whale_tracking.py    # Whale copy-trading strategy
+│   └── ai_signals.py        # AI signal-driven position strategy
+├── utils/                   # Shared utilities
+│   ├── alerting.py          # Telegram alerting
+│   ├── metrics.py           # Prometheus metrics
+│   ├── logger.py            # Structured logging (structlog)
+│   └── helpers.py           # Common helpers
+└── tests/                   # 407 tests across 12 test files
 ```
 
 ## Strategies
 
-| Strategy | Description | Risk Profile |
-|----------|-------------|-------------|
-| **Market Making** | Place limit orders on both sides, earn the spread + maker rebates + holding yield | Low directional risk |
-| **AI Signals** | Ensemble model (news sentiment, market features, momentum) identifies mispriced markets | Medium — directional positions with stop-losses |
-| **Whale Tracking** | Monitor large profitable wallets, copy-trade milliseconds after execution | Medium — follows smart money with size limits |
+| Strategy | Description | Config Key |
+|----------|-------------|------------|
+| **Market Making** | Liquidity provision with inventory skew, adverse selection detection, scheduled event blackouts, and holding reward optimization | `strategies.market_making` |
+| **Cross-Platform Arb** | Detects and executes price discrepancies between Polymarket and Kalshi | `strategies.cross_arb` |
+| **Whale Tracking** | Profiles high-win-rate traders and copy-trades their positions with configurable scaling and stop-loss | `strategies.whale_tracking` |
+| **AI Signals** | LLM-augmented news sentiment + market features → ensemble signal model → directional positions with stop-loss/take-profit | `strategies.ai_signals` |
 
-### Fee Awareness
+## Tech Stack
 
-- **Maker fees:** 0% on all markets — limit orders are free
-- **Taker fees:** Vary by category (Crypto 1.80%, Sports 0.75%, Finance 1.00%, Politics 1.00%, Economics 1.50%, Geopolitics 0%)
-- **Maker rebates:** 20–50% of taker fees returned daily in USDC
-- **Key insight:** Run as a maker (limit orders) to pay zero fees AND earn rebates
+- **Python 3.11** — runtime
+- **py-clob-client** — Polymarket CLOB API
+- **Polygon/USDC** — settlement layer
+- **Prometheus** — metrics exposition (port 9090)
+- **Telegram** — real-time alerts
+- **structlog** — structured JSON logging
+- **pytest** — testing (strict asyncio mode)
 
 ## Setup
 
-### Prerequisites
-
-- Python 3.11+
-- A Polygon-compatible wallet funded with USDC
-- Polymarket API credentials (generate via the Polymarket interface or SDK)
-
-### Install
-
 ```bash
+# Clone the repository
 git clone https://github.com/pr6thv3/polymarket-bot.git
 cd polymarket-bot
+
+# Create virtual environment
 python -m venv .venv
 source .venv/bin/activate   # Linux/macOS
 # .venv\Scripts\activate    # Windows
+
+# Install dependencies
 pip install -r requirements.txt
+
+# Copy and fill environment variables
+cp .env.example .env
+# Edit .env with your credentials — NEVER commit this file
 ```
-
-### Environment
-
-Create a `.env` file in the project root with your credentials:
-
-```env
-POLYMARKET_API_KEY=your_api_key
-POLYMARKET_API_SECRET=your_api_secret
-POLYMARKET_WALLET_PRIVATE_KEY=your_wallet_private_key
-TELEGRAM_BOT_TOKEN=your_telegram_bot_token   # optional, for alerts
-TELEGRAM_CHAT_ID=your_telegram_chat_id        # optional, for alerts
-```
-
-**Never commit `.env` to version control.** It is listed in `.gitignore`.
 
 ## Configuration
 
-All strategy parameters, risk limits, and execution settings live in `config.yaml`. Key sections:
+All runtime configuration lives in `config.yaml`. Key sections:
 
-- **`strategies.market_making`** — spread targets, quote sizes, rebate optimization
-- **`strategies.ai_signals`** — min edge, confidence thresholds, news sources, model weights
-- **`strategies.whale_tracking`** — smart-money filters, win-rate thresholds, max copy size
-- **`risk`** — position limits (5% per market), stop-losses, daily loss caps, 40% halt
-- **`execution`** — rate limits (60 orders/min), post-only defaults, pending timeouts
-- **`taker_fees`** — per-category fee schedule for profit calculations
-- **`alerts`** — Telegram notification triggers
+| Section | Purpose |
+|---------|---------|
+| `risk` | Position limits, loss caps, halt thresholds |
+| `taker_fees` / `rebate_rates` | Per-category fee schedules |
+| `strategies.*` | Per-strategy toggles, thresholds, sizing |
+| `execution` | Rate limits, retries, circuit breaker, dry-run mode |
+| `paper_trading` | Slippage + fill probability simulation params |
+| `backtesting` | Historical replay configuration |
+| `alerting` | Telegram alert routing |
+| `logging` / `metrics` / `monitoring` | Observability stack |
+
+Secrets are loaded from `.env` — never stored in config.yaml or committed to git.
 
 ## Running
 
-### Live Trading
-
 ```bash
+# Live trading (production)
 python main.py
+
+# Paper trading (simulated execution)
+python main.py                    # with execution.dry_run: true in config.yaml
+
+# Backtesting
+python main.py --backtest data/backtest/sample.jsonl
+
+# Custom config path
+python main.py --config path/to/config.yaml
 ```
 
-### Backtesting
-
-```bash
-python main.py --backtest --backtest-strategy market_making
-python main.py --backtest --backtest-strategy ai_signals
-python main.py --backtest --backtest-strategy whale_tracking
-```
+The bot handles Windows asyncio (ProactorEventLoop), graceful shutdown on
+SIGINT/SIGTERM, and auto-recovery from consecutive strategy errors.
 
 ## Testing
 
 ```bash
-# Full suite
+# Full suite (407 tests)
 python -m pytest tests/ -v
 
-# Individual modules
+# Single module
 python -m pytest tests/test_market_making.py -v
-python -m pytest tests/test_news_fetcher.py -v
-python -m pytest tests/test_signal_model.py -v
-python -m pytest tests/test_ai_signals.py -v
+
+# With coverage
+python -m pytest tests/ --cov=. --cov-report=term-missing
 ```
 
-**407/407 tests passing** across all four phases.
-
-## Tech Stack
-
-- **Python 3.11** — primary language
-- **py-clob-client** — official Polymarket CLOB SDK
-- **Polygon / USDC** — on-chain settlement
-- **Prometheus** — real-time metrics and monitoring
-- **Telegram** — alert notifications
-
----
-
-> **Legal note:** Polymarket is geo-restricted in the US. Ensure it is accessible and legal in your jurisdiction before trading.
+All tests use `asyncio_mode = strict` — async tests require `@pytest.mark.asyncio`.
