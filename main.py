@@ -392,24 +392,42 @@ class PolymarketBot:
     # ── Infrastructure loops ──────────────────────────────────────────
 
     async def _health_monitor_loop(self) -> None:
-        """Periodically check CLOB connectivity."""
-        interval = self.config.get("monitoring", {}).get("health_check_sec", 30)
+        """Periodically check CLOB connectivity.
+
+        - Minimum 60s interval to avoid Telegram alert flooding
+        - Requires 2 consecutive failures before sending alert
+        - Uses latency_ms with 'timeout' fallback (never shows raw None)
+        """
+        config_interval = self.config.get("monitoring", {}).get("health_check_sec", 60)
+        interval = max(60, config_interval)  # Minimum 60 seconds
+        consecutive_failures = 0
+        alert_after_n_failures = 2  # Only alert after 2 consecutive failures
 
         while self._running:
             try:
                 health = await self.client.health_check()
 
-                if health.get("status") != "ok":
+                if health.get("status") == "ok":
+                    consecutive_failures = 0  # Reset on success
+                else:
+                    consecutive_failures += 1
+                    latency_display = health.get("latency_ms", "timeout")
+
                     self.logger.warning(
                         "CLOB health check failed",
                         status=health.get("status"),
-                        latency=health.get("latency_sec"),
+                        latency_ms=latency_display,
+                        consecutive_failures=consecutive_failures,
                     )
-                    await self.alerter.send_alert(
-                        "connection_lost",
-                        f"CLOB health check: {health.get('status')}. "
-                        f"Latency: {health.get('latency_sec', 'N/A')}s",
-                    )
+
+                    # Only alert after N consecutive failures (avoids false alarms)
+                    if consecutive_failures >= alert_after_n_failures:
+                        await self.alerter.send_alert(
+                            "connection_lost",
+                            f"CLOB health check: {health.get('status')}. "
+                            f"Latency: {latency_display}ms. "
+                            f"Failures: {consecutive_failures} consecutive.",
+                        )
 
                 # Update P&L metric
                 m.update_pnl(self.portfolio.total_pnl)

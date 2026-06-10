@@ -505,18 +505,49 @@ class ClobClient:
     async def health_check(self) -> dict:
         """Check connectivity to the CLOB API.
 
+        Retries up to 3 times with exponential backoff before reporting
+        failure, to avoid false "connection_lost" Telegram alerts.
+
         Returns:
             Dict with status and latency info.
         """
-        try:
-            start = time.monotonic()
-            await self.get_markets(next_cursor=None)
-            latency = time.monotonic() - start
-            return {"status": "ok", "latency_sec": round(latency, 3)}
-        except CircuitBreakerOpen:
-            return {"status": "circuit_breaker_open", "latency_sec": None}
-        except Exception as exc:
-            return {"status": "error", "error": str(exc), "latency_sec": None}
+        max_retries = 3
+        last_exc = None
+
+        for attempt in range(1, max_retries + 1):
+            try:
+                start = time.monotonic()
+                await self.get_markets(next_cursor=None)
+                latency = time.monotonic() - start
+                return {
+                    "status": "ok",
+                    "latency_sec": round(latency, 3),
+                    "latency_ms": round(latency * 1000, 1),
+                }
+            except CircuitBreakerOpen:
+                return {
+                    "status": "circuit_breaker_open",
+                    "latency_sec": None,
+                    "latency_ms": "timeout",
+                }
+            except Exception as exc:
+                last_exc = exc
+                if attempt < max_retries:
+                    logger.debug(
+                        "Health check retry",
+                        attempt=attempt,
+                        max_retries=max_retries,
+                        error=str(exc),
+                    )
+                    await asyncio.sleep(2 ** attempt)  # 2s, 4s backoff
+
+        # All retries exhausted
+        return {
+            "status": "error",
+            "error": str(last_exc),
+            "latency_sec": None,
+            "latency_ms": "timeout",
+        }
 
     @property
     def is_circuit_breaker_open(self) -> bool:
