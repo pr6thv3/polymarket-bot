@@ -228,45 +228,45 @@ class PolymarketBot:
             self.whale_strategy = None
             self.logger.info("Whale tracking strategy disabled in config")
 
-        def _init_ai_signals(self, config: dict) -> None:
-            """Initialize the AI signal strategy if enabled."""
-            ai_cfg = config.get("strategies", {}).get("ai_signals", {})
-            if ai_cfg.get("enabled", False):
-                try:
-                    from strategies.ai_signals import AISignalsStrategy
-                    from data.news_fetcher import NewsFetcher
-                    from data.signal_model import SignalModel
+    def _init_ai_signals(self, config: dict) -> None:
+        """Initialize the AI signal strategy if enabled."""
+        ai_cfg = config.get("strategies", {}).get("ai_signals", {})
+        if ai_cfg.get("enabled", False):
+            try:
+                from strategies.ai_signals import AISignalsStrategy
+                from data.news_fetcher import NewsFetcher
+                from data.signal_model import SignalModel
 
-                    news_fetcher = NewsFetcher(config)
-                    signal_model = SignalModel(config)
+                news_fetcher = NewsFetcher(config)
+                signal_model = SignalModel(config)
 
-                    self.ai_strategy = AISignalsStrategy(
-                        client=self.client,
-                        orderbook=self.orderbook,
-                        portfolio=self.portfolio,
-                        risk_manager=self.risk_manager,
-                        executor=self.executor,
-                        order_store=self.order_store,
-                        scanner=self.scanner,
-                        news_fetcher=news_fetcher,
-                        signal_model=signal_model,
-                        config=config,
-                    )
-                    self.strategies["ai_signals"] = self.ai_strategy
-                    self.logger.info("AI signal strategy enabled")
-                except ImportError as exc:
-                    self.logger.error(
-                        "Failed to import AI signal strategy",
-                        error=str(exc),
-                    )
-                except Exception as exc:
-                    self.logger.error(
-                        "Failed to initialize AI signal strategy",
-                        error=str(exc),
-                    )
-            else:
-                self.ai_strategy = None
-                self.logger.info("AI signal strategy disabled in config")
+                self.ai_strategy = AISignalsStrategy(
+                    client=self.client,
+                    orderbook=self.orderbook,
+                    portfolio=self.portfolio,
+                    risk_manager=self.risk_manager,
+                    executor=self.executor,
+                    order_store=self.order_store,
+                    scanner=self.scanner,
+                    news_fetcher=news_fetcher,
+                    signal_model=signal_model,
+                    config=config,
+                )
+                self.strategies["ai_signals"] = self.ai_strategy
+                self.logger.info("AI signal strategy enabled")
+            except ImportError as exc:
+                self.logger.error(
+                    "Failed to import AI signal strategy",
+                    error=str(exc),
+                )
+            except Exception as exc:
+                self.logger.error(
+                    "Failed to initialize AI signal strategy",
+                    error=str(exc),
+                )
+        else:
+            self.ai_strategy = None
+            self.logger.info("AI signal strategy disabled in config")
 
     # ── Initialization ─────────────────────────────────────────────────
 

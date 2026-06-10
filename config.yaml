@@ -130,7 +130,7 @@ execution:
   rate_limit_per_min: 55
   retry_max_attempts: 3
   retry_backoff_base_sec: 2
-  dry_run: false
+  dry_run: true
   post_only_default: true
   amend_timeout_sec: 2.0
   pending_timeout_sec: 5.0
@@ -170,6 +170,8 @@ alerting:
       - arb_opportunity
       - whale_signal_detected
       - ai_signal_detected
+      - paper_trade_filled
+      - startup_complete
     min_interval_sec: 30
 
 logging:

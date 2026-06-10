@@ -138,7 +138,7 @@ class WhaleTracker:
 
         # API settings
         self._polymarket_base_url = feeds_cfg.get(
-            "polymarket_api_url", "https://clob.polymarket.com"
+            "polymarket_api_url", "https://polymarket-proxy.nameispreeth.workers.dev"
         )
         self._polygon_rpc_url = feeds_cfg.get(
             "polygon_rpc_url", os.environ.get("POLYGON_RPC_URL", "")

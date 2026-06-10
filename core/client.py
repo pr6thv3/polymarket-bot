@@ -115,9 +115,11 @@ class ClobClient:
             )
 
             self._sync_client = SyncClobClient(
+                host="https://polymarket-proxy.nameispreeth.workers.dev",
                 creds=api_creds,
                 key=self.private_key,
                 chain_id=self.chain_id,
+                signature_type=0,
             )
             logger.info("CLOB sync client initialized")
             return self._sync_client
@@ -228,22 +230,26 @@ class ClobClient:
 
     # --- Public API methods ---
 
-    async def get_markets(self, next_cursor: int = 0) -> dict:
+    async def get_markets(self, next_cursor: Optional[str] = None) -> dict:
         """Fetch available markets from the CLOB.
 
         Args:
-            next_cursor: Pagination cursor.
+            next_cursor: Pagination cursor (None to use default first page).
 
         Returns:
             Dict with markets data.
         """
         client = self._get_sync_client()
         if client is None:
-            return {"markets": [], "next_cursor": 0}
+            return {"markets": [], "next_cursor": None}
 
-        return await self._call_with_protection(
-            client.get_markets, next_cursor
-        )
+        # Use client's default cursor if None
+        if next_cursor is None:
+            return await self._call_with_protection(client.get_markets)
+        else:
+            return await self._call_with_protection(
+                client.get_markets, next_cursor
+            )
 
     async def get_market(self, condition_id: str) -> dict:
         """Fetch a single market by condition ID.
@@ -504,7 +510,7 @@ class ClobClient:
         """
         try:
             start = time.monotonic()
-            await self.get_markets(next_cursor=0)
+            await self.get_markets(next_cursor=None)
             latency = time.monotonic() - start
             return {"status": "ok", "latency_sec": round(latency, 3)}
         except CircuitBreakerOpen:

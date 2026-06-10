@@ -75,7 +75,7 @@ def setup_logging(config: dict) -> None:
             structlog.processors.TimeStamper(fmt="iso"),
             structlog.processors.StackInfoRenderer(),
             structlog.processors.format_exc_info,
-            structlog.processors.UnicodeDecodeError,
+            structlog.processors.UnicodeDecoder(),
             structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
         ],
         context_class=dict,

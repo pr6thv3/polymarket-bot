@@ -215,7 +215,7 @@ class MarketScanner:
         all_markets: List[MarketInfo] = []
 
         # Paginate through all markets
-        cursor = 0
+        cursor = None
         pages = 0
         max_pages = 50  # Safety limit
 
@@ -240,7 +240,7 @@ class MarketScanner:
                     all_markets.append(info)
 
             # Check next cursor
-            next_cursor = data.get("next_cursor", 0) if isinstance(data, dict) else 0
+            next_cursor = data.get("next_cursor") if isinstance(data, dict) else None
             if not next_cursor or next_cursor == cursor:
                 break
             cursor = next_cursor
