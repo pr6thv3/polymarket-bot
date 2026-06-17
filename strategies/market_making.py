@@ -75,6 +75,8 @@ class MMPosition:
     # Fill rate tracking
     fills_in_window: deque = field(default_factory=lambda: deque(maxlen=50))
     cycles_completed: int = 0
+    errors_consecutive: int = 0
+    reference_mid: float = 0.0
 
     @property
     def is_paused(self) -> bool:
@@ -141,6 +143,8 @@ class MarketMakingStrategy(Strategy):
         # ── Re-quoting ──
         self.requote_threshold_bps = mm_cfg.get("midpoint_move_threshold_bps", 50)
         self.cancel_stale_sec = mm_cfg.get("cancel_stale_sec", 120)
+        self.requote_cooldown_sec = mm_cfg.get("requote_cooldown_sec", 10)
+        self.emergency_requote_bps = mm_cfg.get("emergency_requote_bps", 200)
 
         # ── Adverse selection ──
         adverse_cfg = mm_cfg.get("adverse_selection", {})
@@ -196,17 +200,23 @@ class MarketMakingStrategy(Strategy):
         ) > self.scanner.scan_interval_sec:
             try:
                 result = await self.scanner.scan()
-                # Add new eligible markets
-                for info in result.top_markets:
-                    if info.market_id not in self._positions:
-                        await self._add_market(info)
-                        logger.info("New market added to MM", market_id=info.market_id, score=info.score)
+                if result.errors > 0:
+                    logger.warning(
+                        "Scanner encountered errors during scan; skipping active market list update to preserve active quotes",
+                        errors=result.errors,
+                    )
+                else:
+                    # Add new eligible markets
+                    for info in result.top_markets:
+                        if info.market_id not in self._positions:
+                            await self._add_market(info)
+                            logger.info("New market added to MM", market_id=info.market_id, score=info.score)
 
-                # Remove markets that dropped out of top-N
-                active_ids = {m.market_id for m in result.top_markets}
-                for mid in list(self._positions.keys()):
-                    if mid not in active_ids:
-                        await self._remove_market(mid)
+                    # Remove markets that dropped out of top-N
+                    active_ids = {m.market_id for m in result.top_markets}
+                    for mid in list(self._positions.keys()):
+                        if mid not in active_ids:
+                            await self._remove_market(mid)
             except Exception as exc:
                 logger.error("Scanner refresh failed", error=str(exc))
 
@@ -316,6 +326,12 @@ class MarketMakingStrategy(Strategy):
         if bid_price is None or ask_price is None:
             return
 
+        # Clamp to prevent spread-crossing (POST_ONLY rejections)
+        if snapshot.best_ask is not None:
+            bid_price = min(bid_price, snapshot.best_ask - 0.01)
+        if snapshot.best_bid is not None:
+            ask_price = max(ask_price, snapshot.best_bid + 0.01)
+
         # Validate spread bounds
         spread_bps = (ask_price - bid_price) * 10_000
         if spread_bps < self.min_spread_bps:
@@ -339,7 +355,14 @@ class MarketMakingStrategy(Strategy):
         # ── Check if re-quote needed ──
         needs_requote = self._needs_requote(pos, mid)
 
-        if needs_requote or pos.bid_order_id is None:
+        now = time.monotonic()
+        time_since_last_requote = now - pos.last_quote_time if pos.last_quote_time > 0 else float("inf")
+        has_no_quotes = pos.bid_order_id is None and pos.ask_order_id is None
+        cooldown_elapsed = time_since_last_requote >= self.requote_cooldown_sec
+
+        should_place = needs_requote or (has_no_quotes and (pos.last_quote_time == 0 or cooldown_elapsed))
+
+        if should_place:
             # Cancel existing quotes
             if pos.bid_order_id or pos.ask_order_id:
                 await self.executor.cancel_all_for_market(market_id)
@@ -356,6 +379,10 @@ class MarketMakingStrategy(Strategy):
 
             # Place new quote pair
             try:
+                # Update quote time and reference mid to enforce cooldown on attempt
+                pos.last_quote_time = time.monotonic()
+                pos.reference_mid = mid
+
                 bid_id, ask_id = await self.executor.place_quote_pair(
                     market_id=market_id,
                     token_id=pos.token_id,
@@ -370,7 +397,6 @@ class MarketMakingStrategy(Strategy):
                 pos.bid_price = bid_price
                 pos.ask_price = ask_price
                 pos.quote_size = adjusted_size
-                pos.last_quote_time = time.monotonic()
                 self._state.orders_placed += 2
 
             except OrderRejectedByRisk as exc:
@@ -380,7 +406,7 @@ class MarketMakingStrategy(Strategy):
                     reason=str(exc),
                 )
             except Exception as exc:
-                logger.error("Failed to place quotes", market_id=market_id, error=str(exc))
+                logger.error("Failed to place quotes", market_id=market_id, error=str(exc), exc_info=True)
                 pos.errors_consecutive += 1
 
     def _compute_quotes(
@@ -556,7 +582,7 @@ class MarketMakingStrategy(Strategy):
         """Check if current quotes need to be replaced.
 
         Triggers re-quote when:
-        - Midpoint moved beyond threshold
+        - Midpoint moved beyond threshold (enforcing cooldown unless emergency)
         - Quotes are stale (exceeded cancel_stale_sec)
         - No quotes exist yet
 
@@ -571,19 +597,52 @@ class MarketMakingStrategy(Strategy):
         if pos.bid_order_id is None and pos.ask_order_id is None:
             return True
 
+        now = time.monotonic()
+        time_since_last_requote = now - pos.last_quote_time if pos.last_quote_time > 0 else float("inf")
+
         # Stale quotes
-        if pos.last_quote_time > 0:
-            age = time.monotonic() - pos.last_quote_time
-            if age > self.cancel_stale_sec:
-                return True
+        if time_since_last_requote > self.cancel_stale_sec:
+            logger.info(
+                "Re-quote triggered: stale quotes",
+                market_id=pos.market_id,
+                seconds_since_last_requote=round(time_since_last_requote, 2),
+                cancel_stale_sec=self.cancel_stale_sec,
+            )
+            return True
 
         # Midpoint moved beyond threshold
         if pos.bid_price > 0 and pos.ask_price > 0:
-            quote_mid = (pos.bid_price + pos.ask_price) / 2
+            ref_mid = pos.reference_mid if pos.reference_mid > 0 else (pos.bid_price + pos.ask_price) / 2
             if current_mid > 0:
-                move_bps = abs(current_mid - quote_mid) * 10_000
+                move_bps = abs(current_mid - ref_mid) * 10_000
                 if move_bps >= self.requote_threshold_bps:
-                    return True
+                    # Cooldown checks
+                    if time_since_last_requote >= self.requote_cooldown_sec:
+                        logger.info(
+                            "Re-quote triggered: cooldown_expired",
+                            market_id=pos.market_id,
+                            reason="cooldown_expired",
+                            bps_moved=round(move_bps, 2),
+                            seconds_since_last_requote=round(time_since_last_requote, 2),
+                        )
+                        return True
+                    elif move_bps >= self.emergency_requote_bps:
+                        logger.info(
+                            "Re-quote triggered: emergency",
+                            market_id=pos.market_id,
+                            reason="emergency",
+                            bps_moved=round(move_bps, 2),
+                            seconds_since_last_requote=round(time_since_last_requote, 2),
+                        )
+                        return True
+                    else:
+                        logger.debug(
+                            "Re-quote blocked by cooldown",
+                            market_id=pos.market_id,
+                            bps_moved=round(move_bps, 2),
+                            seconds_since_last_requote=round(time_since_last_requote, 2),
+                            cooldown_sec=self.requote_cooldown_sec,
+                        )
 
         return False
 

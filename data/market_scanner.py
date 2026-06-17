@@ -59,6 +59,8 @@ class MarketInfo:
     days_to_resolution: int = 30
     active: bool = True
     closed: bool = False
+    accepting_orders: bool = False
+    enable_order_book: bool = True
 
     # Computed
     score: float = 0.0
@@ -121,7 +123,7 @@ class MarketScanner:
         self.weights = mm_cfg.get("scanner_weights", DEFAULT_WEIGHTS)
 
         # Top-N markets to return
-        self.top_n = mm_cfg.get("scanner_top_n", 10)
+        self.top_n = mm_cfg.get("scanner_top_n", mm_cfg.get("max_active_markets", 10))
 
         # Scan interval
         self.scan_interval_sec = mm_cfg.get("scanner_interval_sec", 300)
@@ -228,7 +230,7 @@ class MarketScanner:
                 self._total_errors += 1
                 break
 
-            markets_list = data.get("markets", []) if isinstance(data, dict) else []
+            markets_list = data.get("data", data.get("markets", [])) if isinstance(data, dict) else []
             if not markets_list:
                 break
 
@@ -245,6 +247,7 @@ class MarketScanner:
                 break
             cursor = next_cursor
             pages += 1
+            await asyncio.sleep(0.25)
 
         result.total_markets = len(all_markets)
 
@@ -291,7 +294,14 @@ class MarketScanner:
                 return None
 
             # Extract token ID for YES side
-            tokens = raw.get("tokens", [])
+            tokens = raw.get("tokens") or []
+            if isinstance(tokens, str):
+                # Some API responses serialize tokens as a string
+                try:
+                    import ast
+                    tokens = ast.literal_eval(tokens)
+                except (ValueError, SyntaxError):
+                    tokens = []
             token_id = ""
             for tok in tokens:
                 if isinstance(tok, dict) and tok.get("outcome", "").upper() == "YES":
@@ -302,20 +312,36 @@ class MarketScanner:
                 first = tokens[0]
                 token_id = first.get("token_id", "") if isinstance(first, dict) else ""
 
-            # Volume
-            volume = float(raw.get("volume", raw.get("volume_num", 0)) or 0)
-            daily_volume = float(raw.get("volume_24hr", raw.get("daily_volume", 0)) or 0)
+            # Volume — API may not include volume fields; use fallback chain
+            volume = float(
+                raw.get("volume")
+                or raw.get("volume_num")
+                or raw.get("volumeNum")
+                or raw.get("usdcVolume")
+                or 0
+            )
+            daily_volume = float(
+                raw.get("volume_24hr")
+                or raw.get("volume24hr")
+                or raw.get("daily_volume")
+                or raw.get("volume_num")
+                or volume  # Fall back to total volume
+                or 0
+            )
 
-            # Category
-            category = (raw.get("category", "politics") or "politics").lower()
+            # Category — API doesn't have a "category" field;
+            # infer from tags list and market_slug instead.
+            category = self._infer_category(raw)
 
             # Days to resolution
             end_date = raw.get("end_date_iso", raw.get("endDate", ""))
             days_to_resolution = self._parse_days_to_resolution(end_date)
 
-            # Active/closed
+            # Active/closed/accepting
             active = raw.get("active", True)
             closed = raw.get("closed", False)
+            accepting_orders = raw.get("accepting_orders", False)
+            enable_order_book = raw.get("enable_order_book", False)
 
             # Question
             question = raw.get("question", raw.get("title", "")) or ""
@@ -330,12 +356,88 @@ class MarketScanner:
                 days_to_resolution=days_to_resolution,
                 active=bool(active),
                 closed=bool(closed),
+                accepting_orders=bool(accepting_orders),
+                enable_order_book=bool(enable_order_book),
                 last_scanned=time.monotonic(),
             )
 
         except Exception as exc:
             logger.debug("Failed to parse market", error=str(exc))
             return None
+
+    @staticmethod
+    def _infer_category(raw: dict) -> str:
+        """Infer market category from tags and market_slug.
+
+        The CLOB API does not return a 'category' field directly.
+        Instead, we match against the tags list and slug text.
+
+        Args:
+            raw: Raw market dict.
+
+        Returns:
+            Inferred category string (lowercase).
+        """
+        # Build a searchable string from tags
+        tags = raw.get("tags") or []
+        tag_names = [
+            t.get("label", t) if isinstance(t, dict) else str(t)
+            for t in tags
+        ]
+        tag_str = " ".join(tag_names).lower()
+        slug = (raw.get("market_slug", "") or "").lower()
+        question = (raw.get("question", "") or "").lower()
+        search = f"{tag_str} {slug} {question}"
+
+        # Match against category keywords (most specific first)
+        if any(kw in search for kw in [
+            "geopolit", "war", "conflict", "nato", "ukraine", "russia",
+            "middle east", "iran", "china", "taiwan", "sanction",
+            "missile", "military", "ceasefire", "invasion",
+        ]):
+            return "geopolitics"
+
+        if any(kw in search for kw in [
+            "finance", "fed ", "federal reserve", "interest rate",
+            "inflation", "gdp", "recession", "s&p", "stock",
+            "treasury", "bond", "fomc", "cpi", "economy",
+            "monetary policy", "rate cut", "rate hike", "dow",
+        ]):
+            return "finance"
+
+        if any(kw in search for kw in [
+            "crypto", "bitcoin", "ethereum", "btc", "eth ",
+            "token", "blockchain", "defi", "nft", "solana",
+            "web3", "mining", "halving", "opensea",
+        ]):
+            return "crypto"
+
+        if any(kw in search for kw in [
+            "nba", "nfl", "mlb", "nhl", "ncaa", "soccer",
+            "football", "tennis", "ufc", "boxing", "f1",
+            "formula", "premier league", "champions league",
+            "world cup", "olympics", "sport", "game",
+            "match", "playoff", "super bowl", "espn",
+        ]):
+            return "sports"
+
+        if any(kw in search for kw in [
+            "politic", "election", "president", "congress",
+            "senate", "governor", "democrat", "republican",
+            "vote", "ballot", "primary", "nominee",
+            "cabinet", "secretary", "impeach", "legislation",
+            "u.s. politic", "white house", "trump", "biden",
+        ]):
+            return "politics"
+
+        if any(kw in search for kw in [
+            "economic", "employment", "jobs", "labor",
+            "trade", "tariff", "gdp", "growth",
+        ]):
+            return "economics"
+
+        # Default fallback
+        return "politics"
 
     def _parse_days_to_resolution(self, end_date_str: str) -> int:
         """Parse an end date string into days remaining.
@@ -431,16 +533,22 @@ class MarketScanner:
         Returns:
             True if the market is eligible for market making.
         """
-        # Must be active and not closed
-        if not info.active or info.closed:
+        # Must be accepting orders (the real tradability indicator).
+        # The CLOB API returns active=True + closed=True for many tradeable
+        # markets, so we use accepting_orders instead of active+!closed.
+        if not info.accepting_orders:
+            return False
+
+        # Must have CLOB order book enabled
+        if not info.enable_order_book:
             return False
 
         # Category filter
         if info.category not in self.target_categories:
             return False
 
-        # Minimum daily volume
-        if info.daily_volume_usd < self.min_daily_volume_usd:
+        # Minimum daily volume (skip gate if API didn't provide volume)
+        if info.daily_volume_usd > 0 and info.daily_volume_usd < self.min_daily_volume_usd:
             return False
 
         # Minimum days to resolution

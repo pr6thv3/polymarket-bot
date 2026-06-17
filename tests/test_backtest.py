@@ -292,7 +292,8 @@ class TestBacktestEngine:
         finally:
             os.unlink(tmppath)
 
-    def test_run_market_making(self):
+    @pytest.mark.asyncio
+    async def test_run_market_making(self):
         engine = self._make_engine()
         ticks = engine.generate_sample_data(
             market_id="test",
@@ -301,7 +302,7 @@ class TestBacktestEngine:
             volatility=0.01,
             spread_bps=200,
         )
-        result = engine.run_market_making(
+        result = await engine.run_market_making(
             ticks=ticks,
             starting_capital=1000.0,
             base_spread_bps=200,

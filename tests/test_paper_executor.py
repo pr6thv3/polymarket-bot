@@ -9,6 +9,7 @@ from core.paper_executor import (
     PaperOrder,
     PaperPortfolio,
     PaperTrade,
+    PaperExecutor,
     PAPER_TAG,
 )
 from core.executor import OrderRejectedByRisk
@@ -200,3 +201,229 @@ class TestPaperTrade:
             exit_time=200.0,
         )
         assert trade.hold_time_sec == 100.0
+
+
+class TestPaperExecutorFillLogic:
+    """Test paper executor fill logic realism."""
+
+    @pytest.fixture
+    def setup_executor(self, sample_config):
+        real_executor = MagicMock()
+        real_executor.risk_manager = MagicMock()
+        # Allow all orders by default
+        real_executor.risk_manager.allow_order = AsyncMock(return_value=(True, ""))
+
+        portfolio = PaperPortfolio(starting_capital=1000.0, config=sample_config)
+        orderbook = MagicMock()
+
+        # Fix fill probability to 100% and partial fill probability to 0% to avoid randomness in tests
+        sample_config["paper_trading"] = {
+            "fill_probability": 1.0,
+            "partial_fill_probability": 0.0,
+            "slippage_bps": 0.0,
+        }
+
+        executor = PaperExecutor(
+            real_executor=real_executor,
+            paper_portfolio=portfolio,
+            orderbook_manager=orderbook,
+            config=sample_config,
+        )
+        return executor, orderbook
+
+    @pytest.mark.asyncio
+    async def test_maker_order_does_not_fill_immediately(self, setup_executor):
+        executor, orderbook = setup_executor
+
+        # Set up orderbook snapshot: best_bid=0.49, best_ask=0.51
+        from core.orderbook import OrderBookSnapshot, BookLevel
+        snapshot = OrderBookSnapshot(
+            market_id="m1",
+            token_id="t1",
+            bids=[BookLevel(price=0.49, size=100)],
+            asks=[BookLevel(price=0.51, size=100)],
+            last_update=100.0,
+        )
+        orderbook.get_snapshot.return_value = snapshot
+
+        # Place BUY limit order at 0.48 (maker order, does not cross spread)
+        order_id = await executor.place_order(
+            market_id="m1",
+            token_id="t1",
+            side="BUY",
+            price=0.48,
+            size=10.0,
+            category="finance",
+            post_only=True,
+        )
+
+        assert order_id is not None
+        order = executor._orders[order_id]
+        assert order.status == "open"  # Sitting open in book
+        assert order.placed_at_snapshot_time == 100.0
+
+    @pytest.mark.asyncio
+    async def test_taker_order_fills_immediately(self, setup_executor):
+        executor, orderbook = setup_executor
+
+        # Set up orderbook snapshot: best_bid=0.49, best_ask=0.51
+        from core.orderbook import OrderBookSnapshot, BookLevel
+        snapshot = OrderBookSnapshot(
+            market_id="m1",
+            token_id="t1",
+            bids=[BookLevel(price=0.49, size=100)],
+            asks=[BookLevel(price=0.51, size=100)],
+            last_update=100.0,
+        )
+        orderbook.get_snapshot.return_value = snapshot
+
+        # Place BUY limit order at 0.52 (taker order, crosses ask)
+        order_id = await executor.place_order(
+            market_id="m1",
+            token_id="t1",
+            side="BUY",
+            price=0.52,
+            size=10.0,
+            category="finance",
+            post_only=False, # not post_only
+        )
+
+        assert order_id is not None
+        order = executor._orders[order_id]
+        assert order.status == "filled"
+        assert order.filled_price == 0.51  # Fills at the best ask (slippage_bps is 0)
+
+    @pytest.mark.asyncio
+    async def test_taker_order_post_only_rejected(self, setup_executor):
+        executor, orderbook = setup_executor
+
+        # Set up orderbook snapshot: best_bid=0.49, best_ask=0.51
+        from core.orderbook import OrderBookSnapshot, BookLevel
+        snapshot = OrderBookSnapshot(
+            market_id="m1",
+            token_id="t1",
+            bids=[BookLevel(price=0.49, size=100)],
+            asks=[BookLevel(price=0.51, size=100)],
+            last_update=100.0,
+        )
+        orderbook.get_snapshot.return_value = snapshot
+
+        # Place BUY limit order at 0.52 with post_only=True (should be rejected)
+        order_id = await executor.place_order(
+            market_id="m1",
+            token_id="t1",
+            side="BUY",
+            price=0.52,
+            size=10.0,
+            category="finance",
+            post_only=True,
+        )
+
+        assert order_id is not None
+        order = executor._orders[order_id]
+        assert order.status == "rejected"
+
+    @pytest.mark.asyncio
+    async def test_maker_order_no_fill_on_same_snapshot_even_if_matching_price(self, setup_executor):
+        executor, orderbook = setup_executor
+
+        # 1. Placement snapshot: best_bid=0.49, best_ask=0.51
+        from core.orderbook import OrderBookSnapshot, BookLevel
+        snapshot = OrderBookSnapshot(
+            market_id="m1",
+            token_id="t1",
+            bids=[BookLevel(price=0.49, size=100)],
+            asks=[BookLevel(price=0.51, size=100)],
+            last_update=100.0,
+        )
+        orderbook.get_snapshot.return_value = snapshot
+
+        order_id = await executor.place_order(
+            market_id="m1",
+            token_id="t1",
+            side="BUY",
+            price=0.48,
+            size=10.0,
+            category="finance",
+            post_only=True,
+        )
+
+        assert order_id is not None
+        order = executor._orders[order_id]
+        assert order.status == "open"
+
+        # 2. Modify snapshot prices to satisfy the fill condition (best_ask=0.48)
+        # BUT keep last_update=100.0 (same snapshot)
+        snapshot_same_time = OrderBookSnapshot(
+            market_id="m1",
+            token_id="t1",
+            bids=[BookLevel(price=0.49, size=100)],
+            asks=[BookLevel(price=0.48, size=100)],
+            last_update=100.0,
+        )
+        orderbook.get_snapshot.return_value = snapshot_same_time
+
+        # Trigger open orders processing
+        filled_count = await executor.process_open_orders()
+        assert filled_count == 0  # Should NOT fill because last_update is same
+        assert order.status == "open"
+
+        # 3. Modify snapshot to subsequent time (last_update=101.0)
+        snapshot_subsequent = OrderBookSnapshot(
+            market_id="m1",
+            token_id="t1",
+            bids=[BookLevel(price=0.49, size=100)],
+            asks=[BookLevel(price=0.48, size=100)],
+            last_update=101.0,
+        )
+        orderbook.get_snapshot.return_value = snapshot_subsequent
+
+        # Trigger open orders processing
+        filled_count2 = await executor.process_open_orders()
+        assert filled_count2 == 1  # Should fill now!
+        assert order.status == "filled"
+
+    @pytest.mark.asyncio
+    async def test_maker_order_fills_on_subsequent_snapshot(self, setup_executor):
+        executor, orderbook = setup_executor
+
+        # 1. Placement snapshot: best_bid=0.49, best_ask=0.51
+        from core.orderbook import OrderBookSnapshot, BookLevel
+        snapshot1 = OrderBookSnapshot(
+            market_id="m1",
+            token_id="t1",
+            bids=[BookLevel(price=0.49, size=100)],
+            asks=[BookLevel(price=0.51, size=100)],
+            last_update=100.0,
+        )
+        orderbook.get_snapshot.return_value = snapshot1
+
+        order_id = await executor.place_order(
+            market_id="m1",
+            token_id="t1",
+            side="BUY",
+            price=0.48,
+            size=10.0,
+            category="finance",
+            post_only=True,
+        )
+
+        assert order_id is not None
+        order = executor._orders[order_id]
+        assert order.status == "open"
+
+        # 2. Subsequent snapshot: best_bid=0.49, best_ask=0.48, last_update=101.0
+        # (Trades through/touches our bid at 0.48)
+        snapshot2 = OrderBookSnapshot(
+            market_id="m1",
+            token_id="t1",
+            bids=[BookLevel(price=0.49, size=100)],
+            asks=[BookLevel(price=0.48, size=100)],
+            last_update=101.0,
+        )
+        orderbook.get_snapshot.return_value = snapshot2
+
+        # Trigger open orders processing
+        filled_count = await executor.process_open_orders()
+        assert filled_count == 1
+        assert order.status == "filled"

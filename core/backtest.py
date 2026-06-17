@@ -128,6 +128,17 @@ class BacktestResult:
     total_fees: float = 0.0
     net_pnl: float = 0.0
 
+    # Net P&L Breakdown
+    gross_spread_captured_usd: float = 0.0
+    rebates_earned_usd: float = 0.0
+    holding_rewards_usd: float = 0.0
+    estimated_gas_costs_usd: float = 0.0
+
+    # Rejection Stats
+    quotes_generated: int = 0
+    quotes_rejected: int = 0
+    rejection_rate: float = 0.0
+
     # Trade stats
     total_trades: int = 0
     winning_trades: int = 0
@@ -184,8 +195,9 @@ class BacktestPortfolio:
 
     @property
     def total_value(self) -> float:
-        """Total portfolio value (USDC + position mark-to-market)."""
-        return self.usdc  # Simplified: positions valued at entry cost
+        """Total portfolio value (USDC + position entry cost)."""
+        pos_val = sum(pos.get("size", 0.0) * pos.get("avg_price", 0.0) for pos in self.positions.values())
+        return self.usdc + pos_val
 
     def get_position(self, market_id: str) -> Optional[Any]:
         """Get position for a market."""
@@ -214,7 +226,7 @@ class BacktestPortfolio:
     async def update_position(
         self, market_id: str, fill_size: float, fill_price: float, **kwargs
     ) -> None:
-        """Update position after a fill."""
+        """Update position after a fill using correct average cost logic."""
         if market_id not in self.positions:
             self.positions[market_id] = {"size": 0.0, "avg_price": 0.0}
 
@@ -222,12 +234,8 @@ class BacktestPortfolio:
         old_size = pos["size"]
         new_size = old_size + fill_size
 
+        # Cost/proceeds accounting
         if fill_size > 0:  # BUY
-            # Weighted average price
-            if new_size > 0:
-                pos["avg_price"] = (
-                    (old_size * pos["avg_price"] + fill_size * fill_price) / new_size
-                )
             cost = fill_size * fill_price
             self.usdc -= cost
             self.locked_usdc = max(0.0, self.locked_usdc - cost)
@@ -235,6 +243,18 @@ class BacktestPortfolio:
             proceeds = abs(fill_size) * fill_price
             self.usdc += proceeds
             self.locked_usdc = max(0.0, self.locked_usdc - abs(fill_size) * pos["avg_price"])
+
+        # Update average price
+        if old_size == 0 or (old_size > 0 and fill_size > 0) or (old_size < 0 and fill_size < 0):
+            # Adding to position
+            if new_size != 0:
+                total_cost = (abs(old_size) * pos["avg_price"]) + (abs(fill_size) * fill_price)
+                pos["avg_price"] = total_cost / abs(new_size)
+        else:
+            # Reducing position
+            # If flipping direction, reset avg entry to fill price
+            if (old_size > 0 and new_size < 0) or (old_size < 0 and new_size > 0):
+                pos["avg_price"] = fill_price
 
         pos["size"] = new_size
 
@@ -486,6 +506,141 @@ class BacktestRiskManager:
         return False
 
 
+# ── Helper classes for Strategy Mocking ──────────────────────────────────
+
+class BacktestSnapshotWrapper:
+    """Mock orderbook snapshot for strategy consumption."""
+
+    def __init__(self, tick: BacktestTick) -> None:
+        self.tick = tick
+
+    @property
+    def mid_price(self) -> float:
+        return self.tick.mid
+
+    @property
+    def best_bid(self) -> Optional[float]:
+        return self.tick.best_bid
+
+    @property
+    def best_ask(self) -> Optional[float]:
+        return self.tick.best_ask
+
+    @property
+    def last_update(self) -> float:
+        return self.tick.timestamp
+
+
+class BacktestMockOrderbook:
+    """Mock orderbook manager that computes rolling volatility and returns wrapped ticks."""
+
+    def __init__(self) -> None:
+        self.snapshots: Dict[str, BacktestTick] = {}
+        self.mid_histories: Dict[str, List[float]] = defaultdict(list)
+
+    def get_snapshot(self, market_id: str) -> Optional[BacktestSnapshotWrapper]:
+        tick = self.snapshots.get(market_id)
+        return BacktestSnapshotWrapper(tick) if tick else None
+
+    def update_tick(self, tick: BacktestTick) -> None:
+        self.snapshots[tick.market_id] = tick
+        self.mid_histories[tick.market_id].append(tick.mid)
+        if len(self.mid_histories[tick.market_id]) > 50:
+            self.mid_histories[tick.market_id].pop(0)
+
+    def get_volatility(self, market_id: str) -> float:
+        mids = self.mid_histories[market_id]
+        if len(mids) < 5:
+            return 0.01  # Default fallback volatility
+
+        # Calculate log returns volatility
+        returns = []
+        for i in range(1, len(mids)):
+            if mids[i-1] > 0 and mids[i] > 0:
+                returns.append((mids[i] - mids[i-1]) / mids[i-1])
+
+        if not returns:
+            return 0.01
+
+        mean = sum(returns) / len(returns)
+        variance = sum((r - mean) ** 2 for r in returns) / len(returns)
+        import math
+        return max(0.0001, math.sqrt(variance))
+
+    def is_volatile(self, market_id: str) -> bool:
+        # Simple adverse selection volatility trigger (e.g. current return > 3 * rolling vol)
+        return False
+
+    def register_market(self, market_id: str, token_id: str) -> None:
+        pass
+
+    def unregister_market(self, market_id: str) -> None:
+        pass
+
+
+class BacktestMockExecutor:
+    """Mock order executor that intercepts placed quotes and performs POST_ONLY check."""
+
+    def __init__(self, tick_ref: Dict[str, BacktestTick], portfolio: BacktestPortfolio, slippage_bps: float) -> None:
+        self.tick_ref = tick_ref
+        self.portfolio = portfolio
+        self.slippage_bps = slippage_bps
+        self.placed_quotes: Dict[str, Dict[str, Any]] = {}
+        
+        # Stats
+        self.quotes_generated = 0
+        self.quotes_rejected = 0
+        self.cancellations = 0
+
+    async def cancel_all_for_market(self, market_id: str) -> int:
+        if market_id in self.placed_quotes:
+            self.placed_quotes.pop(market_id)
+            self.cancellations += 1
+            return 1
+        return 0
+
+    async def place_quote_pair(
+        self,
+        market_id: str,
+        token_id: str,
+        bid_price: float,
+        ask_price: float,
+        size: float,
+        category: str = "",
+    ) -> Tuple[Optional[str], Optional[str]]:
+        self.quotes_generated += 2
+        
+        tick = self.tick_ref.get(market_id)
+        if not tick:
+            return None, None
+
+        bid_id = None
+        ask_id = None
+
+        # Check spread-crossing (POST_ONLY rejection)
+        if tick.best_ask is not None and bid_price >= tick.best_ask:
+            self.quotes_rejected += 1
+        else:
+            bid_id = f"bid-{tick.timestamp}"
+
+        if tick.best_bid is not None and ask_price <= tick.best_bid:
+            self.quotes_rejected += 1
+        else:
+            ask_id = f"ask-{tick.timestamp}"
+
+        # Record quotes that went open
+        if bid_id or ask_id:
+            self.placed_quotes[market_id] = {
+                "bid_price": bid_price if bid_id else None,
+                "ask_price": ask_price if ask_id else None,
+                "size": size,
+                "timestamp": tick.timestamp,
+                "category": category,
+            }
+
+        return bid_id, ask_id
+
+
 # ── Main engine ────────────────────────────────────────────────────────
 
 class BacktestEngine:
@@ -610,8 +765,13 @@ class BacktestEngine:
         base_ts = time.time() - num_ticks * 5  # 5 seconds apart
 
         for i in range(num_ticks):
-            # Random walk
-            price *= (1 + random.gauss(0, volatility))
+            # Realistic Polymarket-like dynamics: flat periods punctuated by occasional jumps
+            if random.random() < 0.05:
+                # Occasional jump
+                price *= (1 + random.gauss(0, volatility * 1.5))
+            else:
+                # Flat period: price remains flat
+                pass
             price = max(0.01, min(0.99, price))
 
             half_spread = price * spread_bps / 20_000
@@ -633,7 +793,7 @@ class BacktestEngine:
 
     # ── Backtest runner ───────────────────────────────────────────────
 
-    def run_market_making(
+    async def run_market_making(
         self,
         ticks: List[BacktestTick],
         starting_capital: Optional[float] = None,
@@ -642,10 +802,10 @@ class BacktestEngine:
         base_spread_bps: float = 200,
         order_size_usd: float = 15.0,
     ) -> BacktestResult:
-        """Run a market-making backtest on the provided ticks.
+        """Run a market-making backtest on the provided ticks using the live strategy.
 
-        Simulates the Avellaneda-Stoikov strategy logic without
-        requiring the full strategy class (lightweight mode).
+        Reuses the actual MarketMakingStrategy code from strategies/market_making.py
+        by stubbing out its dependencies.
 
         Args:
             ticks: Historical market data ticks.
@@ -656,131 +816,282 @@ class BacktestEngine:
             order_size_usd: Size per order in USD.
 
         Returns:
-            BacktestResult with full performance metrics.
+            BacktestResult with detailed P&L breakdown and execution stats.
         """
+        from unittest.mock import MagicMock
+        from strategies.market_making import MarketMakingStrategy, MMPosition
+        from core.client import TAKER_FEES, REBATE_RATES
+
         capital = starting_capital or self.default_capital
         portfolio = BacktestPortfolio(capital)
-        executor = BacktestExecutor(
-            portfolio, self.config,
-            slippage_bps=self.slippage_bps,
-        )
         risk_mgr = BacktestRiskManager(self.config)
+
+        # Update risk_mgr attributes if specified in parameters
+        risk_mgr.max_position_pct = self.config.get("risk_management", {}).get("max_position_pct", 0.05)
+
+        # ── Initialize components for strategy mocking ──
+        mock_orderbook = BacktestMockOrderbook()
+        tick_ref = {}
+        mock_executor = BacktestMockExecutor(tick_ref, portfolio, self.slippage_bps)
+
+        strategy_config = {
+            "strategies": {
+                "market_making": {
+                    "enabled": True,
+                    "kappa": kappa,
+                    "delta": delta,
+                    "base_spread_bps": base_spread_bps,
+                    "order_size_usd": order_size_usd,
+                    "min_spread_bps": self.config.get("strategies", {}).get("market_making", {}).get("min_spread_bps", 100),
+                    "max_spread_bps": self.config.get("strategies", {}).get("market_making", {}).get("max_spread_bps", 400),
+                    "min_order_size_usd": self.config.get("strategies", {}).get("market_making", {}).get("min_order_size_usd", 5.0),
+                    "midpoint_move_threshold_bps": self.config.get("strategies", {}).get("market_making", {}).get("midpoint_move_threshold_bps", 50),
+                    "cancel_stale_sec": self.config.get("strategies", {}).get("market_making", {}).get("cancel_stale_sec", 120),
+                    "requote_cooldown_sec": self.config.get("strategies", {}).get("market_making", {}).get("requote_cooldown_sec", 10),
+                    "emergency_requote_bps": self.config.get("strategies", {}).get("market_making", {}).get("emergency_requote_bps", 200),
+                    "adverse_selection": {
+                        "volatility_pause_threshold": self.config.get("strategies", {}).get("market_making", {}).get("adverse_selection", {}).get("volatility_pause_threshold", 0.05),
+                        "pause_duration_sec": self.config.get("strategies", {}).get("market_making", {}).get("adverse_selection", {}).get("pause_duration_sec", 300),
+                        "fill_rate_window_sec": 60,
+                        "fill_rate_pause_threshold": 0.8,
+                    }
+                }
+            }
+        }
+
+        # Instantiate the actual strategy with mock dependencies
+        strategy = MarketMakingStrategy(
+            client=MagicMock(),
+            orderbook=mock_orderbook,
+            portfolio=portfolio,
+            risk_manager=risk_mgr,
+            executor=mock_executor,
+            order_store=MagicMock(),
+            scanner=MagicMock(),
+            config=strategy_config,
+        )
 
         result = BacktestResult(
             strategy_name="MarketMaking",
             starting_capital=capital,
         )
 
-        inventory = 0.0
         trade_log: List[BacktestTrade] = []
-        open_entry: Optional[Dict] = None
+        open_entries = {}  # market_id -> {price, size, time, fee}
+        
+        # Track gross spread captured, rebates, holding rewards
+        gross_spread_captured = 0.0
+        rebates_earned = 0.0
+        holding_rewards = 0.0
 
-        for tick in ticks:
-            executor.set_current_tick(tick)
-            portfolio.record_equity(tick.timestamp)
+        # Multi-market timing trackers
+        last_timestamp_per_market = {}
 
-            # Risk halt check
-            if risk_mgr.check_halt(portfolio):
-                break
+        # Monkey patch time.monotonic to align strategy timing with historical timestamps
+        import time as py_time
+        original_monotonic = py_time.monotonic
 
-            mid = tick.mid
-            if mid <= 0:
-                continue
+        try:
+            for tick in ticks:
+                # Update tick time
+                py_time.monotonic = lambda: tick.timestamp
 
-            # ── Compute AS quotes ──
-            reservation = mid - inventory * delta
-            half_spread = (base_spread_bps / 20_000) + kappa * 0.01  # Simplified vol
+                mock_orderbook.update_tick(tick)
+                tick_ref[tick.market_id] = tick
+                portfolio.record_equity(tick.timestamp)
 
-            bid_price = reservation - half_spread
-            ask_price = reservation + half_spread
-
-            # Clamp
-            bid_price = max(0.01, min(0.99, bid_price))
-            ask_price = max(0.01, min(0.99, ask_price))
-
-            if bid_price >= ask_price:
-                continue
-
-            # ── Simulate fills ──
-            size = order_size_usd / mid if mid > 0 else 0
-
-            # Buy fill: our bid >= best ask? (someone sells to us)
-            if tick.best_ask and bid_price >= tick.best_ask:
-                fill_price = tick.best_ask * (1 + self.slippage_bps / 10_000)
-                fee = fill_price * size * 0.0  # Maker fee = 0
-
-                portfolio.usdc -= fill_price * size
-                inventory += size
-                portfolio.add_fee(fee)
-
-                result.fills.append(BacktestFill(
-                    timestamp=tick.timestamp,
-                    market_id=tick.market_id,
-                    side="BUY",
-                    price=fill_price,
-                    size=size,
-                    fee_usd=fee,
-                ))
-
-                if not open_entry:
-                    open_entry = {
-                        "market_id": tick.market_id,
-                        "side": "BUY",
-                        "price": fill_price,
-                        "size": size,
-                        "time": tick.timestamp,
-                        "fee": fee,
-                    }
-
-            # Sell fill: our ask <= best bid? (someone buys from us)
-            elif tick.best_bid and ask_price <= tick.best_bid:
-                fill_price = tick.best_bid * (1 - self.slippage_bps / 10_000)
-                fee = fill_price * size * 0.0  # Maker fee = 0
-
-                portfolio.usdc += fill_price * size
-                inventory -= size
-                portfolio.add_fee(fee)
-
-                result.fills.append(BacktestFill(
-                    timestamp=tick.timestamp,
-                    market_id=tick.market_id,
-                    side="SELL",
-                    price=fill_price,
-                    size=size,
-                    fee_usd=fee,
-                ))
-
-                # Close trade if we had an open entry
-                if open_entry and open_entry["side"] == "BUY":
-                    pnl = (fill_price - open_entry["price"]) * open_entry["size"] - open_entry["fee"] - fee
-                    trade = BacktestTrade(
+                # Initialize strategy MMPosition tracking for new markets
+                if tick.market_id not in strategy._positions:
+                    strategy._positions[tick.market_id] = MMPosition(
                         market_id=tick.market_id,
-                        entry_side="BUY",
-                        entry_price=open_entry["price"],
-                        exit_price=fill_price,
-                        size=open_entry["size"],
-                        entry_time=open_entry["time"],
-                        exit_time=tick.timestamp,
-                        pnl_usd=pnl,
-                        fee_usd=open_entry["fee"] + fee,
+                        token_id=f"token-{tick.market_id}",
+                        category="politics",  # Backtest default category
                     )
-                    trade_log.append(trade)
-                    open_entry = None
 
-            result.total_ticks += 1
+                # Risk halt check
+                if risk_mgr.check_halt(portfolio):
+                    break
 
-        # ── Compute results ──
+                mid = tick.mid
+                if mid <= 0:
+                    continue
+
+                # ── 1. Simulate fills for quotes open from the PREVIOUS tick ──
+                quotes = mock_executor.placed_quotes.get(tick.market_id)
+                if quotes:
+                    bid_price = quotes.get("bid_price")
+                    ask_price = quotes.get("ask_price")
+                    size = quotes.get("size", 0.0)
+                    timestamp = quotes.get("timestamp", 0.0)
+                    category = quotes.get("category", "politics")
+
+                    if tick.timestamp > timestamp:
+                        filled_buy = False
+                        filled_sell = False
+
+                        # Buy fill check: best_ask trades through or touches our bid
+                        if bid_price is not None and tick.best_ask is not None and tick.best_ask <= bid_price:
+                            fill_price = bid_price
+                            fee_pct = 0.0  # 0% maker fee
+                            fee = fill_price * size * fee_pct
+
+                            pos_before = portfolio.positions.get(tick.market_id)
+                            # If we have a short position, this BUY reduces it, realizing P&L
+                            if pos_before and pos_before["size"] < 0:
+                                close_size = min(size, abs(pos_before["size"]))
+                                trade_pnl = close_size * (pos_before["avg_price"] - fill_price)
+                                gross_spread_captured += trade_pnl
+
+                                trade = BacktestTrade(
+                                    market_id=tick.market_id,
+                                    entry_side="SELL",
+                                    entry_price=pos_before["avg_price"],
+                                    exit_price=fill_price,
+                                    size=close_size,
+                                    entry_time=timestamp,
+                                    exit_time=tick.timestamp,
+                                    pnl_usd=trade_pnl - fee,
+                                    fee_usd=fee,
+                                )
+                                trade_log.append(trade)
+
+                            await portfolio.update_position(
+                                market_id=tick.market_id,
+                                fill_size=size,
+                                fill_price=fill_price,
+                            )
+                            portfolio.add_fee(fee)
+
+                            # Calculate rebate
+                            taker_fee_pct = TAKER_FEES.get(category, 0.01)
+                            rebate_rate = REBATE_RATES.get(category, 0.25)
+                            rebate = fill_price * size * taker_fee_pct * rebate_rate
+                            rebates_earned += rebate
+
+                            result.fills.append(BacktestFill(
+                                timestamp=tick.timestamp,
+                                market_id=tick.market_id,
+                                side="BUY",
+                                price=fill_price,
+                                size=size,
+                                fee_usd=fee,
+                            ))
+
+                            strategy.record_fill(tick.market_id, "BUY")
+                            filled_buy = True
+
+                        # Sell fill check: best_bid trades through or touches our ask
+                        if ask_price is not None and tick.best_bid is not None and tick.best_bid >= ask_price:
+                            fill_price = ask_price
+                            fee_pct = 0.0
+                            fee = fill_price * size * fee_pct
+
+                            pos_before = portfolio.positions.get(tick.market_id)
+                            # If we have a long position, this SELL reduces it, realizing P&L
+                            if pos_before and pos_before["size"] > 0:
+                                close_size = min(size, pos_before["size"])
+                                trade_pnl = close_size * (fill_price - pos_before["avg_price"])
+                                gross_spread_captured += trade_pnl
+
+                                trade = BacktestTrade(
+                                    market_id=tick.market_id,
+                                    entry_side="BUY",
+                                    entry_price=pos_before["avg_price"],
+                                    exit_price=fill_price,
+                                    size=close_size,
+                                    entry_time=timestamp,
+                                    exit_time=tick.timestamp,
+                                    pnl_usd=trade_pnl - fee,
+                                    fee_usd=fee,
+                                )
+                                trade_log.append(trade)
+
+                            await portfolio.update_position(
+                                market_id=tick.market_id,
+                                fill_size=-size,
+                                fill_price=fill_price,
+                            )
+                            portfolio.add_fee(fee)
+
+                            # Calculate rebate
+                            taker_fee_pct = TAKER_FEES.get(category, 0.01)
+                            rebate_rate = REBATE_RATES.get(category, 0.25)
+                            rebate = fill_price * size * taker_fee_pct * rebate_rate
+                            rebates_earned += rebate
+
+                            result.fills.append(BacktestFill(
+                                timestamp=tick.timestamp,
+                                market_id=tick.market_id,
+                                side="SELL",
+                                price=fill_price,
+                                size=size,
+                                fee_usd=fee,
+                            ))
+
+                            strategy.record_fill(tick.market_id, "SELL")
+                            filled_sell = True
+
+                        if filled_buy:
+                            quotes["bid_price"] = None
+                        if filled_sell:
+                            quotes["ask_price"] = None
+                        if quotes["bid_price"] is None and quotes["ask_price"] is None:
+                            mock_executor.placed_quotes.pop(tick.market_id, None)
+
+                # ── 2. Accumulate Holding Rewards ──
+                if tick.market_id in last_timestamp_per_market:
+                    elapsed_sec = tick.timestamp - last_timestamp_per_market[tick.market_id]
+                    if elapsed_sec > 0:
+                        pos = portfolio.get_position(tick.market_id)
+                        if pos and pos.size > 0:
+                            # 4% APY holding reward
+                            daily_rate = 0.04 / 365.0
+                            sec_rate = daily_rate / 86400.0
+                            reward = sec_rate * elapsed_sec * (pos.size * pos.avg_price)
+                            holding_rewards += reward
+                last_timestamp_per_market[tick.market_id] = tick.timestamp
+
+                # ── 3. Run Strategy Quoting cycle ──
+                pos_state = strategy._positions[tick.market_id]
+                await strategy._quote_market(tick.market_id, pos_state)
+
+                result.total_ticks += 1
+        finally:
+            # Always restore time.monotonic
+            py_time.monotonic = original_monotonic
+
+        # ── 4. Finalize Capital & Metrics ──
+        estimated_gas = (len(result.fills) + mock_executor.cancellations) * 0.01
+        
+        # Credit rebates, holding rewards and debit gas costs in portfolio
+        portfolio.usdc += rebates_earned + holding_rewards - estimated_gas
+
         result.end_time = ticks[-1].timestamp if ticks else 0
         result.start_time = ticks[0].timestamp if ticks else 0
         result.ending_capital = portfolio.total_value
         result.total_pnl = result.ending_capital - result.starting_capital
         result.total_fees = portfolio.total_fees
-        result.net_pnl = result.total_pnl - result.total_fees
+        result.net_pnl = result.total_pnl
         result.all_trades = trade_log
         result.equity_curve = portfolio.equity_curve
         result.max_drawdown_pct = portfolio.get_max_drawdown_pct()
         result.max_drawdown_usd = (
             result.max_drawdown_pct / 100 * result.starting_capital
+        )
+
+        # Net P&L components
+        result.gross_spread_captured_usd = gross_spread_captured
+        result.rebates_earned_usd = rebates_earned
+        result.holding_rewards_usd = holding_rewards
+        result.estimated_gas_costs_usd = estimated_gas
+
+        # Rejection stats
+        result.quotes_generated = mock_executor.quotes_generated
+        result.quotes_rejected = mock_executor.quotes_rejected
+        result.rejection_rate = (
+            mock_executor.quotes_rejected / mock_executor.quotes_generated
+            if mock_executor.quotes_generated > 0
+            else 0.0
         )
 
         # Trade statistics
@@ -856,6 +1167,10 @@ class BacktestEngine:
         Returns:
             Formatted report string.
         """
+        rejection_warning = ""
+        if result.rejection_rate > 0.20:
+            rejection_warning = "\n  ⚠️  WARNING: POST_ONLY rejection rate is > 20%!"
+
         lines = [
             "=" * 60,
             f"  BACKTEST REPORT — {result.strategy_name}",
@@ -864,9 +1179,27 @@ class BacktestEngine:
             "  CAPITAL & P&L",
             f"    Starting Capital:   ${result.starting_capital:,.2f}",
             f"    Ending Capital:     ${result.ending_capital:,.2f}",
-            f"    Total P&L:          ${result.total_pnl:+,.2f}",
+            f"    Total P&L (Sim):    ${result.total_pnl:+,.2f}",
             f"    Total Fees:         ${result.total_fees:,.2f}",
             f"    Net P&L:            ${result.net_pnl:+,.2f}",
+            "",
+            "  NET P&L BREAKDOWN",
+            f"    Gross Spread P&L:   ${result.gross_spread_captured_usd:+,.2f}",
+            f"    Maker Rebates:      ${result.rebates_earned_usd:+,.2f}",
+            f"    Holding Rewards:    ${result.holding_rewards_usd:+,.2f}",
+            f"    Estimated Gas:      ${result.estimated_gas_costs_usd:,.2f}",
+            f"    Net P&L (Sum):      ${result.gross_spread_captured_usd + result.rebates_earned_usd + result.holding_rewards_usd - result.estimated_gas_costs_usd:+,.2f}",
+            "",
+            "  POST_ONLY REJECTION STATS",
+            f"    Quotes Generated:   {result.quotes_generated}",
+            f"    Quotes Rejected:    {result.quotes_rejected}",
+            f"    Quotes Accepted:    {result.quotes_generated - result.quotes_rejected}",
+            f"    Rejection Rate:     {result.rejection_rate:.1%}",
+        ]
+        if rejection_warning:
+            lines.append(rejection_warning)
+
+        lines.extend([
             "",
             "  TRADE STATISTICS",
             f"    Total Trades:       {result.total_trades}",
@@ -891,7 +1224,7 @@ class BacktestEngine:
             f"    Total Ticks:        {result.total_ticks}",
             "",
             "=" * 60,
-        ]
+        ])
 
         report = "\n".join(lines)
         logger.info("Backtest report generated", strategy=result.strategy_name)
@@ -921,6 +1254,13 @@ class BacktestEngine:
             "total_pnl": result.total_pnl,
             "total_fees": result.total_fees,
             "net_pnl": result.net_pnl,
+            "gross_spread_captured_usd": result.gross_spread_captured_usd,
+            "rebates_earned_usd": result.rebates_earned_usd,
+            "holding_rewards_usd": result.holding_rewards_usd,
+            "estimated_gas_costs_usd": result.estimated_gas_costs_usd,
+            "quotes_generated": result.quotes_generated,
+            "quotes_rejected": result.quotes_rejected,
+            "rejection_rate": result.rejection_rate,
             "total_trades": result.total_trades,
             "win_rate": result.win_rate,
             "profit_factor": result.profit_factor,

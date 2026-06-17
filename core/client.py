@@ -107,6 +107,11 @@ class ClobClient:
         try:
             from py_clob_client.client import ClobClient as SyncClobClient
             from py_clob_client.clob_types import ApiCreds
+            import py_clob_client.http_helpers.helpers as clob_helpers
+            import httpx
+
+            # Increase timeout to 30s to prevent read timeouts on large paginated requests
+            clob_helpers._http_client.timeout = httpx.Timeout(30.0)
 
             api_creds = ApiCreds(
                 api_key=self.api_key,
@@ -281,9 +286,16 @@ class ClobClient:
         if client is None:
             return {"bids": [], "asks": []}
 
-        return await self._call_with_protection(
+        res = await self._call_with_protection(
             client.get_order_book, token_id
         )
+        if hasattr(res, "json") and isinstance(res.json, str):
+            import json
+            try:
+                return json.loads(res.json)
+            except Exception:
+                pass
+        return res
 
     async def create_order(
         self,

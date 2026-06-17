@@ -15,7 +15,7 @@ from data.market_scanner import MarketScanner, MarketInfo, ScanResult, DEFAULT_W
 def mock_client():
     """Create a mock ClobClient."""
     client = MagicMock()
-    client.get_markets = AsyncMock(return_value={"markets": [], "next_cursor": 0})
+    client.get_markets = AsyncMock(return_value={"data": [], "next_cursor": 0})
     return client
 
 
@@ -73,6 +73,17 @@ def scanner(mock_client, mock_orderbook, scanner_config):
     return MarketScanner(mock_client, mock_orderbook, scanner_config)
 
 
+# Map category to representative tags for the tag-based inference
+_CATEGORY_TAGS = {
+    "finance": ["Finance", "economy", "All"],
+    "politics": ["Politics", "election", "All"],
+    "geopolitics": ["geopolitics", "war", "conflict", "All"],
+    "crypto": ["Crypto", "bitcoin", "blockchain", "All"],
+    "sports": ["Sports", "NBA", "NFL", "All"],
+    "economics": ["economics", "employment", "trade", "All"],
+}
+
+
 def make_market_raw(
     condition_id="market-1",
     token_id="token-1",
@@ -81,9 +92,11 @@ def make_market_raw(
     days_to_resolution=30,
     active=True,
     closed=False,
+    accepting_orders=True,
+    enable_order_book=True,
     end_date_iso="",
 ) -> dict:
-    """Helper to create a raw market dict."""
+    """Helper to create a raw market dict matching real CLOB API shape."""
     from datetime import datetime, timezone, timedelta
     if not end_date_iso and days_to_resolution:
         future = datetime.now(timezone.utc) + timedelta(days=days_to_resolution)
@@ -98,10 +111,13 @@ def make_market_raw(
         ],
         "volume": daily_volume * 10,
         "volume_24hr": daily_volume,
-        "category": category,
+        "tags": _CATEGORY_TAGS.get(category, ["All"]),
+        "market_slug": f"{category}-event-{condition_id}",
         "question": f"Will event {condition_id} happen?",
         "active": active,
         "closed": closed,
+        "accepting_orders": accepting_orders,
+        "enable_order_book": enable_order_book,
         "end_date_iso": end_date_iso,
     }
 
@@ -265,27 +281,29 @@ class TestEligibility:
             market_id="m1", token_id="t1",
             category="finance", daily_volume_usd=50000,
             spread_bps=200, days_to_resolution=30,
-            active=True, closed=False,
+            active=True, closed=False, accepting_orders=True,
         )
         scanner._compute_score(info)
         assert scanner._is_eligible(info) is True
 
     def test_closed_market_rejected(self, scanner):
+        """Market with closed=True and accepting_orders=False is rejected."""
         info = MarketInfo(
             market_id="m1", token_id="t1",
             category="finance", daily_volume_usd=50000,
             spread_bps=200, days_to_resolution=30,
-            active=True, closed=True,
+            active=True, closed=True, accepting_orders=False,
         )
         scanner._compute_score(info)
         assert scanner._is_eligible(info) is False
 
     def test_inactive_market_rejected(self, scanner):
+        """Market with accepting_orders=False is rejected."""
         info = MarketInfo(
             market_id="m1", token_id="t1",
             category="finance", daily_volume_usd=50000,
             spread_bps=200, days_to_resolution=30,
-            active=False, closed=False,
+            active=False, closed=False, accepting_orders=False,
         )
         scanner._compute_score(info)
         assert scanner._is_eligible(info) is False
@@ -295,7 +313,7 @@ class TestEligibility:
             market_id="m1", token_id="t1",
             category="sports", daily_volume_usd=50000,
             spread_bps=200, days_to_resolution=30,
-            active=True, closed=False,
+            active=True, closed=False, accepting_orders=True,
         )
         scanner._compute_score(info)
         assert scanner._is_eligible(info) is False
@@ -305,7 +323,7 @@ class TestEligibility:
             market_id="m1", token_id="t1",
             category="finance", daily_volume_usd=100,
             spread_bps=200, days_to_resolution=30,
-            active=True, closed=False,
+            active=True, closed=False, accepting_orders=True,
         )
         scanner._compute_score(info)
         assert scanner._is_eligible(info) is False
@@ -315,7 +333,7 @@ class TestEligibility:
             market_id="m1", token_id="t1",
             category="finance", daily_volume_usd=50000,
             spread_bps=200, days_to_resolution=1,
-            active=True, closed=False,
+            active=True, closed=False, accepting_orders=True,
         )
         scanner._compute_score(info)
         assert scanner._is_eligible(info) is False
@@ -326,7 +344,7 @@ class TestEligibility:
             market_id="m1", token_id="t1",
             category="finance", daily_volume_usd=50000,
             spread_bps=50, days_to_resolution=30,
-            active=True, closed=False,
+            active=True, closed=False, accepting_orders=True,
         )
         scanner._compute_score(info)
         assert scanner._is_eligible(info) is False
@@ -337,7 +355,7 @@ class TestEligibility:
             market_id="m1", token_id="t1",
             category="finance", daily_volume_usd=50000,
             spread_bps=600, days_to_resolution=30,
-            active=True, closed=False,
+            active=True, closed=False, accepting_orders=True,
         )
         scanner._compute_score(info)
         assert scanner._is_eligible(info) is False
@@ -349,7 +367,7 @@ class TestEligibility:
             market_id="m1", token_id="t1",
             category="finance", daily_volume_usd=50000,
             spread_bps=0, days_to_resolution=30,
-            active=True, closed=False,
+            active=True, closed=False, accepting_orders=True,
         )
         scanner._compute_score(info)
         # Zero spread = book not fetched yet, don't reject
@@ -369,7 +387,7 @@ class TestScanning:
             for i in range(10)
         ]
         mock_client.get_markets = AsyncMock(return_value={
-            "markets": markets,
+            "data": markets,
             "next_cursor": 0,
         })
 
@@ -383,7 +401,7 @@ class TestScanning:
     async def test_scan_caches_result(self, scanner, mock_client):
         """Second scan without force should use cache."""
         mock_client.get_markets = AsyncMock(return_value={
-            "markets": [make_market_raw()],
+            "data": [make_market_raw()],
             "next_cursor": 0,
         })
 
@@ -415,9 +433,9 @@ class TestScanning:
             nonlocal call_count
             call_count += 1
             if call_count == 1:
-                return {"markets": page1, "next_cursor": 1}
+                return {"data": page1, "next_cursor": 1}
             else:
-                return {"markets": page2, "next_cursor": 0}
+                return {"data": page2, "next_cursor": 0}
 
         mock_client.get_markets = get_markets_paginated
 
@@ -430,7 +448,7 @@ class TestScanning:
     async def test_get_eligible_markets(self, scanner, mock_client):
         """get_eligible_markets should return sorted list."""
         mock_client.get_markets = AsyncMock(return_value={
-            "markets": [
+            "data": [
                 make_market_raw(condition_id="m1", category="finance", daily_volume=100000),
                 make_market_raw(condition_id="m2", category="geopolitics", daily_volume=50000),
                 make_market_raw(condition_id="m3", category="sports", daily_volume=200000),

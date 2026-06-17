@@ -325,13 +325,13 @@ class Portfolio:
             if day != self._current_day:
                 # New day — roll over
                 self._current_day = day
-                if day not in self._daily_pnl:
-                    self._daily_pnl[day] = DailyPnL(
-                        date=day,
-                        unrealized_pnl_start=sum(
-                            p.unrealized_pnl for p in self._positions.values()
-                        ),
-                    )
+            if day not in self._daily_pnl:
+                self._daily_pnl[day] = DailyPnL(
+                    date=day,
+                    unrealized_pnl_start=sum(
+                        p.unrealized_pnl for p in self._positions.values()
+                    ),
+                )
             return self._daily_pnl[day]
 
     async def record_spread_captured(self, amount: float) -> None:
@@ -406,6 +406,18 @@ class Portfolio:
                     first_opened_at=pdata.get("first_opened_at", time.time()),
                 )
 
+            # Restore daily PnL
+            for day, pdata in data.get("daily_pnl", {}).items():
+                self._daily_pnl[day] = DailyPnL(
+                    date=day,
+                    realized_pnl=pdata.get("realized_pnl", 0.0),
+                    unrealized_pnl_start=pdata.get("unrealized_pnl_start", 0.0),
+                    unrealized_pnl_end=pdata.get("unrealized_pnl_end", 0.0),
+                    spread_captured=pdata.get("spread_captured", 0.0),
+                    rebates_earned=pdata.get("rebates_earned", 0.0),
+                    holding_rewards_earned=pdata.get("holding_rewards_earned", 0.0),
+                )
+
             return True
         except Exception as exc:
             logger.error("Failed to load portfolio state", error=str(exc))
@@ -440,6 +452,8 @@ class Portfolio:
                     "daily_pnl": {
                         day: {
                             "realized_pnl": pnl.realized_pnl,
+                            "unrealized_pnl_start": pnl.unrealized_pnl_start,
+                            "unrealized_pnl_end": pnl.unrealized_pnl_end,
                             "spread_captured": pnl.spread_captured,
                             "rebates_earned": pnl.rebates_earned,
                             "holding_rewards_earned": pnl.holding_rewards_earned,

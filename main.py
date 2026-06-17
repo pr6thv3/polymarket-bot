@@ -724,7 +724,7 @@ class PolymarketBot:
 
 # ── Backtest runner ────────────────────────────────────────────────────
 
-def run_backtest(config: dict, args: argparse.Namespace) -> None:
+async def run_backtest(config: dict, args: argparse.Namespace) -> None:
     """Run a backtest instead of live/paper trading.
 
     Args:
@@ -775,7 +775,7 @@ def run_backtest(config: dict, args: argparse.Namespace) -> None:
                 spread_bps=200,
             )
 
-        result = engine.run_market_making(
+        result = await engine.run_market_making(
             ticks=all_ticks,
             starting_capital=capital,
             base_spread_bps=config.get("strategies", {}).get("market_making", {}).get("base_spread_bps", 200),
@@ -878,7 +878,7 @@ async def main() -> None:
     # ── Backtest mode ──
     if args.backtest:
         logger.info("Running in backtest mode")
-        run_backtest(config, args)
+        await run_backtest(config, args)
         return
 
     # ── Determine paper mode ──

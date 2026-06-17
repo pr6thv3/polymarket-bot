@@ -52,6 +52,7 @@ class PaperOrder:
     post_only: bool = True
     category: str = ""
     placed_at: float = field(default_factory=time.monotonic)
+    placed_at_snapshot_time: float = 0.0
     filled_size: float = 0.0
     filled_price: float = 0.0
     status: str = "open"  # open, filled, cancelled, rejected, expired
@@ -364,6 +365,10 @@ class PaperExecutor:
                 f"have {self.paper_portfolio.free_usdc:.2f}"
             )
 
+        # ── Get current snapshot timestamp ──
+        snapshot = self.orderbook.get_snapshot(market_id)
+        placed_at_snapshot_time = snapshot.last_update if snapshot else 0.0
+
         # ── Create virtual order ──
         order_id = f"paper-{self._next_order_id}"
         self._next_order_id += 1
@@ -377,12 +382,13 @@ class PaperExecutor:
             size=size,
             post_only=post_only if post_only is not None else True,
             category=category,
+            placed_at_snapshot_time=placed_at_snapshot_time,
         )
         self._orders[order_id] = order
         self._total_orders_placed += 1
 
         # ── Simulate fill ──
-        filled = await self._simulate_fill(order)
+        filled = await self._simulate_fill(order, is_placement=True)
 
         logger.info(
             f"{PAPER_TAG} Order placed",
@@ -399,44 +405,32 @@ class PaperExecutor:
 
         return order_id
 
-    async def _simulate_fill(self, order: PaperOrder) -> bool:
+    async def _simulate_fill(self, order: PaperOrder, is_placement: bool = False) -> bool:
         """Simulate a fill for a virtual order.
 
         Fill logic:
-        1. POST_ONLY orders: fill only if they would add liquidity
-           (price doesn't cross the spread)
-        2. Taker orders: fill at best opposite price with slippage
-        3. Apply fill probability (not every order gets filled)
-        4. Apply partial fill probability
-
-        Args:
-            order: The virtual order to fill.
-
-        Returns:
-            True if the order was filled (fully or partially).
+        1. If is_placement is True, check if it crosses opposite side (taker order).
+           - Taker fills immediately with slippage.
+           - Rejects if post_only.
+           - If it does not cross, it sits in the book (returns False).
+        2. If is_placement is False (polling open orders), it is treated as a maker order.
+           - Fills only on a SUBSEQUENT snapshot if the market trades through or touches our price.
         """
         import random
 
-        # Check fill probability
-        if random.random() > self.fill_probability:
-            order.status = "open"  # Remains open, not filled yet
-            logger.debug(
-                f"{PAPER_TAG} Order not filled (probability)",
-                order_id=order.order_id,
-            )
+        # Get current orderbook snapshot
+        snapshot = self.orderbook.get_snapshot(order.market_id)
+        if not snapshot:
             return False
 
-        # Get orderbook snapshot for fill price
-        snapshot = self.orderbook.get_snapshot(order.market_id)
         fill_price = order.price
-        fill_size = order.size
+        should_fill = False
 
-        if snapshot:
+        if is_placement:
+            # Check if order crosses the spread on entry (taker order)
             if order.side == "BUY":
-                # Buy fills at or below the ask
                 if snapshot.best_ask and order.price >= snapshot.best_ask:
                     if order.post_only:
-                        # POST_ONLY would be rejected IRL
                         order.status = "rejected"
                         self.paper_portfolio.unlock_usdc(order.price * order.size)
                         logger.debug(
@@ -445,20 +439,44 @@ class PaperExecutor:
                         )
                         return False
                     fill_price = snapshot.best_ask * (1 + self.slippage_bps / 10_000)
-                else:
-                    # Maker fill: our bid sits in the book
-                    fill_price = order.price
+                    should_fill = True
             else:  # SELL
                 if snapshot.best_bid and order.price <= snapshot.best_bid:
                     if order.post_only:
                         order.status = "rejected"
                         self.paper_portfolio.unlock_usdc(order.price * order.size)
+                        logger.debug(
+                            f"{PAPER_TAG} POST_ONLY rejected (would take)",
+                            order_id=order.order_id,
+                        )
                         return False
                     fill_price = snapshot.best_bid * (1 - self.slippage_bps / 10_000)
-                else:
-                    fill_price = order.price
+                    should_fill = True
+        else:
+            # Maker order in the book. Must be a subsequent snapshot
+            if snapshot.last_update <= order.placed_at_snapshot_time:
+                return False
 
-        # Partial fill
+            # Check if market has traded through or touched our limit price
+            if order.side == "BUY":
+                if snapshot.best_ask and snapshot.best_ask <= order.price:
+                    fill_price = order.price
+                    should_fill = True
+            else:  # SELL
+                if snapshot.best_bid and snapshot.best_bid >= order.price:
+                    fill_price = order.price
+                    should_fill = True
+
+        if not should_fill:
+            return False
+
+        # Apply fill probability
+        if random.random() > self.fill_probability:
+            order.status = "open"  # Remains open
+            return False
+
+        # Determine fill size (partial vs full)
+        fill_size = order.size
         if random.random() < self.partial_fill_probability:
             fill_pct = max(self.min_fill_pct, random.random())
             fill_size = order.size * fill_pct
@@ -480,7 +498,7 @@ class PaperExecutor:
             market_id=order.market_id,
             side=order.side,
             price=fill_price,
-            size=fill_size if order.status == "partial" else order.filled_size,
+            size=fill_size,
             category=order.category,
         )
 
@@ -491,13 +509,12 @@ class PaperExecutor:
             "market_id": order.market_id,
             "side": order.side,
             "price": fill_price,
-            "size": fill_size if order.status == "partial" else order.filled_size,
+            "size": fill_size,
             "fee_usd": fee_usd,
             "rebate_usd": rebate_usd,
         })
 
         self._total_fills += 1
-
         m.record_order_filled(market_id=order.market_id, side=order.side.lower())
 
         if rebate_usd > 0:
@@ -641,7 +658,7 @@ class PaperExecutor:
             if not order.is_open:
                 continue
 
-            filled = await self._simulate_fill(order)
+            filled = await self._simulate_fill(order, is_placement=False)
             if filled:
                 filled_count += 1
 

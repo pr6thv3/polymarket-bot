@@ -29,6 +29,8 @@ strategies:
     base_spread_bps: 200
     order_size_usd: 15.0
     min_order_size_usd: 5.0
+    max_active_markets: 5
+    scanner_top_n: 5
     target_categories:
       - geopolitics
       - finance
@@ -38,7 +40,9 @@ strategies:
       min_days_to_resolution: 14
       target_apy: 0.04
     midpoint_move_threshold_bps: 50
-    cancel_stale_sec: 120
+    cancel_stale_sec: 1800
+    requote_cooldown_sec: 10
+    emergency_requote_bps: 200
     adverse_selection:
       volatility_pause_threshold: 0.05
       pause_duration_sec: 300
