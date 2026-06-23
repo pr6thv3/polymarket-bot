@@ -31,6 +31,8 @@ strategies:
     min_order_size_usd: 5.0
     max_active_markets: 5
     scanner_top_n: 5
+    scanner_use_activity_score: false
+    scanner_min_activity_score: 0.0
     target_categories:
       - geopolitics
       - finance
@@ -132,8 +134,9 @@ strategies:
 
 execution:
   rate_limit_per_min: 55
-  retry_max_attempts: 3
+  retry_max_attempts: 100
   retry_backoff_base_sec: 2
+  retry_backoff_max_sec: 30
   dry_run: true
   post_only_default: true
   amend_timeout_sec: 2.0

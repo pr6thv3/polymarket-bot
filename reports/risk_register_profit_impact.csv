@@ -1,0 +1,12 @@
+Issue,Category,Severity,Probability,ImpactUsdPerMonth,FixCostDays,Priority,WhyItMatters,Verification,StopCondition,PriorityScore
+No proven real-data maker edge / zero fills,Market making,5,5,-500,3,P0,"Current real-data backtest: 1078 quotes, 0 trades, -$5.36",24h targeted data + markout report,"If fill rate <=2% or lower CI EV <=0, no live trading",4166.67
+Unrealistic/random paper fill model,Simulation,5,4,-400,2,P0,Paper executor still uses fill_probability after touch-through,Replace with evidence-based fill model,"If paper P&L cannot reconcile to replay, ignore paper profit",4000.0
+Market scanner selects sticky/no-flow books,Data,5,4,-300,2,P0,Collected markets show <2.1% opportunity and toxic markouts,Add activity/toxicity gates,"If no markets pass gates, abandon active MM",3000.0
+Adverse selection markout high/unmeasured,Market making,5,4,-300,3,P0,Markout diagnostic shows 100-200% toxicity vs gross edge,Measure markout by horizon before tuning,"If toxicity >30-40% gross, no-go",2000.0
+Unverified rebates/holding rewards,Economic,4,3,-150,1,P1,"Backtest has zero rebates/rewards; config assumes rates/APY",Verify eligibility or exclude revenue,"If excluding rewards makes EV <=0, no-go",1800.0
+No queue-position/traded-volume fill model,Simulation,5,4,-350,4,P0,"Current snapshots only infer touch-through, no queue depletion",Collect trades/depth or use conservative trade-through rule,"If model cannot prove fills, no live trading",1750.0
+Proxy latency/staleness unmeasured,Operational,4,3,-150,2,P1,Cloudflare Worker proxy is mandatory path,Measure latency and stale quote rate,"If p95 >750ms or stale quote >2%, no live MM",900.0
+Restart/open-order reconciliation unproven,Execution,5,2,-250,3,P1,No inspected startup reconciliation against exchange open orders,Implement/rehearse reconciliation,"If unreconciled orders >0, no live",833.33
+Amend cancel+replace token_id bug,Execution,3,2,-75,1,P1,Executor fallback uses market_id as token_id,Fix before using amend live,"If amend fallback enabled, test required",450.0
+Cross-arb disabled/missing credentials,Opportunity,3,3,-100,5,P2,"Kalshi keys empty; mapping unproven",Research spike only after MM falsified,"If no executable arb after fees/latency, abandon",180.0
+AI/whale signal overfitting,Opportunity,2,4,-50,10,P3,Disabled and no timestamped historical alpha,Do not build until data exists,"If no out-of-sample edge, abandon",40.0

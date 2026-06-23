@@ -12,6 +12,7 @@ import json
 import os
 import time
 from datetime import datetime, timezone
+from types import SimpleNamespace
 import structlog
 
 from utils.helpers import load_config
@@ -48,6 +49,17 @@ async def main():
         default="data/backtest",
         help="Directory to save the snapshots (default: data/backtest)",
     )
+    parser.add_argument(
+        "--from-current-snapshot",
+        action="store_true",
+        help="Collect top passing markets from reports/current_market_snapshot.json instead of the scanner",
+    )
+    parser.add_argument(
+        "--markets",
+        type=int,
+        default=3,
+        help="Number of markets to collect (default: 3)",
+    )
     args = parser.parse_args()
 
     # Load configuration
@@ -60,16 +72,40 @@ async def main():
     scanner = MarketScanner(client, orderbook, config)
 
     # Perform initial scan to find top markets
-    logger.info("Scanning for eligible markets...")
-    scan_result = await scanner.scan(force=True)
-    if not scan_result.top_markets:
+    if args.from_current_snapshot:
+        snapshot_path = "reports/current_market_snapshot.json"
+        logger.info("Loading targeted markets from current snapshot", path=snapshot_path)
+        with open(snapshot_path, "r", encoding="utf-8") as f:
+            rows = json.load(f)
+        passing_rows = [
+            row for row in rows
+            if 100 <= float(row.get("spread_bps", 0)) <= 800
+            and min(float(row.get("bid_touch_usd", 0)), float(row.get("ask_touch_usd", 0))) >= 25
+            and int(row.get("days_to_resolution", 0)) >= 3
+            and row.get("token_id")
+        ]
+        top_markets = [
+            SimpleNamespace(
+                market_id=row["condition_id"],
+                token_id=row["token_id"],
+                question=row.get("question", ""),
+                category=row.get("category", "unknown"),
+                daily_volume_usd=float(row.get("volume_24h", 0.0)),
+            )
+            for row in passing_rows[: args.markets]
+        ]
+    else:
+        logger.info("Scanning for eligible markets...")
+        scan_result = await scanner.scan(force=True)
+        top_markets = scan_result.top_markets[: args.markets]
+
+    if not top_markets:
         logger.error("No top eligible markets found to collect data for!")
         return
 
-    # Select top 3 markets
-    top_3 = scan_result.top_markets[:3]
-    logger.info("Selected top 3 markets for collection:")
-    for idx, mkt in enumerate(top_3, 1):
+    # Select target markets
+    logger.info("Selected markets for collection:", count=len(top_markets))
+    for idx, mkt in enumerate(top_markets, 1):
         logger.info(
             f"  {idx}. {mkt.question}",
             market_id=mkt.market_id,
@@ -82,7 +118,7 @@ async def main():
 
     # Open snapshot files
     files = {}
-    for mkt in top_3:
+    for mkt in top_markets:
         filepath = os.path.join(args.output_dir, f"{mkt.market_id}.jsonl")
         files[mkt.market_id] = open(filepath, "a", encoding="utf-8")
         logger.info(f"Writing data for {mkt.market_id[:10]}... to {filepath}")
@@ -91,6 +127,9 @@ async def main():
     start_time = time.time()
     end_time = start_time + duration_sec
     ticks_collected = 0
+    snapshots_written = {mkt.market_id: 0 for mkt in top_markets}
+    error_count = 0
+    fetch_latencies_sec = []
 
     logger.info(
         "Starting snapshot collection loop...",
@@ -102,13 +141,17 @@ async def main():
         while time.time() < end_time:
             loop_start = time.time()
 
-            # Query orderbooks for all 3 markets concurrently
-            tasks = [client.get_orderbook(mkt.token_id) for mkt in top_3]
+            # Query orderbooks for all target markets concurrently
+            fetch_start = time.time()
+            tasks = [client.get_orderbook(mkt.token_id) for mkt in top_markets]
             responses = await asyncio.gather(*tasks, return_exceptions=True)
+            fetch_latency_sec = time.time() - fetch_start
+            fetch_latencies_sec.append(fetch_latency_sec)
 
             timestamp = time.time()
-            for mkt, response in zip(top_3, responses):
+            for mkt, response in zip(top_markets, responses):
                 if isinstance(response, Exception):
+                    error_count += 1
                     logger.warning(
                         "Failed to fetch orderbook",
                         market_id=mkt.market_id,
@@ -146,6 +189,7 @@ async def main():
                 # Write line
                 files[mkt.market_id].write(json.dumps(snapshot) + "\n")
                 files[mkt.market_id].flush()
+                snapshots_written[mkt.market_id] += 1
 
             ticks_collected += 1
             elapsed = time.time() - loop_start
@@ -166,7 +210,39 @@ async def main():
         # Close all files
         for f in files.values():
             f.close()
-        logger.info("Data collection finished successfully.", total_iterations=ticks_collected)
+        avg_latency = (
+            sum(fetch_latencies_sec) / len(fetch_latencies_sec)
+            if fetch_latencies_sec else None
+        )
+        summary = {
+            "started_at_epoch": start_time,
+            "finished_at_epoch": time.time(),
+            "duration_minutes_requested": args.duration_minutes,
+            "interval_seconds": args.interval_seconds,
+            "total_iterations": ticks_collected,
+            "error_count": error_count,
+            "average_request_latency_sec": avg_latency,
+            "snapshots_written": snapshots_written,
+            "selected_markets": [
+                {
+                    "market_id": mkt.market_id,
+                    "token_id": mkt.token_id,
+                    "question": mkt.question,
+                    "category": mkt.category,
+                }
+                for mkt in top_markets
+            ],
+        }
+        summary_path = os.path.join(args.output_dir, "collection_summary.json")
+        with open(summary_path, "w", encoding="utf-8") as f:
+            json.dump(summary, f, indent=2)
+        logger.info(
+            "Data collection finished successfully.",
+            total_iterations=ticks_collected,
+            error_count=error_count,
+            average_request_latency_sec=avg_latency,
+            summary_path=summary_path,
+        )
 
 if __name__ == "__main__":
     asyncio.run(main())

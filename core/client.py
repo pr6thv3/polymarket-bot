@@ -75,6 +75,7 @@ class ClobClient:
         # Retry config
         self.retry_max = exec_cfg.get("retry_max_attempts", 3)
         self.retry_backoff = exec_cfg.get("retry_backoff_base_sec", 2.0)
+        self.retry_backoff_max = exec_cfg.get("retry_backoff_max_sec", 30.0)
 
         # Circuit breaker
         self._cb_threshold = cb_cfg.get("threshold", 10)
@@ -209,7 +210,7 @@ class ClobClient:
                 )
 
                 if is_retryable and attempt < self.retry_max:
-                    delay = self.retry_backoff ** attempt
+                    delay = min(self.retry_backoff ** attempt, self.retry_backoff_max)
                     logger.warning(
                         "API call failed, retrying",
                         attempt=attempt,

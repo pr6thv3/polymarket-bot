@@ -127,6 +127,14 @@ def make_market_raw(
 class TestMarketParsing:
     """Tests for parsing raw API market data into MarketInfo."""
 
+    def test_market_info_has_activity_fields(self):
+        info = MarketInfo(market_id="m1", token_id="t1")
+
+        assert info.activity_score == 0.0
+        assert info.top_change_count == 0
+        assert info.unique_top_of_book == 0
+        assert info.fill_opportunity_rate_pct == 0.0
+
     def test_parse_valid_market(self, scanner):
         raw = make_market_raw(condition_id="m1", token_id="t1", category="finance")
         info = scanner._parse_market(raw)
@@ -183,6 +191,35 @@ class TestMarketParsing:
 
 class TestScoring:
     """Tests for the composite scoring formula."""
+
+    def test_activity_score_does_not_affect_score_by_default(self, scanner):
+        low = MarketInfo(market_id="low", token_id="t", daily_volume_usd=50000, activity_score=0.0)
+        high = MarketInfo(market_id="high", token_id="t", daily_volume_usd=50000, activity_score=100.0)
+
+        scanner._compute_score(low)
+        scanner._compute_score(high)
+
+        assert low.score == high.score
+
+    def test_activity_score_affects_score_when_enabled(self, mock_client, mock_orderbook, scanner_config):
+        scanner_config["strategies"]["market_making"]["scanner_use_activity_score"] = True
+        scanner_config["strategies"]["market_making"]["scanner_weights"] = {
+            "volume": 0.0,
+            "spread_width": 0.0,
+            "rebate_yield": 0.0,
+            "holding_yield": 0.0,
+            "resolution_risk": 0.0,
+            "activity": 1.0,
+        }
+        scanner = MarketScanner(mock_client, mock_orderbook, scanner_config)
+        low = MarketInfo(market_id="low", token_id="t", activity_score=0.0)
+        high = MarketInfo(market_id="high", token_id="t", activity_score=80.0)
+
+        scanner._compute_score(low)
+        scanner._compute_score(high)
+
+        assert high.score == 80.0
+        assert low.score == 0.0
 
     def test_high_volume_gets_high_volume_score(self, scanner):
         info = MarketInfo(
@@ -275,6 +312,38 @@ class TestScoring:
 
 class TestEligibility:
     """Tests for market eligibility filtering."""
+
+    def test_activity_gate_disabled_by_default(self, scanner):
+        info = MarketInfo(
+            market_id="m1",
+            token_id="t1",
+            category="politics",
+            daily_volume_usd=10000,
+            days_to_resolution=30,
+            accepting_orders=True,
+            enable_order_book=True,
+            activity_score=0.0,
+        )
+        scanner._compute_score(info)
+
+        assert scanner._is_eligible(info) is True
+
+    def test_activity_gate_filters_sticky_market_when_enabled(self, mock_client, mock_orderbook, scanner_config):
+        scanner_config["strategies"]["market_making"]["scanner_min_activity_score"] = 20.0
+        scanner = MarketScanner(mock_client, mock_orderbook, scanner_config)
+        info = MarketInfo(
+            market_id="m1",
+            token_id="t1",
+            category="politics",
+            daily_volume_usd=10000,
+            days_to_resolution=30,
+            accepting_orders=True,
+            enable_order_book=True,
+            activity_score=5.0,
+        )
+        scanner._compute_score(info)
+
+        assert scanner._is_eligible(info) is False
 
     def test_eligible_market_passes(self, scanner):
         info = MarketInfo(

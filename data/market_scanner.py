@@ -68,6 +68,12 @@ class MarketInfo:
     holding_yield: float = 0.0
     last_scanned: float = 0.0
 
+    # Activity diagnostics (optional, populated by offline/live diagnostics)
+    activity_score: float = 0.0
+    top_change_count: int = 0
+    unique_top_of_book: int = 0
+    fill_opportunity_rate_pct: float = 0.0
+
 
 @dataclass
 class ScanResult:
@@ -124,6 +130,11 @@ class MarketScanner:
 
         # Top-N markets to return
         self.top_n = mm_cfg.get("scanner_top_n", mm_cfg.get("max_active_markets", 10))
+
+        # Optional Phase 3B activity diagnostics. Disabled by default so
+        # existing scanner behavior is unchanged until diagnostics prove useful.
+        self.use_activity_score = mm_cfg.get("scanner_use_activity_score", False)
+        self.min_activity_score = mm_cfg.get("scanner_min_activity_score", 0.0)
 
         # Scan interval
         self.scan_interval_sec = mm_cfg.get("scanner_interval_sec", 300)
@@ -515,6 +526,9 @@ class MarketScanner:
         else:
             risk_factor = 1.0
 
+        # 6. Optional activity diagnostics factor (0-100 -> 0-1)
+        activity_norm = min(1.0, max(0.0, info.activity_score / 100.0)) if self.use_activity_score else 0.0
+
         # Composite score (0–100)
         info.score = (
             w.get("volume", 0.25) * volume_norm
@@ -522,6 +536,7 @@ class MarketScanner:
             + w.get("rebate_yield", 0.25) * rebate_norm
             + w.get("holding_yield", 0.15) * holding_norm
             + w.get("resolution_risk", 0.15) * risk_factor
+            + w.get("activity", 0.0) * activity_norm
         ) * 100.0
 
     def _is_eligible(self, info: MarketInfo) -> bool:
@@ -561,6 +576,10 @@ class MarketScanner:
                 return False
             if info.spread_bps > self.max_spread_bps:
                 return False
+
+        # Optional Phase 3B activity gate for filtering sticky books.
+        if self.min_activity_score > 0 and info.activity_score < self.min_activity_score:
+            return False
 
         # Minimum score threshold
         if info.score < 10.0:

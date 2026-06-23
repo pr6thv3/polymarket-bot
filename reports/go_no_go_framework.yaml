@@ -1,0 +1,31 @@
+live_trading_go_gates:
+  dry_run_must_be_true_until_manual_cutover: true
+  minimum_real_data_duration_hours: 24
+  minimum_markets_tested: 10
+  minimum_orders_or_hypothetical_quotes: 1000
+  net_pnl_after_all_costs_pct_min: 2.0
+  lower_95_confidence_net_pnl_min_usd: 0.0
+  maker_fill_rate_min_pct: 5.0
+  roundtrip_rate_min_pct: 1.0
+  adverse_selection_max_pct_of_gross: 30.0
+  gas_or_operational_cost_max_pct_of_gross: 20.0
+  post_only_rejection_rate_max_pct: 10.0
+  stale_quote_rate_max_pct: 2.0
+  cancel_success_rate_min_pct: 99.0
+  duplicate_order_count_max: 0
+  unreconciled_open_orders_max: 0
+  max_drawdown_pct: 5.0
+  daily_loss_cap_pct: 2.0
+  proxy_p95_latency_ms_max: 750
+  circuit_breaker_events_max: 0
+  restart_reconciliation_required: true
+capital_ramp:
+  phase_0: paper_only
+  phase_1_max_capital_usd: 50
+  phase_1_required_days: 7
+  phase_2_max_capital_usd: 250
+  phase_2_required_days: 14
+  stop_if_any_gate_fails: true
+current_status:
+  live_trading: NO_GO
+  reason: "Real-data backtest negative; zero trades; fill rate below gate; adverse markout/toxicity unproven-high."
