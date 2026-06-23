@@ -155,6 +155,7 @@ Status freeze:
 - Phase 3C completed.
 - Passive market-making is paused.
 - Reason: 0 fills, 0 roundtrips, 0.00% fill rate, negative net P&L after gas.
+- Additional reliability finding: collector had `161` errors over `346` iterations (`46.5%`), confirming the current local + proxy setup is weak for latency-sensitive strategies.
 - Live trading remains **NO-GO**.
 - Next research track: holding/reward economics.
 - This is an economics verification task only: no live orders, no deposits, and `dry_run` stays true.

@@ -70,6 +70,12 @@ Live trading remains **NO-GO**.
 }
 ```
 
+## Operational reliability finding
+
+The collector completed, but its error rate was high: `161` errors over `346` iterations (`46.5%`). This does not change the market-making no-go decision because profitability/fill gates already failed, but it strengthens the conclusion that the current local + proxy setup is weak for any latency-sensitive strategy.
+
+Implication: do not pursue latency-sensitive market-making, cross-exchange execution, or fast signal trading from this setup until collection/proxy reliability is fixed and measured. Slower read-only research and paper reward simulations are acceptable.
+
 ## Exact next action
 
 If decision is `PAUSE MARKET-MAKING AND PIVOT` or `KILL MARKET-MAKING FOR NOW`, do not run another passive market-making validation on the same assumptions. Pivot to slower holding/reward economics verification or cross-venue pricing research.

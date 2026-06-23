@@ -144,5 +144,6 @@ Current reward-track conclusion:
 
 - Build a paper reward-farming simulator next.
 - Do not live trade: docs/payout/scoring formula remain unresolved.
+- Treat the Phase 3C collector error rate (`161/346`, `46.5%`) as an operational blocker for any latency-sensitive strategy until proxy/local reliability is fixed and remeasured.
 - Use `tools/reward_economics_model.py` and `tools/run_reward_research.py` for read-only modeling.
 - Key reports: `reports/reward_rules_verified.md`, `reports/reward_candidate_markets.md`, `reports/reward_economics_sweep.md`, `reports/reward_track_go_no_go.md`.

@@ -14,6 +14,7 @@ Live trading remains **NO-GO**. Passive market-making remains paused. Reward far
 - Live official CLOB market payloads do include reward metadata: `rewards.rates`, `rewards.min_size`, `rewards.max_spread`, and `minimum_order_size`.
 - Observed reward rates range from `0.001` on GTA/culture markets to thousands per day on sports markets in USDC-denominated API fields; units and pro-rata allocation must be verified before trusting them.
 - Fresh read-only scan found `25` reward-markets with valid YES/NO books in the first scanned page range.
+- Prior Phase 3C collector reliability was weak: `161` errors over `346` iterations (`46.5%`). This is an operational blocker for latency-sensitive strategies and a reason to keep reward validation read-only/paper until the data path is reliable.
 
 ## Best modeled capital sweep row
 
