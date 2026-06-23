@@ -1,0 +1,68 @@
+[
+  {
+    "capital_usd": 50,
+    "market_id": "0x9b6fef249040fd17e9c107955b37ac2c3e923509b6b0ff01cc463a331ddeb894",
+    "question": "Will France win the 2026 FIFA World Cup?",
+    "expected_daily_reward": 3333.0,
+    "expected_daily_loss": 0.016849315068493152,
+    "expected_net_ev": 3332.9841506849316,
+    "annualized_return": 24330.784300000003,
+    "min_capital_meaningful": 400.0,
+    "small_account_viable": true
+  },
+  {
+    "capital_usd": 100,
+    "market_id": "0x9b6fef249040fd17e9c107955b37ac2c3e923509b6b0ff01cc463a331ddeb894",
+    "question": "Will France win the 2026 FIFA World Cup?",
+    "expected_daily_reward": 3333.0,
+    "expected_daily_loss": 0.033698630136986304,
+    "expected_net_ev": 3332.968301369863,
+    "annualized_return": 12165.334300000002,
+    "min_capital_meaningful": 400.0,
+    "small_account_viable": true
+  },
+  {
+    "capital_usd": 250,
+    "market_id": "0x9b6fef249040fd17e9c107955b37ac2c3e923509b6b0ff01cc463a331ddeb894",
+    "question": "Will France win the 2026 FIFA World Cup?",
+    "expected_daily_reward": 3333.0,
+    "expected_daily_loss": 0.08424657534246575,
+    "expected_net_ev": 3332.9207534246575,
+    "annualized_return": 4866.0643,
+    "min_capital_meaningful": 400.0,
+    "small_account_viable": true
+  },
+  {
+    "capital_usd": 500,
+    "market_id": "0x9b6fef249040fd17e9c107955b37ac2c3e923509b6b0ff01cc463a331ddeb894",
+    "question": "Will France win the 2026 FIFA World Cup?",
+    "expected_daily_reward": 3333.0,
+    "expected_daily_loss": 0.1684931506849315,
+    "expected_net_ev": 3332.8415068493155,
+    "annualized_return": 2432.9743000000003,
+    "min_capital_meaningful": 400.0,
+    "small_account_viable": false
+  },
+  {
+    "capital_usd": 1000,
+    "market_id": "0x9b6fef249040fd17e9c107955b37ac2c3e923509b6b0ff01cc463a331ddeb894",
+    "question": "Will France win the 2026 FIFA World Cup?",
+    "expected_daily_reward": 3333.0,
+    "expected_daily_loss": 0.336986301369863,
+    "expected_net_ev": 3332.6830136986305,
+    "annualized_return": 1216.4293,
+    "min_capital_meaningful": 400.0,
+    "small_account_viable": false
+  },
+  {
+    "capital_usd": 5000,
+    "market_id": "0x9b6fef249040fd17e9c107955b37ac2c3e923509b6b0ff01cc463a331ddeb894",
+    "question": "Will France win the 2026 FIFA World Cup?",
+    "expected_daily_reward": 3333.0,
+    "expected_daily_loss": 1.6849315068493151,
+    "expected_net_ev": 3331.4150684931506,
+    "annualized_return": 243.1933,
+    "min_capital_meaningful": 400.0,
+    "small_account_viable": false
+  }
+]

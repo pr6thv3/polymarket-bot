@@ -121,3 +121,28 @@ Final decision:
 
 1. Verify holding/reward economics with read-only reward eligibility and capital lockup analysis.
 2. Run cross-venue pricing research: market mapping, fee model, latency/fill assumptions, and paper-only arbitrage replay.
+
+## Phase 4 reward-economics pivot
+
+Current frozen state:
+
+- Phase 3C completed.
+- Passive market-making is paused.
+- Reason: 0 fills, 0 roundtrips, 0.00% fill rate, negative net P&L.
+- Live trading remains **NO-GO**.
+- Next research track: holding/reward economics.
+
+Reward-economics workflow:
+
+1. Verify current official Polymarket reward rules from primary/high-quality sources.
+2. Build `tools/reward_economics_model.py` to separate reward income, spread income, holding yield, gas cost, adverse-selection cost, and opportunity cost.
+3. Use fresh read-only market data only.
+4. Run capital sweeps without placing orders.
+5. Keep reward farming **NO-GO** unless rules, eligible markets, net EV, capital requirements, and operational risks all pass.
+
+Current reward-track conclusion:
+
+- Build a paper reward-farming simulator next.
+- Do not live trade: docs/payout/scoring formula remain unresolved.
+- Use `tools/reward_economics_model.py` and `tools/run_reward_research.py` for read-only modeling.
+- Key reports: `reports/reward_rules_verified.md`, `reports/reward_candidate_markets.md`, `reports/reward_economics_sweep.md`, `reports/reward_track_go_no_go.md`.

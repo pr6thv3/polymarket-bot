@@ -145,3 +145,25 @@ Pause active market-making validation on this strategy/market-selection assumpti
 
 1. holding/reward economics verification, or
 2. cross-venue pricing research / arbitrage mapping.
+
+## Phase 4 — Holding/Reward Economics Verification
+
+Started: 2026-06-23T19:05Z
+
+Status freeze:
+
+- Phase 3C completed.
+- Passive market-making is paused.
+- Reason: 0 fills, 0 roundtrips, 0.00% fill rate, negative net P&L after gas.
+- Live trading remains **NO-GO**.
+- Next research track: holding/reward economics.
+- This is an economics verification task only: no live orders, no deposits, and `dry_run` stays true.
+
+Reward research result:
+
+- Official docs/rewards pages were unreachable from this host, so the full payout/scoring formula is not verified.
+- Live CLOB market payloads do expose reward metadata: `rewards.rates`, `rewards.min_size`, `rewards.max_spread`, and `minimum_order_size`.
+- Fresh read-only scan found 25 reward markets with valid YES/NO books.
+- Best observed API reward-rate candidate: France 2026 FIFA World Cup market, API daily reward rate `3333.0`, USDC asset address, minimum reward size `200`, max spread raw `4.5`.
+- The optimistic model is positive only if full daily reward capture is possible; this is unverified and not enough for live trading.
+- Final recommendation: **BUILD REWARD FARMING PAPER SIMULATOR**; live reward farming remains NO-GO.

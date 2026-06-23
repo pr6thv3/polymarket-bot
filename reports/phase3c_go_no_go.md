@@ -73,3 +73,12 @@ Live trading remains **NO-GO**.
 ## Exact next action
 
 If decision is `PAUSE MARKET-MAKING AND PIVOT` or `KILL MARKET-MAKING FOR NOW`, do not run another passive market-making validation on the same assumptions. Pivot to slower holding/reward economics verification or cross-venue pricing research.
+
+## Phase 4 pivot freeze
+
+- Phase 3C completed.
+- Passive market-making is paused.
+- Reason: 0 fills, 0 roundtrips, 0.00% fill rate, negative net P&L.
+- Live trading remains **NO-GO**.
+- Next research track: holding/reward economics.
+- Reward economics verification must remain read-only/no-live-order until a separate go/no-go report passes.
