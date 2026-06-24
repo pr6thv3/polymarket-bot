@@ -142,8 +142,11 @@ Reward-economics workflow:
 
 Current reward-track conclusion:
 
-- Build a paper reward-farming simulator next.
+- Paper reward-farming simulator is built: `tools/reward_farming_paper_simulator.py`.
+- Data-path gate is built: `tools/data_path_reliability_check.py`.
 - Do not live trade: docs/payout/scoring formula remain unresolved.
-- Treat the Phase 3C collector error rate (`161/346`, `46.5%`) as an operational blocker for any latency-sensitive strategy until proxy/local reliability is fixed and remeasured.
-- Use `tools/reward_economics_model.py` and `tools/run_reward_research.py` for read-only modeling.
-- Key reports: `reports/reward_rules_verified.md`, `reports/reward_candidate_markets.md`, `reports/reward_economics_sweep.md`, `reports/reward_track_go_no_go.md`.
+- Treat the Phase 3C collector error rate (`161/346`, `46.5%`) as an operational blocker for latency-sensitive strategies.
+- Latest read-only reliability probe improved vs collector: `0.00%` error rate over 40 requests, but p95 latency `1861ms` still fails latency-sensitive gate.
+- Reward simulator conclusion: small account reward farming is not realistically positive EV under 0.01%/0.05%/0.10% pro-rata share assumptions after gas/ops, adverse risk, and opportunity cost.
+- Current final recommendation: **VERIFY FORMULA FIRST**; if formula cannot be verified, pivot to cross-venue pricing research.
+- Key reports: `reports/data_path_reliability_report.md`, `reports/reward_simulator/capital_sweep.md`, `reports/reward_simulator/market_ranking.md`, `reports/reward_simulator/formula_verification.md`, `reports/reward_simulator/reward_farming_paper_go_no_go.md`.

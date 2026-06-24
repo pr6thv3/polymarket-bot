@@ -1,0 +1,29 @@
+{
+  "generated_at": "2026-06-24T18:26:15+00:00",
+  "endpoint_tested": "CLOB get_markets + sampled get_orderbook (read-only)",
+  "total_requests": 40,
+  "successful_requests": 40,
+  "failed_requests": 0,
+  "error_rate_pct": 0.0,
+  "average_latency_ms": 959.2062924974016,
+  "p50_latency_ms": 811.462700003176,
+  "p95_latency_ms": 1861.2843799885013,
+  "p99_latency_ms": 2383.618015007523,
+  "timeout_count": 0,
+  "retry_count": 0,
+  "consecutive_failure_max": 0,
+  "duration_minutes": 1.0,
+  "interval_seconds": 10.0,
+  "max_pages": 10,
+  "max_markets": 10,
+  "prior_blocker_reference": "Previous collector: 161 errors / 346 iterations = 46.5% error rate.",
+  "gates": {
+    "latency_sensitive_pass": false,
+    "research_pass": true,
+    "simulator_results_reliable": true,
+    "reasons": [
+      "latency-sensitive p95 latency 1861ms >= 1000ms"
+    ]
+  },
+  "errors": []
+}

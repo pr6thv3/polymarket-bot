@@ -168,3 +168,12 @@ Reward research result:
 - Best observed API reward-rate candidate: France 2026 FIFA World Cup market, API daily reward rate `3333.0`, USDC asset address, minimum reward size `200`, max spread raw `4.5`.
 - The optimistic model is positive only if full daily reward capture is possible; this is unverified and not enough for live trading.
 - Final recommendation: **BUILD REWARD FARMING PAPER SIMULATOR**; live reward farming remains NO-GO.
+
+Reward farming paper simulator result:
+
+- Added `tools/data_path_reliability_check.py` and `tools/reward_farming_paper_simulator.py`.
+- Data-path reliability probe: `40/40` successful read-only requests, `0.00%` error rate, p95 latency `1861ms`; reward simulator/read-only research gate passes, latency-sensitive strategy gate fails.
+- Capital sweep result: pessimistic/base/optimistic pro-rata scenarios are all negative after gas/ops, adverse risk, and opportunity cost at `$50`, `$100`, `$250`, `$500`, `$1,000`, and `$5,000`.
+- Best pessimistic market by EV is still negative: France 2026 FIFA World Cup, pro-rata reward `$0.3333/day`, gas `$5.7600/day`, net EV `$-5.4485/day`, low confidence.
+- Formula verification remains incomplete because official docs/UI timed out; live reward farming remains **NO-GO**.
+- Current final recommendation: **VERIFY FORMULA FIRST** before further reward-farming work; if formula remains inaccessible, pivot to cross-venue pricing research.

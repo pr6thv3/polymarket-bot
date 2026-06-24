@@ -1,0 +1,2551 @@
+{
+  "rankings": {
+    "pessimistic": [
+      {
+        "market_id": "0x9b6fef249040fd17e9c107955b37ac2c3e923509b6b0ff01cc463a331ddeb894",
+        "question": "Will France win the 2026 FIFA World Cup?",
+        "capital_usd": 50,
+        "capital_required_usd": 400.0,
+        "capital_sufficient": false,
+        "eligible": false,
+        "rejected_reasons": [
+          "capital $50.00 below required $400.00",
+          "adverse/gas cost dominates pessimistic reward",
+          "docs/formula unknown makes result speculative"
+        ],
+        "min_size": 200.0,
+        "max_spread": 4.5,
+        "spread_bps": 10.000000000000009,
+        "touch_depth": 13378.04928,
+        "liquidity": 13378.04928,
+        "volume": "not available",
+        "rewards_daily_rate": 3333.0,
+        "asset_address": [
+          "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
+        ],
+        "probability_of_fill": 0.030000000000000002,
+        "expected_adverse_move_pct": 0.01,
+        "quote_staleness_risk": "medium",
+        "adverse_risk_confidence": "medium",
+        "scenarios": {
+          "pessimistic": {
+            "scenario": "pessimistic",
+            "share_fraction": 0.0001,
+            "gross_reward_pool_usd_day": 3333.0,
+            "pro_rata_reward_usd_day": 0.33330000000000004,
+            "adverse_loss_usd_day": 0.015000000000000003,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.448549315068493,
+            "expected_monthly_ev_usd": -163.4564794520548,
+            "ev_per_dollar_locked": -0.10897098630136987,
+            "annualized_return_estimate": -39.774409999999996,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "base": {
+            "scenario": "base",
+            "share_fraction": 0.0005,
+            "gross_reward_pool_usd_day": 3333.0,
+            "pro_rata_reward_usd_day": 1.6665,
+            "adverse_loss_usd_day": 0.015000000000000003,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -4.115349315068492,
+            "expected_monthly_ev_usd": -123.46047945205477,
+            "ev_per_dollar_locked": -0.08230698630136984,
+            "annualized_return_estimate": -30.042049999999996,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "optimistic": {
+            "scenario": "optimistic",
+            "share_fraction": 0.001,
+            "gross_reward_pool_usd_day": 3333.0,
+            "pro_rata_reward_usd_day": 3.333,
+            "adverse_loss_usd_day": 0.015000000000000003,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -2.4488493150684927,
+            "expected_monthly_ev_usd": -73.46547945205478,
+            "ev_per_dollar_locked": -0.04897698630136985,
+            "annualized_return_estimate": -17.876599999999996,
+            "confidence": "low",
+            "small_account_viable": false
+          }
+        }
+      },
+      {
+        "market_id": "0x0c4cd2055d6ea89354ffddc55d6dbcef9355748112ea952fc925f3db6a5c457f",
+        "question": "Will Argentina win the 2026 FIFA World Cup?",
+        "capital_usd": 50,
+        "capital_required_usd": 400.0,
+        "capital_sufficient": false,
+        "eligible": false,
+        "rejected_reasons": [
+          "capital $50.00 below required $400.00",
+          "adverse/gas cost dominates pessimistic reward",
+          "docs/formula unknown makes result speculative"
+        ],
+        "min_size": 200.0,
+        "max_spread": 4.5,
+        "spread_bps": 10.000000000000009,
+        "touch_depth": 14347.535339999999,
+        "liquidity": 14347.535339999999,
+        "volume": "not available",
+        "rewards_daily_rate": 2381.0,
+        "asset_address": [
+          "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
+        ],
+        "probability_of_fill": 0.030000000000000002,
+        "expected_adverse_move_pct": 0.01,
+        "quote_staleness_risk": "medium",
+        "adverse_risk_confidence": "medium",
+        "scenarios": {
+          "pessimistic": {
+            "scenario": "pessimistic",
+            "share_fraction": 0.0001,
+            "gross_reward_pool_usd_day": 2381.0,
+            "pro_rata_reward_usd_day": 0.2381,
+            "adverse_loss_usd_day": 0.015000000000000003,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.543749315068493,
+            "expected_monthly_ev_usd": -166.3124794520548,
+            "ev_per_dollar_locked": -0.11087498630136987,
+            "annualized_return_estimate": -40.46937,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "base": {
+            "scenario": "base",
+            "share_fraction": 0.0005,
+            "gross_reward_pool_usd_day": 2381.0,
+            "pro_rata_reward_usd_day": 1.1905000000000001,
+            "adverse_loss_usd_day": 0.015000000000000003,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -4.591349315068492,
+            "expected_monthly_ev_usd": -137.74047945205476,
+            "ev_per_dollar_locked": -0.09182698630136985,
+            "annualized_return_estimate": -33.51685,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "optimistic": {
+            "scenario": "optimistic",
+            "share_fraction": 0.001,
+            "gross_reward_pool_usd_day": 2381.0,
+            "pro_rata_reward_usd_day": 2.3810000000000002,
+            "adverse_loss_usd_day": 0.015000000000000003,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -3.4008493150684926,
+            "expected_monthly_ev_usd": -102.02547945205478,
+            "ev_per_dollar_locked": -0.06801698630136985,
+            "annualized_return_estimate": -24.826199999999993,
+            "confidence": "low",
+            "small_account_viable": false
+          }
+        }
+      },
+      {
+        "market_id": "0x7976b8dbacf9077eb1453a62bcefd6ab2df199acd28aad276ff0d920d6992892",
+        "question": "Will Spain win the 2026 FIFA World Cup?",
+        "capital_usd": 50,
+        "capital_required_usd": 400.0,
+        "capital_sufficient": false,
+        "eligible": false,
+        "rejected_reasons": [
+          "capital $50.00 below required $400.00",
+          "adverse/gas cost dominates pessimistic reward",
+          "docs/formula unknown makes result speculative"
+        ],
+        "min_size": 200.0,
+        "max_spread": 4.5,
+        "spread_bps": 10.000000000000009,
+        "touch_depth": 31600.839420000004,
+        "liquidity": 31600.839420000004,
+        "volume": "not available",
+        "rewards_daily_rate": 2143.0,
+        "asset_address": [
+          "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
+        ],
+        "probability_of_fill": 0.030000000000000002,
+        "expected_adverse_move_pct": 0.01,
+        "quote_staleness_risk": "medium",
+        "adverse_risk_confidence": "medium",
+        "scenarios": {
+          "pessimistic": {
+            "scenario": "pessimistic",
+            "share_fraction": 0.0001,
+            "gross_reward_pool_usd_day": 2143.0,
+            "pro_rata_reward_usd_day": 0.21430000000000002,
+            "adverse_loss_usd_day": 0.015000000000000003,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.567549315068493,
+            "expected_monthly_ev_usd": -167.0264794520548,
+            "ev_per_dollar_locked": -0.11135098630136986,
+            "annualized_return_estimate": -40.64311,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "base": {
+            "scenario": "base",
+            "share_fraction": 0.0005,
+            "gross_reward_pool_usd_day": 2143.0,
+            "pro_rata_reward_usd_day": 1.0715000000000001,
+            "adverse_loss_usd_day": 0.015000000000000003,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -4.710349315068493,
+            "expected_monthly_ev_usd": -141.31047945205478,
+            "ev_per_dollar_locked": -0.09420698630136987,
+            "annualized_return_estimate": -34.385549999999995,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "optimistic": {
+            "scenario": "optimistic",
+            "share_fraction": 0.001,
+            "gross_reward_pool_usd_day": 2143.0,
+            "pro_rata_reward_usd_day": 2.1430000000000002,
+            "adverse_loss_usd_day": 0.015000000000000003,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -3.6388493150684926,
+            "expected_monthly_ev_usd": -109.16547945205478,
+            "ev_per_dollar_locked": -0.07277698630136985,
+            "annualized_return_estimate": -26.563599999999997,
+            "confidence": "low",
+            "small_account_viable": false
+          }
+        }
+      },
+      {
+        "market_id": "0x375409bc5eeeff961e82b479caeccc20f33d15738e5bce1186d628aa3d9dfb1f",
+        "question": "Will England win the 2026 FIFA World Cup?",
+        "capital_usd": 50,
+        "capital_required_usd": 400.0,
+        "capital_sufficient": false,
+        "eligible": false,
+        "rejected_reasons": [
+          "capital $50.00 below required $400.00",
+          "adverse/gas cost dominates pessimistic reward",
+          "docs/formula unknown makes result speculative"
+        ],
+        "min_size": 200.0,
+        "max_spread": 4.5,
+        "spread_bps": 10.000000000000009,
+        "touch_depth": 2623.74,
+        "liquidity": 2623.74,
+        "volume": "not available",
+        "rewards_daily_rate": 1667.0,
+        "asset_address": [
+          "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
+        ],
+        "probability_of_fill": 0.030000000000000002,
+        "expected_adverse_move_pct": 0.01,
+        "quote_staleness_risk": "medium",
+        "adverse_risk_confidence": "medium",
+        "scenarios": {
+          "pessimistic": {
+            "scenario": "pessimistic",
+            "share_fraction": 0.0001,
+            "gross_reward_pool_usd_day": 1667.0,
+            "pro_rata_reward_usd_day": 0.16670000000000001,
+            "adverse_loss_usd_day": 0.015000000000000003,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.615149315068493,
+            "expected_monthly_ev_usd": -168.45447945205478,
+            "ev_per_dollar_locked": -0.11230298630136985,
+            "annualized_return_estimate": -40.99058999999999,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "base": {
+            "scenario": "base",
+            "share_fraction": 0.0005,
+            "gross_reward_pool_usd_day": 1667.0,
+            "pro_rata_reward_usd_day": 0.8335,
+            "adverse_loss_usd_day": 0.015000000000000003,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -4.9483493150684925,
+            "expected_monthly_ev_usd": -148.45047945205476,
+            "ev_per_dollar_locked": -0.09896698630136985,
+            "annualized_return_estimate": -36.122949999999996,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "optimistic": {
+            "scenario": "optimistic",
+            "share_fraction": 0.001,
+            "gross_reward_pool_usd_day": 1667.0,
+            "pro_rata_reward_usd_day": 1.667,
+            "adverse_loss_usd_day": 0.015000000000000003,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -4.114849315068493,
+            "expected_monthly_ev_usd": -123.44547945205478,
+            "ev_per_dollar_locked": -0.08229698630136985,
+            "annualized_return_estimate": -30.038399999999996,
+            "confidence": "low",
+            "small_account_viable": false
+          }
+        }
+      },
+      {
+        "market_id": "0x4f3421fb2daf5cca7430ed8d8132463963081572d75434393a1808fdb8829fe8",
+        "question": "Will Portugal win the 2026 FIFA World Cup?",
+        "capital_usd": 50,
+        "capital_required_usd": 400.0,
+        "capital_sufficient": false,
+        "eligible": false,
+        "rejected_reasons": [
+          "capital $50.00 below required $400.00",
+          "adverse/gas cost dominates pessimistic reward",
+          "docs/formula unknown makes result speculative"
+        ],
+        "min_size": 200.0,
+        "max_spread": 4.5,
+        "spread_bps": 10.000000000000009,
+        "touch_depth": 688.57575,
+        "liquidity": 688.57575,
+        "volume": "not available",
+        "rewards_daily_rate": 476.0,
+        "asset_address": [
+          "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
+        ],
+        "probability_of_fill": 0.025,
+        "expected_adverse_move_pct": 0.01,
+        "quote_staleness_risk": "medium",
+        "adverse_risk_confidence": "medium",
+        "scenarios": {
+          "pessimistic": {
+            "scenario": "pessimistic",
+            "share_fraction": 0.0001,
+            "gross_reward_pool_usd_day": 476.0,
+            "pro_rata_reward_usd_day": 0.0476,
+            "adverse_loss_usd_day": 0.0125,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.731749315068493,
+            "expected_monthly_ev_usd": -171.95247945205477,
+            "ev_per_dollar_locked": -0.11463498630136985,
+            "annualized_return_estimate": -41.84177,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "base": {
+            "scenario": "base",
+            "share_fraction": 0.0005,
+            "gross_reward_pool_usd_day": 476.0,
+            "pro_rata_reward_usd_day": 0.23800000000000002,
+            "adverse_loss_usd_day": 0.0125,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.5413493150684925,
+            "expected_monthly_ev_usd": -166.24047945205479,
+            "ev_per_dollar_locked": -0.11082698630136985,
+            "annualized_return_estimate": -40.45184999999999,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "optimistic": {
+            "scenario": "optimistic",
+            "share_fraction": 0.001,
+            "gross_reward_pool_usd_day": 476.0,
+            "pro_rata_reward_usd_day": 0.47600000000000003,
+            "adverse_loss_usd_day": 0.0125,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.303349315068493,
+            "expected_monthly_ev_usd": -159.1004794520548,
+            "ev_per_dollar_locked": -0.10606698630136986,
+            "annualized_return_estimate": -38.71445,
+            "confidence": "low",
+            "small_account_viable": false
+          }
+        }
+      },
+      {
+        "market_id": "0x7ad403c3508f8e3912940fd1a913f227591145ca0614074208e0b962d5fcc422",
+        "question": "Will JD Vance win the 2028 US Presidential Election?",
+        "capital_usd": 50,
+        "capital_required_usd": 400.0,
+        "capital_sufficient": false,
+        "eligible": false,
+        "rejected_reasons": [
+          "capital $50.00 below required $400.00",
+          "touch depth too thin",
+          "adverse/gas cost dominates pessimistic reward",
+          "docs/formula unknown makes result speculative"
+        ],
+        "min_size": 200.0,
+        "max_spread": 5.5,
+        "spread_bps": 10.000000000000009,
+        "touch_depth": 44.6622,
+        "liquidity": 44.6622,
+        "volume": "not available",
+        "rewards_daily_rate": 428.0,
+        "asset_address": [
+          "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
+        ],
+        "probability_of_fill": 0.045,
+        "expected_adverse_move_pct": 0.01,
+        "quote_staleness_risk": "medium",
+        "adverse_risk_confidence": "medium",
+        "scenarios": {
+          "pessimistic": {
+            "scenario": "pessimistic",
+            "share_fraction": 0.0001,
+            "gross_reward_pool_usd_day": 428.0,
+            "pro_rata_reward_usd_day": 0.042800000000000005,
+            "adverse_loss_usd_day": 0.0225,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.746549315068493,
+            "expected_monthly_ev_usd": -172.3964794520548,
+            "ev_per_dollar_locked": -0.11493098630136986,
+            "annualized_return_estimate": -41.94981,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "base": {
+            "scenario": "base",
+            "share_fraction": 0.0005,
+            "gross_reward_pool_usd_day": 428.0,
+            "pro_rata_reward_usd_day": 0.214,
+            "adverse_loss_usd_day": 0.0225,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.575349315068493,
+            "expected_monthly_ev_usd": -167.2604794520548,
+            "ev_per_dollar_locked": -0.11150698630136986,
+            "annualized_return_estimate": -40.700050000000005,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "optimistic": {
+            "scenario": "optimistic",
+            "share_fraction": 0.001,
+            "gross_reward_pool_usd_day": 428.0,
+            "pro_rata_reward_usd_day": 0.428,
+            "adverse_loss_usd_day": 0.0225,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.361349315068493,
+            "expected_monthly_ev_usd": -160.84047945205478,
+            "ev_per_dollar_locked": -0.10722698630136986,
+            "annualized_return_estimate": -39.13785,
+            "confidence": "low",
+            "small_account_viable": false
+          }
+        }
+      },
+      {
+        "market_id": "0x4567b275e6b667a6217f5cb4f06a797d3a1eaf1d0281fb5bc8c75e2046ae7e57",
+        "question": "Will Gavin Newsom win the 2028 US Presidential Election?",
+        "capital_usd": 50,
+        "capital_required_usd": 400.0,
+        "capital_sufficient": false,
+        "eligible": false,
+        "rejected_reasons": [
+          "capital $50.00 below required $400.00",
+          "adverse/gas cost dominates pessimistic reward",
+          "docs/formula unknown makes result speculative"
+        ],
+        "min_size": 200.0,
+        "max_spread": 5.5,
+        "spread_bps": 10.000000000000009,
+        "touch_depth": 409.2597,
+        "liquidity": 409.2597,
+        "volume": "not available",
+        "rewards_daily_rate": 286.0,
+        "asset_address": [
+          "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
+        ],
+        "probability_of_fill": 0.025,
+        "expected_adverse_move_pct": 0.01,
+        "quote_staleness_risk": "medium",
+        "adverse_risk_confidence": "medium",
+        "scenarios": {
+          "pessimistic": {
+            "scenario": "pessimistic",
+            "share_fraction": 0.0001,
+            "gross_reward_pool_usd_day": 286.0,
+            "pro_rata_reward_usd_day": 0.0286,
+            "adverse_loss_usd_day": 0.0125,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.750749315068493,
+            "expected_monthly_ev_usd": -172.5224794520548,
+            "ev_per_dollar_locked": -0.11501498630136986,
+            "annualized_return_estimate": -41.98047,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "base": {
+            "scenario": "base",
+            "share_fraction": 0.0005,
+            "gross_reward_pool_usd_day": 286.0,
+            "pro_rata_reward_usd_day": 0.14300000000000002,
+            "adverse_loss_usd_day": 0.0125,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.636349315068493,
+            "expected_monthly_ev_usd": -169.0904794520548,
+            "ev_per_dollar_locked": -0.11272698630136986,
+            "annualized_return_estimate": -41.14535,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "optimistic": {
+            "scenario": "optimistic",
+            "share_fraction": 0.001,
+            "gross_reward_pool_usd_day": 286.0,
+            "pro_rata_reward_usd_day": 0.28600000000000003,
+            "adverse_loss_usd_day": 0.0125,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.4933493150684924,
+            "expected_monthly_ev_usd": -164.8004794520548,
+            "ev_per_dollar_locked": -0.10986698630136985,
+            "annualized_return_estimate": -40.10144999999999,
+            "confidence": "low",
+            "small_account_viable": false
+          }
+        }
+      },
+      {
+        "market_id": "0x2053d8515f1b8cbeea4ccdb56e60e89c2617e43a8660d95166b8e71d27865277",
+        "question": "Will Marco Rubio win the 2028 US Presidential Election?",
+        "capital_usd": 50,
+        "capital_required_usd": 400.0,
+        "capital_sufficient": false,
+        "eligible": false,
+        "rejected_reasons": [
+          "capital $50.00 below required $400.00",
+          "adverse/gas cost dominates pessimistic reward",
+          "docs/formula unknown makes result speculative"
+        ],
+        "min_size": 200.0,
+        "max_spread": 5.5,
+        "spread_bps": 10.000000000000009,
+        "touch_depth": 576.6809499999999,
+        "liquidity": 576.6809499999999,
+        "volume": "not available",
+        "rewards_daily_rate": 286.0,
+        "asset_address": [
+          "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
+        ],
+        "probability_of_fill": 0.025,
+        "expected_adverse_move_pct": 0.01,
+        "quote_staleness_risk": "medium",
+        "adverse_risk_confidence": "medium",
+        "scenarios": {
+          "pessimistic": {
+            "scenario": "pessimistic",
+            "share_fraction": 0.0001,
+            "gross_reward_pool_usd_day": 286.0,
+            "pro_rata_reward_usd_day": 0.0286,
+            "adverse_loss_usd_day": 0.0125,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.750749315068493,
+            "expected_monthly_ev_usd": -172.5224794520548,
+            "ev_per_dollar_locked": -0.11501498630136986,
+            "annualized_return_estimate": -41.98047,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "base": {
+            "scenario": "base",
+            "share_fraction": 0.0005,
+            "gross_reward_pool_usd_day": 286.0,
+            "pro_rata_reward_usd_day": 0.14300000000000002,
+            "adverse_loss_usd_day": 0.0125,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.636349315068493,
+            "expected_monthly_ev_usd": -169.0904794520548,
+            "ev_per_dollar_locked": -0.11272698630136986,
+            "annualized_return_estimate": -41.14535,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "optimistic": {
+            "scenario": "optimistic",
+            "share_fraction": 0.001,
+            "gross_reward_pool_usd_day": 286.0,
+            "pro_rata_reward_usd_day": 0.28600000000000003,
+            "adverse_loss_usd_day": 0.0125,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.4933493150684924,
+            "expected_monthly_ev_usd": -164.8004794520548,
+            "ev_per_dollar_locked": -0.10986698630136985,
+            "annualized_return_estimate": -40.10144999999999,
+            "confidence": "low",
+            "small_account_viable": false
+          }
+        }
+      },
+      {
+        "market_id": "0x6bd56627aa21311850825edb27e53434a0e17a4f782be0086bc07f71eee00d0d",
+        "question": "Putin out as President of Russia by December 31, 2026?",
+        "capital_usd": 50,
+        "capital_required_usd": 400.0,
+        "capital_sufficient": false,
+        "eligible": false,
+        "rejected_reasons": [
+          "capital $50.00 below required $400.00",
+          "adverse/gas cost dominates pessimistic reward",
+          "docs/formula unknown makes result speculative"
+        ],
+        "min_size": 200.0,
+        "max_spread": 3.5,
+        "spread_bps": 99.99999999999994,
+        "touch_depth": 1736.3349,
+        "liquidity": 1736.3349,
+        "volume": "not available",
+        "rewards_daily_rate": 50.0,
+        "asset_address": [
+          "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
+        ],
+        "probability_of_fill": 0.015,
+        "expected_adverse_move_pct": 0.01,
+        "quote_staleness_risk": "medium",
+        "adverse_risk_confidence": "medium",
+        "scenarios": {
+          "pessimistic": {
+            "scenario": "pessimistic",
+            "share_fraction": 0.0001,
+            "gross_reward_pool_usd_day": 50.0,
+            "pro_rata_reward_usd_day": 0.005,
+            "adverse_loss_usd_day": 0.0075,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.769349315068493,
+            "expected_monthly_ev_usd": -173.0804794520548,
+            "ev_per_dollar_locked": -0.11538698630136986,
+            "annualized_return_estimate": -42.11625,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "base": {
+            "scenario": "base",
+            "share_fraction": 0.0005,
+            "gross_reward_pool_usd_day": 50.0,
+            "pro_rata_reward_usd_day": 0.025,
+            "adverse_loss_usd_day": 0.0075,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.749349315068493,
+            "expected_monthly_ev_usd": -172.4804794520548,
+            "ev_per_dollar_locked": -0.11498698630136986,
+            "annualized_return_estimate": -41.97024999999999,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "optimistic": {
+            "scenario": "optimistic",
+            "share_fraction": 0.001,
+            "gross_reward_pool_usd_day": 50.0,
+            "pro_rata_reward_usd_day": 0.05,
+            "adverse_loss_usd_day": 0.0075,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.724349315068492,
+            "expected_monthly_ev_usd": -171.73047945205477,
+            "ev_per_dollar_locked": -0.11448698630136984,
+            "annualized_return_estimate": -41.787749999999996,
+            "confidence": "low",
+            "small_account_viable": false
+          }
+        }
+      },
+      {
+        "market_id": "0x0f49db97f71c68b1e42a6d16e3de93d85dbf7d4148e3f018eb79e88554be9f75",
+        "question": "Will Gavin Newsom win the 2028 Democratic presidential nomination?",
+        "capital_usd": 50,
+        "capital_required_usd": 200.0,
+        "capital_sufficient": false,
+        "eligible": false,
+        "rejected_reasons": [
+          "capital $50.00 below required $200.00",
+          "touch depth too thin",
+          "adverse/gas cost dominates pessimistic reward",
+          "docs/formula unknown makes result speculative"
+        ],
+        "min_size": 100.0,
+        "max_spread": 4.5,
+        "spread_bps": 20.000000000000018,
+        "touch_depth": 36.676080000000006,
+        "liquidity": 36.676080000000006,
+        "volume": "not available",
+        "rewards_daily_rate": 124.0,
+        "asset_address": [
+          "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
+        ],
+        "probability_of_fill": 0.03,
+        "expected_adverse_move_pct": 0.01,
+        "quote_staleness_risk": "medium",
+        "adverse_risk_confidence": "medium",
+        "scenarios": {
+          "pessimistic": {
+            "scenario": "pessimistic",
+            "share_fraction": 0.0001,
+            "gross_reward_pool_usd_day": 124.0,
+            "pro_rata_reward_usd_day": 0.012400000000000001,
+            "adverse_loss_usd_day": 0.015,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.769449315068493,
+            "expected_monthly_ev_usd": -173.08347945205477,
+            "ev_per_dollar_locked": -0.11538898630136986,
+            "annualized_return_estimate": -42.11697999999999,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "base": {
+            "scenario": "base",
+            "share_fraction": 0.0005,
+            "gross_reward_pool_usd_day": 124.0,
+            "pro_rata_reward_usd_day": 0.062,
+            "adverse_loss_usd_day": 0.015,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.719849315068493,
+            "expected_monthly_ev_usd": -171.5954794520548,
+            "ev_per_dollar_locked": -0.11439698630136987,
+            "annualized_return_estimate": -41.7549,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "optimistic": {
+            "scenario": "optimistic",
+            "share_fraction": 0.001,
+            "gross_reward_pool_usd_day": 124.0,
+            "pro_rata_reward_usd_day": 0.124,
+            "adverse_loss_usd_day": 0.015,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.657849315068493,
+            "expected_monthly_ev_usd": -169.7354794520548,
+            "ev_per_dollar_locked": -0.11315698630136986,
+            "annualized_return_estimate": -41.302299999999995,
+            "confidence": "low",
+            "small_account_viable": false
+          }
+        }
+      }
+    ],
+    "base": [
+      {
+        "market_id": "0x9b6fef249040fd17e9c107955b37ac2c3e923509b6b0ff01cc463a331ddeb894",
+        "question": "Will France win the 2026 FIFA World Cup?",
+        "capital_usd": 50,
+        "capital_required_usd": 400.0,
+        "capital_sufficient": false,
+        "eligible": false,
+        "rejected_reasons": [
+          "capital $50.00 below required $400.00",
+          "adverse/gas cost dominates pessimistic reward",
+          "docs/formula unknown makes result speculative"
+        ],
+        "min_size": 200.0,
+        "max_spread": 4.5,
+        "spread_bps": 10.000000000000009,
+        "touch_depth": 13378.04928,
+        "liquidity": 13378.04928,
+        "volume": "not available",
+        "rewards_daily_rate": 3333.0,
+        "asset_address": [
+          "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
+        ],
+        "probability_of_fill": 0.030000000000000002,
+        "expected_adverse_move_pct": 0.01,
+        "quote_staleness_risk": "medium",
+        "adverse_risk_confidence": "medium",
+        "scenarios": {
+          "pessimistic": {
+            "scenario": "pessimistic",
+            "share_fraction": 0.0001,
+            "gross_reward_pool_usd_day": 3333.0,
+            "pro_rata_reward_usd_day": 0.33330000000000004,
+            "adverse_loss_usd_day": 0.015000000000000003,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.448549315068493,
+            "expected_monthly_ev_usd": -163.4564794520548,
+            "ev_per_dollar_locked": -0.10897098630136987,
+            "annualized_return_estimate": -39.774409999999996,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "base": {
+            "scenario": "base",
+            "share_fraction": 0.0005,
+            "gross_reward_pool_usd_day": 3333.0,
+            "pro_rata_reward_usd_day": 1.6665,
+            "adverse_loss_usd_day": 0.015000000000000003,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -4.115349315068492,
+            "expected_monthly_ev_usd": -123.46047945205477,
+            "ev_per_dollar_locked": -0.08230698630136984,
+            "annualized_return_estimate": -30.042049999999996,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "optimistic": {
+            "scenario": "optimistic",
+            "share_fraction": 0.001,
+            "gross_reward_pool_usd_day": 3333.0,
+            "pro_rata_reward_usd_day": 3.333,
+            "adverse_loss_usd_day": 0.015000000000000003,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -2.4488493150684927,
+            "expected_monthly_ev_usd": -73.46547945205478,
+            "ev_per_dollar_locked": -0.04897698630136985,
+            "annualized_return_estimate": -17.876599999999996,
+            "confidence": "low",
+            "small_account_viable": false
+          }
+        }
+      },
+      {
+        "market_id": "0x0c4cd2055d6ea89354ffddc55d6dbcef9355748112ea952fc925f3db6a5c457f",
+        "question": "Will Argentina win the 2026 FIFA World Cup?",
+        "capital_usd": 50,
+        "capital_required_usd": 400.0,
+        "capital_sufficient": false,
+        "eligible": false,
+        "rejected_reasons": [
+          "capital $50.00 below required $400.00",
+          "adverse/gas cost dominates pessimistic reward",
+          "docs/formula unknown makes result speculative"
+        ],
+        "min_size": 200.0,
+        "max_spread": 4.5,
+        "spread_bps": 10.000000000000009,
+        "touch_depth": 14347.535339999999,
+        "liquidity": 14347.535339999999,
+        "volume": "not available",
+        "rewards_daily_rate": 2381.0,
+        "asset_address": [
+          "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
+        ],
+        "probability_of_fill": 0.030000000000000002,
+        "expected_adverse_move_pct": 0.01,
+        "quote_staleness_risk": "medium",
+        "adverse_risk_confidence": "medium",
+        "scenarios": {
+          "pessimistic": {
+            "scenario": "pessimistic",
+            "share_fraction": 0.0001,
+            "gross_reward_pool_usd_day": 2381.0,
+            "pro_rata_reward_usd_day": 0.2381,
+            "adverse_loss_usd_day": 0.015000000000000003,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.543749315068493,
+            "expected_monthly_ev_usd": -166.3124794520548,
+            "ev_per_dollar_locked": -0.11087498630136987,
+            "annualized_return_estimate": -40.46937,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "base": {
+            "scenario": "base",
+            "share_fraction": 0.0005,
+            "gross_reward_pool_usd_day": 2381.0,
+            "pro_rata_reward_usd_day": 1.1905000000000001,
+            "adverse_loss_usd_day": 0.015000000000000003,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -4.591349315068492,
+            "expected_monthly_ev_usd": -137.74047945205476,
+            "ev_per_dollar_locked": -0.09182698630136985,
+            "annualized_return_estimate": -33.51685,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "optimistic": {
+            "scenario": "optimistic",
+            "share_fraction": 0.001,
+            "gross_reward_pool_usd_day": 2381.0,
+            "pro_rata_reward_usd_day": 2.3810000000000002,
+            "adverse_loss_usd_day": 0.015000000000000003,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -3.4008493150684926,
+            "expected_monthly_ev_usd": -102.02547945205478,
+            "ev_per_dollar_locked": -0.06801698630136985,
+            "annualized_return_estimate": -24.826199999999993,
+            "confidence": "low",
+            "small_account_viable": false
+          }
+        }
+      },
+      {
+        "market_id": "0x7976b8dbacf9077eb1453a62bcefd6ab2df199acd28aad276ff0d920d6992892",
+        "question": "Will Spain win the 2026 FIFA World Cup?",
+        "capital_usd": 50,
+        "capital_required_usd": 400.0,
+        "capital_sufficient": false,
+        "eligible": false,
+        "rejected_reasons": [
+          "capital $50.00 below required $400.00",
+          "adverse/gas cost dominates pessimistic reward",
+          "docs/formula unknown makes result speculative"
+        ],
+        "min_size": 200.0,
+        "max_spread": 4.5,
+        "spread_bps": 10.000000000000009,
+        "touch_depth": 31600.839420000004,
+        "liquidity": 31600.839420000004,
+        "volume": "not available",
+        "rewards_daily_rate": 2143.0,
+        "asset_address": [
+          "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
+        ],
+        "probability_of_fill": 0.030000000000000002,
+        "expected_adverse_move_pct": 0.01,
+        "quote_staleness_risk": "medium",
+        "adverse_risk_confidence": "medium",
+        "scenarios": {
+          "pessimistic": {
+            "scenario": "pessimistic",
+            "share_fraction": 0.0001,
+            "gross_reward_pool_usd_day": 2143.0,
+            "pro_rata_reward_usd_day": 0.21430000000000002,
+            "adverse_loss_usd_day": 0.015000000000000003,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.567549315068493,
+            "expected_monthly_ev_usd": -167.0264794520548,
+            "ev_per_dollar_locked": -0.11135098630136986,
+            "annualized_return_estimate": -40.64311,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "base": {
+            "scenario": "base",
+            "share_fraction": 0.0005,
+            "gross_reward_pool_usd_day": 2143.0,
+            "pro_rata_reward_usd_day": 1.0715000000000001,
+            "adverse_loss_usd_day": 0.015000000000000003,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -4.710349315068493,
+            "expected_monthly_ev_usd": -141.31047945205478,
+            "ev_per_dollar_locked": -0.09420698630136987,
+            "annualized_return_estimate": -34.385549999999995,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "optimistic": {
+            "scenario": "optimistic",
+            "share_fraction": 0.001,
+            "gross_reward_pool_usd_day": 2143.0,
+            "pro_rata_reward_usd_day": 2.1430000000000002,
+            "adverse_loss_usd_day": 0.015000000000000003,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -3.6388493150684926,
+            "expected_monthly_ev_usd": -109.16547945205478,
+            "ev_per_dollar_locked": -0.07277698630136985,
+            "annualized_return_estimate": -26.563599999999997,
+            "confidence": "low",
+            "small_account_viable": false
+          }
+        }
+      },
+      {
+        "market_id": "0x375409bc5eeeff961e82b479caeccc20f33d15738e5bce1186d628aa3d9dfb1f",
+        "question": "Will England win the 2026 FIFA World Cup?",
+        "capital_usd": 50,
+        "capital_required_usd": 400.0,
+        "capital_sufficient": false,
+        "eligible": false,
+        "rejected_reasons": [
+          "capital $50.00 below required $400.00",
+          "adverse/gas cost dominates pessimistic reward",
+          "docs/formula unknown makes result speculative"
+        ],
+        "min_size": 200.0,
+        "max_spread": 4.5,
+        "spread_bps": 10.000000000000009,
+        "touch_depth": 2623.74,
+        "liquidity": 2623.74,
+        "volume": "not available",
+        "rewards_daily_rate": 1667.0,
+        "asset_address": [
+          "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
+        ],
+        "probability_of_fill": 0.030000000000000002,
+        "expected_adverse_move_pct": 0.01,
+        "quote_staleness_risk": "medium",
+        "adverse_risk_confidence": "medium",
+        "scenarios": {
+          "pessimistic": {
+            "scenario": "pessimistic",
+            "share_fraction": 0.0001,
+            "gross_reward_pool_usd_day": 1667.0,
+            "pro_rata_reward_usd_day": 0.16670000000000001,
+            "adverse_loss_usd_day": 0.015000000000000003,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.615149315068493,
+            "expected_monthly_ev_usd": -168.45447945205478,
+            "ev_per_dollar_locked": -0.11230298630136985,
+            "annualized_return_estimate": -40.99058999999999,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "base": {
+            "scenario": "base",
+            "share_fraction": 0.0005,
+            "gross_reward_pool_usd_day": 1667.0,
+            "pro_rata_reward_usd_day": 0.8335,
+            "adverse_loss_usd_day": 0.015000000000000003,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -4.9483493150684925,
+            "expected_monthly_ev_usd": -148.45047945205476,
+            "ev_per_dollar_locked": -0.09896698630136985,
+            "annualized_return_estimate": -36.122949999999996,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "optimistic": {
+            "scenario": "optimistic",
+            "share_fraction": 0.001,
+            "gross_reward_pool_usd_day": 1667.0,
+            "pro_rata_reward_usd_day": 1.667,
+            "adverse_loss_usd_day": 0.015000000000000003,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -4.114849315068493,
+            "expected_monthly_ev_usd": -123.44547945205478,
+            "ev_per_dollar_locked": -0.08229698630136985,
+            "annualized_return_estimate": -30.038399999999996,
+            "confidence": "low",
+            "small_account_viable": false
+          }
+        }
+      },
+      {
+        "market_id": "0x4f3421fb2daf5cca7430ed8d8132463963081572d75434393a1808fdb8829fe8",
+        "question": "Will Portugal win the 2026 FIFA World Cup?",
+        "capital_usd": 50,
+        "capital_required_usd": 400.0,
+        "capital_sufficient": false,
+        "eligible": false,
+        "rejected_reasons": [
+          "capital $50.00 below required $400.00",
+          "adverse/gas cost dominates pessimistic reward",
+          "docs/formula unknown makes result speculative"
+        ],
+        "min_size": 200.0,
+        "max_spread": 4.5,
+        "spread_bps": 10.000000000000009,
+        "touch_depth": 688.57575,
+        "liquidity": 688.57575,
+        "volume": "not available",
+        "rewards_daily_rate": 476.0,
+        "asset_address": [
+          "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
+        ],
+        "probability_of_fill": 0.025,
+        "expected_adverse_move_pct": 0.01,
+        "quote_staleness_risk": "medium",
+        "adverse_risk_confidence": "medium",
+        "scenarios": {
+          "pessimistic": {
+            "scenario": "pessimistic",
+            "share_fraction": 0.0001,
+            "gross_reward_pool_usd_day": 476.0,
+            "pro_rata_reward_usd_day": 0.0476,
+            "adverse_loss_usd_day": 0.0125,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.731749315068493,
+            "expected_monthly_ev_usd": -171.95247945205477,
+            "ev_per_dollar_locked": -0.11463498630136985,
+            "annualized_return_estimate": -41.84177,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "base": {
+            "scenario": "base",
+            "share_fraction": 0.0005,
+            "gross_reward_pool_usd_day": 476.0,
+            "pro_rata_reward_usd_day": 0.23800000000000002,
+            "adverse_loss_usd_day": 0.0125,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.5413493150684925,
+            "expected_monthly_ev_usd": -166.24047945205479,
+            "ev_per_dollar_locked": -0.11082698630136985,
+            "annualized_return_estimate": -40.45184999999999,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "optimistic": {
+            "scenario": "optimistic",
+            "share_fraction": 0.001,
+            "gross_reward_pool_usd_day": 476.0,
+            "pro_rata_reward_usd_day": 0.47600000000000003,
+            "adverse_loss_usd_day": 0.0125,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.303349315068493,
+            "expected_monthly_ev_usd": -159.1004794520548,
+            "ev_per_dollar_locked": -0.10606698630136986,
+            "annualized_return_estimate": -38.71445,
+            "confidence": "low",
+            "small_account_viable": false
+          }
+        }
+      },
+      {
+        "market_id": "0x7ad403c3508f8e3912940fd1a913f227591145ca0614074208e0b962d5fcc422",
+        "question": "Will JD Vance win the 2028 US Presidential Election?",
+        "capital_usd": 50,
+        "capital_required_usd": 400.0,
+        "capital_sufficient": false,
+        "eligible": false,
+        "rejected_reasons": [
+          "capital $50.00 below required $400.00",
+          "touch depth too thin",
+          "adverse/gas cost dominates pessimistic reward",
+          "docs/formula unknown makes result speculative"
+        ],
+        "min_size": 200.0,
+        "max_spread": 5.5,
+        "spread_bps": 10.000000000000009,
+        "touch_depth": 44.6622,
+        "liquidity": 44.6622,
+        "volume": "not available",
+        "rewards_daily_rate": 428.0,
+        "asset_address": [
+          "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
+        ],
+        "probability_of_fill": 0.045,
+        "expected_adverse_move_pct": 0.01,
+        "quote_staleness_risk": "medium",
+        "adverse_risk_confidence": "medium",
+        "scenarios": {
+          "pessimistic": {
+            "scenario": "pessimistic",
+            "share_fraction": 0.0001,
+            "gross_reward_pool_usd_day": 428.0,
+            "pro_rata_reward_usd_day": 0.042800000000000005,
+            "adverse_loss_usd_day": 0.0225,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.746549315068493,
+            "expected_monthly_ev_usd": -172.3964794520548,
+            "ev_per_dollar_locked": -0.11493098630136986,
+            "annualized_return_estimate": -41.94981,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "base": {
+            "scenario": "base",
+            "share_fraction": 0.0005,
+            "gross_reward_pool_usd_day": 428.0,
+            "pro_rata_reward_usd_day": 0.214,
+            "adverse_loss_usd_day": 0.0225,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.575349315068493,
+            "expected_monthly_ev_usd": -167.2604794520548,
+            "ev_per_dollar_locked": -0.11150698630136986,
+            "annualized_return_estimate": -40.700050000000005,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "optimistic": {
+            "scenario": "optimistic",
+            "share_fraction": 0.001,
+            "gross_reward_pool_usd_day": 428.0,
+            "pro_rata_reward_usd_day": 0.428,
+            "adverse_loss_usd_day": 0.0225,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.361349315068493,
+            "expected_monthly_ev_usd": -160.84047945205478,
+            "ev_per_dollar_locked": -0.10722698630136986,
+            "annualized_return_estimate": -39.13785,
+            "confidence": "low",
+            "small_account_viable": false
+          }
+        }
+      },
+      {
+        "market_id": "0x4567b275e6b667a6217f5cb4f06a797d3a1eaf1d0281fb5bc8c75e2046ae7e57",
+        "question": "Will Gavin Newsom win the 2028 US Presidential Election?",
+        "capital_usd": 50,
+        "capital_required_usd": 400.0,
+        "capital_sufficient": false,
+        "eligible": false,
+        "rejected_reasons": [
+          "capital $50.00 below required $400.00",
+          "adverse/gas cost dominates pessimistic reward",
+          "docs/formula unknown makes result speculative"
+        ],
+        "min_size": 200.0,
+        "max_spread": 5.5,
+        "spread_bps": 10.000000000000009,
+        "touch_depth": 409.2597,
+        "liquidity": 409.2597,
+        "volume": "not available",
+        "rewards_daily_rate": 286.0,
+        "asset_address": [
+          "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
+        ],
+        "probability_of_fill": 0.025,
+        "expected_adverse_move_pct": 0.01,
+        "quote_staleness_risk": "medium",
+        "adverse_risk_confidence": "medium",
+        "scenarios": {
+          "pessimistic": {
+            "scenario": "pessimistic",
+            "share_fraction": 0.0001,
+            "gross_reward_pool_usd_day": 286.0,
+            "pro_rata_reward_usd_day": 0.0286,
+            "adverse_loss_usd_day": 0.0125,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.750749315068493,
+            "expected_monthly_ev_usd": -172.5224794520548,
+            "ev_per_dollar_locked": -0.11501498630136986,
+            "annualized_return_estimate": -41.98047,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "base": {
+            "scenario": "base",
+            "share_fraction": 0.0005,
+            "gross_reward_pool_usd_day": 286.0,
+            "pro_rata_reward_usd_day": 0.14300000000000002,
+            "adverse_loss_usd_day": 0.0125,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.636349315068493,
+            "expected_monthly_ev_usd": -169.0904794520548,
+            "ev_per_dollar_locked": -0.11272698630136986,
+            "annualized_return_estimate": -41.14535,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "optimistic": {
+            "scenario": "optimistic",
+            "share_fraction": 0.001,
+            "gross_reward_pool_usd_day": 286.0,
+            "pro_rata_reward_usd_day": 0.28600000000000003,
+            "adverse_loss_usd_day": 0.0125,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.4933493150684924,
+            "expected_monthly_ev_usd": -164.8004794520548,
+            "ev_per_dollar_locked": -0.10986698630136985,
+            "annualized_return_estimate": -40.10144999999999,
+            "confidence": "low",
+            "small_account_viable": false
+          }
+        }
+      },
+      {
+        "market_id": "0x2053d8515f1b8cbeea4ccdb56e60e89c2617e43a8660d95166b8e71d27865277",
+        "question": "Will Marco Rubio win the 2028 US Presidential Election?",
+        "capital_usd": 50,
+        "capital_required_usd": 400.0,
+        "capital_sufficient": false,
+        "eligible": false,
+        "rejected_reasons": [
+          "capital $50.00 below required $400.00",
+          "adverse/gas cost dominates pessimistic reward",
+          "docs/formula unknown makes result speculative"
+        ],
+        "min_size": 200.0,
+        "max_spread": 5.5,
+        "spread_bps": 10.000000000000009,
+        "touch_depth": 576.6809499999999,
+        "liquidity": 576.6809499999999,
+        "volume": "not available",
+        "rewards_daily_rate": 286.0,
+        "asset_address": [
+          "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
+        ],
+        "probability_of_fill": 0.025,
+        "expected_adverse_move_pct": 0.01,
+        "quote_staleness_risk": "medium",
+        "adverse_risk_confidence": "medium",
+        "scenarios": {
+          "pessimistic": {
+            "scenario": "pessimistic",
+            "share_fraction": 0.0001,
+            "gross_reward_pool_usd_day": 286.0,
+            "pro_rata_reward_usd_day": 0.0286,
+            "adverse_loss_usd_day": 0.0125,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.750749315068493,
+            "expected_monthly_ev_usd": -172.5224794520548,
+            "ev_per_dollar_locked": -0.11501498630136986,
+            "annualized_return_estimate": -41.98047,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "base": {
+            "scenario": "base",
+            "share_fraction": 0.0005,
+            "gross_reward_pool_usd_day": 286.0,
+            "pro_rata_reward_usd_day": 0.14300000000000002,
+            "adverse_loss_usd_day": 0.0125,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.636349315068493,
+            "expected_monthly_ev_usd": -169.0904794520548,
+            "ev_per_dollar_locked": -0.11272698630136986,
+            "annualized_return_estimate": -41.14535,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "optimistic": {
+            "scenario": "optimistic",
+            "share_fraction": 0.001,
+            "gross_reward_pool_usd_day": 286.0,
+            "pro_rata_reward_usd_day": 0.28600000000000003,
+            "adverse_loss_usd_day": 0.0125,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.4933493150684924,
+            "expected_monthly_ev_usd": -164.8004794520548,
+            "ev_per_dollar_locked": -0.10986698630136985,
+            "annualized_return_estimate": -40.10144999999999,
+            "confidence": "low",
+            "small_account_viable": false
+          }
+        }
+      },
+      {
+        "market_id": "0x0f49db97f71c68b1e42a6d16e3de93d85dbf7d4148e3f018eb79e88554be9f75",
+        "question": "Will Gavin Newsom win the 2028 Democratic presidential nomination?",
+        "capital_usd": 50,
+        "capital_required_usd": 200.0,
+        "capital_sufficient": false,
+        "eligible": false,
+        "rejected_reasons": [
+          "capital $50.00 below required $200.00",
+          "touch depth too thin",
+          "adverse/gas cost dominates pessimistic reward",
+          "docs/formula unknown makes result speculative"
+        ],
+        "min_size": 100.0,
+        "max_spread": 4.5,
+        "spread_bps": 20.000000000000018,
+        "touch_depth": 36.676080000000006,
+        "liquidity": 36.676080000000006,
+        "volume": "not available",
+        "rewards_daily_rate": 124.0,
+        "asset_address": [
+          "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
+        ],
+        "probability_of_fill": 0.03,
+        "expected_adverse_move_pct": 0.01,
+        "quote_staleness_risk": "medium",
+        "adverse_risk_confidence": "medium",
+        "scenarios": {
+          "pessimistic": {
+            "scenario": "pessimistic",
+            "share_fraction": 0.0001,
+            "gross_reward_pool_usd_day": 124.0,
+            "pro_rata_reward_usd_day": 0.012400000000000001,
+            "adverse_loss_usd_day": 0.015,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.769449315068493,
+            "expected_monthly_ev_usd": -173.08347945205477,
+            "ev_per_dollar_locked": -0.11538898630136986,
+            "annualized_return_estimate": -42.11697999999999,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "base": {
+            "scenario": "base",
+            "share_fraction": 0.0005,
+            "gross_reward_pool_usd_day": 124.0,
+            "pro_rata_reward_usd_day": 0.062,
+            "adverse_loss_usd_day": 0.015,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.719849315068493,
+            "expected_monthly_ev_usd": -171.5954794520548,
+            "ev_per_dollar_locked": -0.11439698630136987,
+            "annualized_return_estimate": -41.7549,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "optimistic": {
+            "scenario": "optimistic",
+            "share_fraction": 0.001,
+            "gross_reward_pool_usd_day": 124.0,
+            "pro_rata_reward_usd_day": 0.124,
+            "adverse_loss_usd_day": 0.015,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.657849315068493,
+            "expected_monthly_ev_usd": -169.7354794520548,
+            "ev_per_dollar_locked": -0.11315698630136986,
+            "annualized_return_estimate": -41.302299999999995,
+            "confidence": "low",
+            "small_account_viable": false
+          }
+        }
+      },
+      {
+        "market_id": "0x6bd56627aa21311850825edb27e53434a0e17a4f782be0086bc07f71eee00d0d",
+        "question": "Putin out as President of Russia by December 31, 2026?",
+        "capital_usd": 50,
+        "capital_required_usd": 400.0,
+        "capital_sufficient": false,
+        "eligible": false,
+        "rejected_reasons": [
+          "capital $50.00 below required $400.00",
+          "adverse/gas cost dominates pessimistic reward",
+          "docs/formula unknown makes result speculative"
+        ],
+        "min_size": 200.0,
+        "max_spread": 3.5,
+        "spread_bps": 99.99999999999994,
+        "touch_depth": 1736.3349,
+        "liquidity": 1736.3349,
+        "volume": "not available",
+        "rewards_daily_rate": 50.0,
+        "asset_address": [
+          "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
+        ],
+        "probability_of_fill": 0.015,
+        "expected_adverse_move_pct": 0.01,
+        "quote_staleness_risk": "medium",
+        "adverse_risk_confidence": "medium",
+        "scenarios": {
+          "pessimistic": {
+            "scenario": "pessimistic",
+            "share_fraction": 0.0001,
+            "gross_reward_pool_usd_day": 50.0,
+            "pro_rata_reward_usd_day": 0.005,
+            "adverse_loss_usd_day": 0.0075,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.769349315068493,
+            "expected_monthly_ev_usd": -173.0804794520548,
+            "ev_per_dollar_locked": -0.11538698630136986,
+            "annualized_return_estimate": -42.11625,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "base": {
+            "scenario": "base",
+            "share_fraction": 0.0005,
+            "gross_reward_pool_usd_day": 50.0,
+            "pro_rata_reward_usd_day": 0.025,
+            "adverse_loss_usd_day": 0.0075,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.749349315068493,
+            "expected_monthly_ev_usd": -172.4804794520548,
+            "ev_per_dollar_locked": -0.11498698630136986,
+            "annualized_return_estimate": -41.97024999999999,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "optimistic": {
+            "scenario": "optimistic",
+            "share_fraction": 0.001,
+            "gross_reward_pool_usd_day": 50.0,
+            "pro_rata_reward_usd_day": 0.05,
+            "adverse_loss_usd_day": 0.0075,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.724349315068492,
+            "expected_monthly_ev_usd": -171.73047945205477,
+            "ev_per_dollar_locked": -0.11448698630136984,
+            "annualized_return_estimate": -41.787749999999996,
+            "confidence": "low",
+            "small_account_viable": false
+          }
+        }
+      }
+    ],
+    "optimistic": [
+      {
+        "market_id": "0x9b6fef249040fd17e9c107955b37ac2c3e923509b6b0ff01cc463a331ddeb894",
+        "question": "Will France win the 2026 FIFA World Cup?",
+        "capital_usd": 50,
+        "capital_required_usd": 400.0,
+        "capital_sufficient": false,
+        "eligible": false,
+        "rejected_reasons": [
+          "capital $50.00 below required $400.00",
+          "adverse/gas cost dominates pessimistic reward",
+          "docs/formula unknown makes result speculative"
+        ],
+        "min_size": 200.0,
+        "max_spread": 4.5,
+        "spread_bps": 10.000000000000009,
+        "touch_depth": 13378.04928,
+        "liquidity": 13378.04928,
+        "volume": "not available",
+        "rewards_daily_rate": 3333.0,
+        "asset_address": [
+          "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
+        ],
+        "probability_of_fill": 0.030000000000000002,
+        "expected_adverse_move_pct": 0.01,
+        "quote_staleness_risk": "medium",
+        "adverse_risk_confidence": "medium",
+        "scenarios": {
+          "pessimistic": {
+            "scenario": "pessimistic",
+            "share_fraction": 0.0001,
+            "gross_reward_pool_usd_day": 3333.0,
+            "pro_rata_reward_usd_day": 0.33330000000000004,
+            "adverse_loss_usd_day": 0.015000000000000003,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.448549315068493,
+            "expected_monthly_ev_usd": -163.4564794520548,
+            "ev_per_dollar_locked": -0.10897098630136987,
+            "annualized_return_estimate": -39.774409999999996,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "base": {
+            "scenario": "base",
+            "share_fraction": 0.0005,
+            "gross_reward_pool_usd_day": 3333.0,
+            "pro_rata_reward_usd_day": 1.6665,
+            "adverse_loss_usd_day": 0.015000000000000003,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -4.115349315068492,
+            "expected_monthly_ev_usd": -123.46047945205477,
+            "ev_per_dollar_locked": -0.08230698630136984,
+            "annualized_return_estimate": -30.042049999999996,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "optimistic": {
+            "scenario": "optimistic",
+            "share_fraction": 0.001,
+            "gross_reward_pool_usd_day": 3333.0,
+            "pro_rata_reward_usd_day": 3.333,
+            "adverse_loss_usd_day": 0.015000000000000003,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -2.4488493150684927,
+            "expected_monthly_ev_usd": -73.46547945205478,
+            "ev_per_dollar_locked": -0.04897698630136985,
+            "annualized_return_estimate": -17.876599999999996,
+            "confidence": "low",
+            "small_account_viable": false
+          }
+        }
+      },
+      {
+        "market_id": "0x0c4cd2055d6ea89354ffddc55d6dbcef9355748112ea952fc925f3db6a5c457f",
+        "question": "Will Argentina win the 2026 FIFA World Cup?",
+        "capital_usd": 50,
+        "capital_required_usd": 400.0,
+        "capital_sufficient": false,
+        "eligible": false,
+        "rejected_reasons": [
+          "capital $50.00 below required $400.00",
+          "adverse/gas cost dominates pessimistic reward",
+          "docs/formula unknown makes result speculative"
+        ],
+        "min_size": 200.0,
+        "max_spread": 4.5,
+        "spread_bps": 10.000000000000009,
+        "touch_depth": 14347.535339999999,
+        "liquidity": 14347.535339999999,
+        "volume": "not available",
+        "rewards_daily_rate": 2381.0,
+        "asset_address": [
+          "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
+        ],
+        "probability_of_fill": 0.030000000000000002,
+        "expected_adverse_move_pct": 0.01,
+        "quote_staleness_risk": "medium",
+        "adverse_risk_confidence": "medium",
+        "scenarios": {
+          "pessimistic": {
+            "scenario": "pessimistic",
+            "share_fraction": 0.0001,
+            "gross_reward_pool_usd_day": 2381.0,
+            "pro_rata_reward_usd_day": 0.2381,
+            "adverse_loss_usd_day": 0.015000000000000003,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.543749315068493,
+            "expected_monthly_ev_usd": -166.3124794520548,
+            "ev_per_dollar_locked": -0.11087498630136987,
+            "annualized_return_estimate": -40.46937,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "base": {
+            "scenario": "base",
+            "share_fraction": 0.0005,
+            "gross_reward_pool_usd_day": 2381.0,
+            "pro_rata_reward_usd_day": 1.1905000000000001,
+            "adverse_loss_usd_day": 0.015000000000000003,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -4.591349315068492,
+            "expected_monthly_ev_usd": -137.74047945205476,
+            "ev_per_dollar_locked": -0.09182698630136985,
+            "annualized_return_estimate": -33.51685,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "optimistic": {
+            "scenario": "optimistic",
+            "share_fraction": 0.001,
+            "gross_reward_pool_usd_day": 2381.0,
+            "pro_rata_reward_usd_day": 2.3810000000000002,
+            "adverse_loss_usd_day": 0.015000000000000003,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -3.4008493150684926,
+            "expected_monthly_ev_usd": -102.02547945205478,
+            "ev_per_dollar_locked": -0.06801698630136985,
+            "annualized_return_estimate": -24.826199999999993,
+            "confidence": "low",
+            "small_account_viable": false
+          }
+        }
+      },
+      {
+        "market_id": "0x7976b8dbacf9077eb1453a62bcefd6ab2df199acd28aad276ff0d920d6992892",
+        "question": "Will Spain win the 2026 FIFA World Cup?",
+        "capital_usd": 50,
+        "capital_required_usd": 400.0,
+        "capital_sufficient": false,
+        "eligible": false,
+        "rejected_reasons": [
+          "capital $50.00 below required $400.00",
+          "adverse/gas cost dominates pessimistic reward",
+          "docs/formula unknown makes result speculative"
+        ],
+        "min_size": 200.0,
+        "max_spread": 4.5,
+        "spread_bps": 10.000000000000009,
+        "touch_depth": 31600.839420000004,
+        "liquidity": 31600.839420000004,
+        "volume": "not available",
+        "rewards_daily_rate": 2143.0,
+        "asset_address": [
+          "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
+        ],
+        "probability_of_fill": 0.030000000000000002,
+        "expected_adverse_move_pct": 0.01,
+        "quote_staleness_risk": "medium",
+        "adverse_risk_confidence": "medium",
+        "scenarios": {
+          "pessimistic": {
+            "scenario": "pessimistic",
+            "share_fraction": 0.0001,
+            "gross_reward_pool_usd_day": 2143.0,
+            "pro_rata_reward_usd_day": 0.21430000000000002,
+            "adverse_loss_usd_day": 0.015000000000000003,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.567549315068493,
+            "expected_monthly_ev_usd": -167.0264794520548,
+            "ev_per_dollar_locked": -0.11135098630136986,
+            "annualized_return_estimate": -40.64311,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "base": {
+            "scenario": "base",
+            "share_fraction": 0.0005,
+            "gross_reward_pool_usd_day": 2143.0,
+            "pro_rata_reward_usd_day": 1.0715000000000001,
+            "adverse_loss_usd_day": 0.015000000000000003,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -4.710349315068493,
+            "expected_monthly_ev_usd": -141.31047945205478,
+            "ev_per_dollar_locked": -0.09420698630136987,
+            "annualized_return_estimate": -34.385549999999995,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "optimistic": {
+            "scenario": "optimistic",
+            "share_fraction": 0.001,
+            "gross_reward_pool_usd_day": 2143.0,
+            "pro_rata_reward_usd_day": 2.1430000000000002,
+            "adverse_loss_usd_day": 0.015000000000000003,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -3.6388493150684926,
+            "expected_monthly_ev_usd": -109.16547945205478,
+            "ev_per_dollar_locked": -0.07277698630136985,
+            "annualized_return_estimate": -26.563599999999997,
+            "confidence": "low",
+            "small_account_viable": false
+          }
+        }
+      },
+      {
+        "market_id": "0x375409bc5eeeff961e82b479caeccc20f33d15738e5bce1186d628aa3d9dfb1f",
+        "question": "Will England win the 2026 FIFA World Cup?",
+        "capital_usd": 50,
+        "capital_required_usd": 400.0,
+        "capital_sufficient": false,
+        "eligible": false,
+        "rejected_reasons": [
+          "capital $50.00 below required $400.00",
+          "adverse/gas cost dominates pessimistic reward",
+          "docs/formula unknown makes result speculative"
+        ],
+        "min_size": 200.0,
+        "max_spread": 4.5,
+        "spread_bps": 10.000000000000009,
+        "touch_depth": 2623.74,
+        "liquidity": 2623.74,
+        "volume": "not available",
+        "rewards_daily_rate": 1667.0,
+        "asset_address": [
+          "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
+        ],
+        "probability_of_fill": 0.030000000000000002,
+        "expected_adverse_move_pct": 0.01,
+        "quote_staleness_risk": "medium",
+        "adverse_risk_confidence": "medium",
+        "scenarios": {
+          "pessimistic": {
+            "scenario": "pessimistic",
+            "share_fraction": 0.0001,
+            "gross_reward_pool_usd_day": 1667.0,
+            "pro_rata_reward_usd_day": 0.16670000000000001,
+            "adverse_loss_usd_day": 0.015000000000000003,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.615149315068493,
+            "expected_monthly_ev_usd": -168.45447945205478,
+            "ev_per_dollar_locked": -0.11230298630136985,
+            "annualized_return_estimate": -40.99058999999999,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "base": {
+            "scenario": "base",
+            "share_fraction": 0.0005,
+            "gross_reward_pool_usd_day": 1667.0,
+            "pro_rata_reward_usd_day": 0.8335,
+            "adverse_loss_usd_day": 0.015000000000000003,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -4.9483493150684925,
+            "expected_monthly_ev_usd": -148.45047945205476,
+            "ev_per_dollar_locked": -0.09896698630136985,
+            "annualized_return_estimate": -36.122949999999996,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "optimistic": {
+            "scenario": "optimistic",
+            "share_fraction": 0.001,
+            "gross_reward_pool_usd_day": 1667.0,
+            "pro_rata_reward_usd_day": 1.667,
+            "adverse_loss_usd_day": 0.015000000000000003,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -4.114849315068493,
+            "expected_monthly_ev_usd": -123.44547945205478,
+            "ev_per_dollar_locked": -0.08229698630136985,
+            "annualized_return_estimate": -30.038399999999996,
+            "confidence": "low",
+            "small_account_viable": false
+          }
+        }
+      },
+      {
+        "market_id": "0x4f3421fb2daf5cca7430ed8d8132463963081572d75434393a1808fdb8829fe8",
+        "question": "Will Portugal win the 2026 FIFA World Cup?",
+        "capital_usd": 50,
+        "capital_required_usd": 400.0,
+        "capital_sufficient": false,
+        "eligible": false,
+        "rejected_reasons": [
+          "capital $50.00 below required $400.00",
+          "adverse/gas cost dominates pessimistic reward",
+          "docs/formula unknown makes result speculative"
+        ],
+        "min_size": 200.0,
+        "max_spread": 4.5,
+        "spread_bps": 10.000000000000009,
+        "touch_depth": 688.57575,
+        "liquidity": 688.57575,
+        "volume": "not available",
+        "rewards_daily_rate": 476.0,
+        "asset_address": [
+          "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
+        ],
+        "probability_of_fill": 0.025,
+        "expected_adverse_move_pct": 0.01,
+        "quote_staleness_risk": "medium",
+        "adverse_risk_confidence": "medium",
+        "scenarios": {
+          "pessimistic": {
+            "scenario": "pessimistic",
+            "share_fraction": 0.0001,
+            "gross_reward_pool_usd_day": 476.0,
+            "pro_rata_reward_usd_day": 0.0476,
+            "adverse_loss_usd_day": 0.0125,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.731749315068493,
+            "expected_monthly_ev_usd": -171.95247945205477,
+            "ev_per_dollar_locked": -0.11463498630136985,
+            "annualized_return_estimate": -41.84177,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "base": {
+            "scenario": "base",
+            "share_fraction": 0.0005,
+            "gross_reward_pool_usd_day": 476.0,
+            "pro_rata_reward_usd_day": 0.23800000000000002,
+            "adverse_loss_usd_day": 0.0125,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.5413493150684925,
+            "expected_monthly_ev_usd": -166.24047945205479,
+            "ev_per_dollar_locked": -0.11082698630136985,
+            "annualized_return_estimate": -40.45184999999999,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "optimistic": {
+            "scenario": "optimistic",
+            "share_fraction": 0.001,
+            "gross_reward_pool_usd_day": 476.0,
+            "pro_rata_reward_usd_day": 0.47600000000000003,
+            "adverse_loss_usd_day": 0.0125,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.303349315068493,
+            "expected_monthly_ev_usd": -159.1004794520548,
+            "ev_per_dollar_locked": -0.10606698630136986,
+            "annualized_return_estimate": -38.71445,
+            "confidence": "low",
+            "small_account_viable": false
+          }
+        }
+      },
+      {
+        "market_id": "0x7ad403c3508f8e3912940fd1a913f227591145ca0614074208e0b962d5fcc422",
+        "question": "Will JD Vance win the 2028 US Presidential Election?",
+        "capital_usd": 50,
+        "capital_required_usd": 400.0,
+        "capital_sufficient": false,
+        "eligible": false,
+        "rejected_reasons": [
+          "capital $50.00 below required $400.00",
+          "touch depth too thin",
+          "adverse/gas cost dominates pessimistic reward",
+          "docs/formula unknown makes result speculative"
+        ],
+        "min_size": 200.0,
+        "max_spread": 5.5,
+        "spread_bps": 10.000000000000009,
+        "touch_depth": 44.6622,
+        "liquidity": 44.6622,
+        "volume": "not available",
+        "rewards_daily_rate": 428.0,
+        "asset_address": [
+          "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
+        ],
+        "probability_of_fill": 0.045,
+        "expected_adverse_move_pct": 0.01,
+        "quote_staleness_risk": "medium",
+        "adverse_risk_confidence": "medium",
+        "scenarios": {
+          "pessimistic": {
+            "scenario": "pessimistic",
+            "share_fraction": 0.0001,
+            "gross_reward_pool_usd_day": 428.0,
+            "pro_rata_reward_usd_day": 0.042800000000000005,
+            "adverse_loss_usd_day": 0.0225,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.746549315068493,
+            "expected_monthly_ev_usd": -172.3964794520548,
+            "ev_per_dollar_locked": -0.11493098630136986,
+            "annualized_return_estimate": -41.94981,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "base": {
+            "scenario": "base",
+            "share_fraction": 0.0005,
+            "gross_reward_pool_usd_day": 428.0,
+            "pro_rata_reward_usd_day": 0.214,
+            "adverse_loss_usd_day": 0.0225,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.575349315068493,
+            "expected_monthly_ev_usd": -167.2604794520548,
+            "ev_per_dollar_locked": -0.11150698630136986,
+            "annualized_return_estimate": -40.700050000000005,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "optimistic": {
+            "scenario": "optimistic",
+            "share_fraction": 0.001,
+            "gross_reward_pool_usd_day": 428.0,
+            "pro_rata_reward_usd_day": 0.428,
+            "adverse_loss_usd_day": 0.0225,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.361349315068493,
+            "expected_monthly_ev_usd": -160.84047945205478,
+            "ev_per_dollar_locked": -0.10722698630136986,
+            "annualized_return_estimate": -39.13785,
+            "confidence": "low",
+            "small_account_viable": false
+          }
+        }
+      },
+      {
+        "market_id": "0x4567b275e6b667a6217f5cb4f06a797d3a1eaf1d0281fb5bc8c75e2046ae7e57",
+        "question": "Will Gavin Newsom win the 2028 US Presidential Election?",
+        "capital_usd": 50,
+        "capital_required_usd": 400.0,
+        "capital_sufficient": false,
+        "eligible": false,
+        "rejected_reasons": [
+          "capital $50.00 below required $400.00",
+          "adverse/gas cost dominates pessimistic reward",
+          "docs/formula unknown makes result speculative"
+        ],
+        "min_size": 200.0,
+        "max_spread": 5.5,
+        "spread_bps": 10.000000000000009,
+        "touch_depth": 409.2597,
+        "liquidity": 409.2597,
+        "volume": "not available",
+        "rewards_daily_rate": 286.0,
+        "asset_address": [
+          "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
+        ],
+        "probability_of_fill": 0.025,
+        "expected_adverse_move_pct": 0.01,
+        "quote_staleness_risk": "medium",
+        "adverse_risk_confidence": "medium",
+        "scenarios": {
+          "pessimistic": {
+            "scenario": "pessimistic",
+            "share_fraction": 0.0001,
+            "gross_reward_pool_usd_day": 286.0,
+            "pro_rata_reward_usd_day": 0.0286,
+            "adverse_loss_usd_day": 0.0125,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.750749315068493,
+            "expected_monthly_ev_usd": -172.5224794520548,
+            "ev_per_dollar_locked": -0.11501498630136986,
+            "annualized_return_estimate": -41.98047,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "base": {
+            "scenario": "base",
+            "share_fraction": 0.0005,
+            "gross_reward_pool_usd_day": 286.0,
+            "pro_rata_reward_usd_day": 0.14300000000000002,
+            "adverse_loss_usd_day": 0.0125,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.636349315068493,
+            "expected_monthly_ev_usd": -169.0904794520548,
+            "ev_per_dollar_locked": -0.11272698630136986,
+            "annualized_return_estimate": -41.14535,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "optimistic": {
+            "scenario": "optimistic",
+            "share_fraction": 0.001,
+            "gross_reward_pool_usd_day": 286.0,
+            "pro_rata_reward_usd_day": 0.28600000000000003,
+            "adverse_loss_usd_day": 0.0125,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.4933493150684924,
+            "expected_monthly_ev_usd": -164.8004794520548,
+            "ev_per_dollar_locked": -0.10986698630136985,
+            "annualized_return_estimate": -40.10144999999999,
+            "confidence": "low",
+            "small_account_viable": false
+          }
+        }
+      },
+      {
+        "market_id": "0x2053d8515f1b8cbeea4ccdb56e60e89c2617e43a8660d95166b8e71d27865277",
+        "question": "Will Marco Rubio win the 2028 US Presidential Election?",
+        "capital_usd": 50,
+        "capital_required_usd": 400.0,
+        "capital_sufficient": false,
+        "eligible": false,
+        "rejected_reasons": [
+          "capital $50.00 below required $400.00",
+          "adverse/gas cost dominates pessimistic reward",
+          "docs/formula unknown makes result speculative"
+        ],
+        "min_size": 200.0,
+        "max_spread": 5.5,
+        "spread_bps": 10.000000000000009,
+        "touch_depth": 576.6809499999999,
+        "liquidity": 576.6809499999999,
+        "volume": "not available",
+        "rewards_daily_rate": 286.0,
+        "asset_address": [
+          "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
+        ],
+        "probability_of_fill": 0.025,
+        "expected_adverse_move_pct": 0.01,
+        "quote_staleness_risk": "medium",
+        "adverse_risk_confidence": "medium",
+        "scenarios": {
+          "pessimistic": {
+            "scenario": "pessimistic",
+            "share_fraction": 0.0001,
+            "gross_reward_pool_usd_day": 286.0,
+            "pro_rata_reward_usd_day": 0.0286,
+            "adverse_loss_usd_day": 0.0125,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.750749315068493,
+            "expected_monthly_ev_usd": -172.5224794520548,
+            "ev_per_dollar_locked": -0.11501498630136986,
+            "annualized_return_estimate": -41.98047,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "base": {
+            "scenario": "base",
+            "share_fraction": 0.0005,
+            "gross_reward_pool_usd_day": 286.0,
+            "pro_rata_reward_usd_day": 0.14300000000000002,
+            "adverse_loss_usd_day": 0.0125,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.636349315068493,
+            "expected_monthly_ev_usd": -169.0904794520548,
+            "ev_per_dollar_locked": -0.11272698630136986,
+            "annualized_return_estimate": -41.14535,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "optimistic": {
+            "scenario": "optimistic",
+            "share_fraction": 0.001,
+            "gross_reward_pool_usd_day": 286.0,
+            "pro_rata_reward_usd_day": 0.28600000000000003,
+            "adverse_loss_usd_day": 0.0125,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.4933493150684924,
+            "expected_monthly_ev_usd": -164.8004794520548,
+            "ev_per_dollar_locked": -0.10986698630136985,
+            "annualized_return_estimate": -40.10144999999999,
+            "confidence": "low",
+            "small_account_viable": false
+          }
+        }
+      },
+      {
+        "market_id": "0x0f49db97f71c68b1e42a6d16e3de93d85dbf7d4148e3f018eb79e88554be9f75",
+        "question": "Will Gavin Newsom win the 2028 Democratic presidential nomination?",
+        "capital_usd": 50,
+        "capital_required_usd": 200.0,
+        "capital_sufficient": false,
+        "eligible": false,
+        "rejected_reasons": [
+          "capital $50.00 below required $200.00",
+          "touch depth too thin",
+          "adverse/gas cost dominates pessimistic reward",
+          "docs/formula unknown makes result speculative"
+        ],
+        "min_size": 100.0,
+        "max_spread": 4.5,
+        "spread_bps": 20.000000000000018,
+        "touch_depth": 36.676080000000006,
+        "liquidity": 36.676080000000006,
+        "volume": "not available",
+        "rewards_daily_rate": 124.0,
+        "asset_address": [
+          "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
+        ],
+        "probability_of_fill": 0.03,
+        "expected_adverse_move_pct": 0.01,
+        "quote_staleness_risk": "medium",
+        "adverse_risk_confidence": "medium",
+        "scenarios": {
+          "pessimistic": {
+            "scenario": "pessimistic",
+            "share_fraction": 0.0001,
+            "gross_reward_pool_usd_day": 124.0,
+            "pro_rata_reward_usd_day": 0.012400000000000001,
+            "adverse_loss_usd_day": 0.015,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.769449315068493,
+            "expected_monthly_ev_usd": -173.08347945205477,
+            "ev_per_dollar_locked": -0.11538898630136986,
+            "annualized_return_estimate": -42.11697999999999,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "base": {
+            "scenario": "base",
+            "share_fraction": 0.0005,
+            "gross_reward_pool_usd_day": 124.0,
+            "pro_rata_reward_usd_day": 0.062,
+            "adverse_loss_usd_day": 0.015,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.719849315068493,
+            "expected_monthly_ev_usd": -171.5954794520548,
+            "ev_per_dollar_locked": -0.11439698630136987,
+            "annualized_return_estimate": -41.7549,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "optimistic": {
+            "scenario": "optimistic",
+            "share_fraction": 0.001,
+            "gross_reward_pool_usd_day": 124.0,
+            "pro_rata_reward_usd_day": 0.124,
+            "adverse_loss_usd_day": 0.015,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.657849315068493,
+            "expected_monthly_ev_usd": -169.7354794520548,
+            "ev_per_dollar_locked": -0.11315698630136986,
+            "annualized_return_estimate": -41.302299999999995,
+            "confidence": "low",
+            "small_account_viable": false
+          }
+        }
+      },
+      {
+        "market_id": "0x6bd56627aa21311850825edb27e53434a0e17a4f782be0086bc07f71eee00d0d",
+        "question": "Putin out as President of Russia by December 31, 2026?",
+        "capital_usd": 50,
+        "capital_required_usd": 400.0,
+        "capital_sufficient": false,
+        "eligible": false,
+        "rejected_reasons": [
+          "capital $50.00 below required $400.00",
+          "adverse/gas cost dominates pessimistic reward",
+          "docs/formula unknown makes result speculative"
+        ],
+        "min_size": 200.0,
+        "max_spread": 3.5,
+        "spread_bps": 99.99999999999994,
+        "touch_depth": 1736.3349,
+        "liquidity": 1736.3349,
+        "volume": "not available",
+        "rewards_daily_rate": 50.0,
+        "asset_address": [
+          "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
+        ],
+        "probability_of_fill": 0.015,
+        "expected_adverse_move_pct": 0.01,
+        "quote_staleness_risk": "medium",
+        "adverse_risk_confidence": "medium",
+        "scenarios": {
+          "pessimistic": {
+            "scenario": "pessimistic",
+            "share_fraction": 0.0001,
+            "gross_reward_pool_usd_day": 50.0,
+            "pro_rata_reward_usd_day": 0.005,
+            "adverse_loss_usd_day": 0.0075,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.769349315068493,
+            "expected_monthly_ev_usd": -173.0804794520548,
+            "ev_per_dollar_locked": -0.11538698630136986,
+            "annualized_return_estimate": -42.11625,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "base": {
+            "scenario": "base",
+            "share_fraction": 0.0005,
+            "gross_reward_pool_usd_day": 50.0,
+            "pro_rata_reward_usd_day": 0.025,
+            "adverse_loss_usd_day": 0.0075,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.749349315068493,
+            "expected_monthly_ev_usd": -172.4804794520548,
+            "ev_per_dollar_locked": -0.11498698630136986,
+            "annualized_return_estimate": -41.97024999999999,
+            "confidence": "low",
+            "small_account_viable": false
+          },
+          "optimistic": {
+            "scenario": "optimistic",
+            "share_fraction": 0.001,
+            "gross_reward_pool_usd_day": 50.0,
+            "pro_rata_reward_usd_day": 0.05,
+            "adverse_loss_usd_day": 0.0075,
+            "worst_case_loss_usd": 1.5,
+            "gas_usd_day": 5.76,
+            "opportunity_cost_usd_day": 0.00684931506849315,
+            "expected_net_ev_usd_day": -5.724349315068492,
+            "expected_monthly_ev_usd": -171.73047945205477,
+            "ev_per_dollar_locked": -0.11448698630136984,
+            "annualized_return_estimate": -41.787749999999996,
+            "confidence": "low",
+            "small_account_viable": false
+          }
+        }
+      }
+    ]
+  },
+  "rejected": [
+    {
+      "market_id": "0x9b6fef249040fd17e9c107955b37ac2c3e923509b6b0ff01cc463a331ddeb894",
+      "question": "Will France win the 2026 FIFA World Cup?",
+      "reasons": [
+        "capital $50.00 below required $400.00",
+        "adverse/gas cost dominates pessimistic reward",
+        "docs/formula unknown makes result speculative"
+      ]
+    },
+    {
+      "market_id": "0x0c4cd2055d6ea89354ffddc55d6dbcef9355748112ea952fc925f3db6a5c457f",
+      "question": "Will Argentina win the 2026 FIFA World Cup?",
+      "reasons": [
+        "capital $50.00 below required $400.00",
+        "adverse/gas cost dominates pessimistic reward",
+        "docs/formula unknown makes result speculative"
+      ]
+    },
+    {
+      "market_id": "0x7976b8dbacf9077eb1453a62bcefd6ab2df199acd28aad276ff0d920d6992892",
+      "question": "Will Spain win the 2026 FIFA World Cup?",
+      "reasons": [
+        "capital $50.00 below required $400.00",
+        "adverse/gas cost dominates pessimistic reward",
+        "docs/formula unknown makes result speculative"
+      ]
+    },
+    {
+      "market_id": "0x375409bc5eeeff961e82b479caeccc20f33d15738e5bce1186d628aa3d9dfb1f",
+      "question": "Will England win the 2026 FIFA World Cup?",
+      "reasons": [
+        "capital $50.00 below required $400.00",
+        "adverse/gas cost dominates pessimistic reward",
+        "docs/formula unknown makes result speculative"
+      ]
+    },
+    {
+      "market_id": "0x4f3421fb2daf5cca7430ed8d8132463963081572d75434393a1808fdb8829fe8",
+      "question": "Will Portugal win the 2026 FIFA World Cup?",
+      "reasons": [
+        "capital $50.00 below required $400.00",
+        "adverse/gas cost dominates pessimistic reward",
+        "docs/formula unknown makes result speculative"
+      ]
+    },
+    {
+      "market_id": "0x7ad403c3508f8e3912940fd1a913f227591145ca0614074208e0b962d5fcc422",
+      "question": "Will JD Vance win the 2028 US Presidential Election?",
+      "reasons": [
+        "capital $50.00 below required $400.00",
+        "touch depth too thin",
+        "adverse/gas cost dominates pessimistic reward",
+        "docs/formula unknown makes result speculative"
+      ]
+    },
+    {
+      "market_id": "0x4567b275e6b667a6217f5cb4f06a797d3a1eaf1d0281fb5bc8c75e2046ae7e57",
+      "question": "Will Gavin Newsom win the 2028 US Presidential Election?",
+      "reasons": [
+        "capital $50.00 below required $400.00",
+        "adverse/gas cost dominates pessimistic reward",
+        "docs/formula unknown makes result speculative"
+      ]
+    },
+    {
+      "market_id": "0x2053d8515f1b8cbeea4ccdb56e60e89c2617e43a8660d95166b8e71d27865277",
+      "question": "Will Marco Rubio win the 2028 US Presidential Election?",
+      "reasons": [
+        "capital $50.00 below required $400.00",
+        "adverse/gas cost dominates pessimistic reward",
+        "docs/formula unknown makes result speculative"
+      ]
+    },
+    {
+      "market_id": "0x0f49db97f71c68b1e42a6d16e3de93d85dbf7d4148e3f018eb79e88554be9f75",
+      "question": "Will Gavin Newsom win the 2028 Democratic presidential nomination?",
+      "reasons": [
+        "capital $50.00 below required $200.00",
+        "touch depth too thin",
+        "adverse/gas cost dominates pessimistic reward",
+        "docs/formula unknown makes result speculative"
+      ]
+    },
+    {
+      "market_id": "0x6bd56627aa21311850825edb27e53434a0e17a4f782be0086bc07f71eee00d0d",
+      "question": "Putin out as President of Russia by December 31, 2026?",
+      "reasons": [
+        "capital $50.00 below required $400.00",
+        "adverse/gas cost dominates pessimistic reward",
+        "docs/formula unknown makes result speculative"
+      ]
+    },
+    {
+      "market_id": "0xe6bcc2f1dd025ce5e1833190f7c60a71171c94f805df55b9ab0ded695ec93565",
+      "question": "Will Alexandria Ocasio-Cortez win the 2028 Democratic presidential nomination?",
+      "reasons": [
+        "capital $50.00 below required $200.00",
+        "adverse/gas cost dominates pessimistic reward",
+        "docs/formula unknown makes result speculative"
+      ]
+    },
+    {
+      "market_id": "0x18b1c135d0a40c5894da9412e77311827d9caf16cf4cd6591b247a34730af919",
+      "question": "Will J.D. Vance win the 2028 Republican presidential nomination?",
+      "reasons": [
+        "capital $50.00 below required $100.00",
+        "adverse/gas cost dominates pessimistic reward",
+        "docs/formula unknown makes result speculative"
+      ]
+    },
+    {
+      "market_id": "0x74dba1ce1ae9dd535414e85f2d9ab5ea32c0fb1acc9b7130b67e6d91217e24e1",
+      "question": "Will Jon Ossoff win the 2028 Democratic presidential nomination?",
+      "reasons": [
+        "capital $50.00 below required $200.00",
+        "touch depth too thin",
+        "adverse/gas cost dominates pessimistic reward",
+        "docs/formula unknown makes result speculative"
+      ]
+    },
+    {
+      "market_id": "0x909659c9436228e2be56d5582ba6188166f2f8bf3c596335512c8f2e380d01ec",
+      "question": "Will Kamala Harris win the 2028 Democratic presidential nomination?",
+      "reasons": [
+        "capital $50.00 below required $200.00",
+        "adverse/gas cost dominates pessimistic reward",
+        "docs/formula unknown makes result speculative"
+      ]
+    },
+    {
+      "market_id": "0xa467b14d51f01b957109d9cbb1d6c124fab2a089d52ed8f471d23c2812e743b7",
+      "question": "Xi Jinping out before 2027?",
+      "reasons": [
+        "capital $50.00 below required $400.00",
+        "touch depth too thin",
+        "adverse/gas cost dominates pessimistic reward",
+        "docs/formula unknown makes result speculative"
+      ]
+    },
+    {
+      "market_id": "0xe2b48e3b44de9658ee9c8b37354301763e33c0b502fd966839d644b4c0a9dea8",
+      "question": "Will Harvey Weinstein be sentenced to less than 5 years in prison?",
+      "reasons": [
+        "touch depth too thin",
+        "adverse/gas cost dominates pessimistic reward",
+        "docs/formula unknown makes result speculative"
+      ]
+    },
+    {
+      "market_id": "0x50ddb9cd80d5c271664a2ebb7fcaed1d0a148d82c8e8d314d830f75a944c3dcc",
+      "question": "New Playboi Carti Album before GTA VI?",
+      "reasons": [
+        "touch depth too thin",
+        "adverse/gas cost dominates pessimistic reward",
+        "docs/formula unknown makes result speculative"
+      ]
+    },
+    {
+      "market_id": "0xdee5db5410b362783a1405b66b9aa08a7d050ae1f99e8da85b9d1ae7962dad3b",
+      "question": "Will Harvey Weinstein be sentenced to between 20 and 30 years in prison?",
+      "reasons": [
+        "touch depth too thin",
+        "adverse/gas cost dominates pessimistic reward",
+        "docs/formula unknown makes result speculative"
+      ]
+    },
+    {
+      "market_id": "0xf398b0e5016eeaee9b0885ed84012b6dc91269ac10d3b59d60722859c2e30b2f",
+      "question": "Will Harvey Weinstein be sentenced to no prison time?",
+      "reasons": [
+        "touch depth too thin",
+        "adverse/gas cost dominates pessimistic reward",
+        "docs/formula unknown makes result speculative"
+      ]
+    },
+    {
+      "market_id": "0x7b49b9bacb5f435bc10f3b100ff59e2fdd346f7f92a9001881bc9825a0af0f11",
+      "question": "Will China invades Taiwan before GTA VI?",
+      "reasons": [
+        "adverse/gas cost dominates pessimistic reward",
+        "docs/formula unknown makes result speculative"
+      ]
+    },
+    {
+      "market_id": "0x84f8b70331323c2fba97d7ceaa9a35fb645a0770d0dbff169d07f24f376766e9",
+      "question": "Trump out as President before GTA VI?",
+      "reasons": [
+        "adverse/gas cost dominates pessimistic reward",
+        "docs/formula unknown makes result speculative"
+      ]
+    },
+    {
+      "market_id": "0x32b09f6390252b37d674501527e709016d55581b2c1e544bd4b8167f5f732f4c",
+      "question": "Will Jesus Christ return before GTA VI?",
+      "reasons": [
+        "adverse/gas cost dominates pessimistic reward",
+        "docs/formula unknown makes result speculative"
+      ]
+    },
+    {
+      "market_id": "0xcdb1f0400949238a63d3e88243d2ada08cd9c2a71985ced9f0cfd5e66354cf90",
+      "question": "Will USA win the 2026 FIFA World Cup?",
+      "reasons": [
+        "adverse/gas cost dominates pessimistic reward",
+        "docs/formula unknown makes result speculative"
+      ]
+    },
+    {
+      "market_id": "0x7b52405ad0e0d31bfe970940b67d77f24ecedeab8a2361c11148c02a006e325c",
+      "question": "Will Norway win the 2026 FIFA World Cup?",
+      "reasons": [
+        "adverse/gas cost dominates pessimistic reward",
+        "docs/formula unknown makes result speculative"
+      ]
+    },
+    {
+      "market_id": "0x0189df05ed7bf84d799213b01a79571e305c03b2ac5359cfbb3a323448ba20fa",
+      "question": "Will Japan win the 2026 FIFA World Cup?",
+      "reasons": [
+        "adverse/gas cost dominates pessimistic reward",
+        "docs/formula unknown makes result speculative"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "generated_at": "2026-06-24T18:26:26+00:00",
+  "decision": "VERIFY FORMULA FIRST",
+  "candidate_count": 25,
+  "capital_levels": [
+    50,
+    100,
+    250,
+    500,
+    1000,
+    5000
+  ],
+  "reliability": {
+    "error_rate_pct": 0.0,
+    "p95_latency_ms": 1861.2843799885013,
+    "simulator_results_reliable": true,
+    "source": "reports\\data_path_reliability_report.json"
+  },
+  "formula_warning": "Reward formula remains partially unverified; live reward farming remains NO-GO."
+}
