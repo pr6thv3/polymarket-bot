@@ -176,4 +176,6 @@ Reward farming paper simulator result:
 - Capital sweep result: pessimistic/base/optimistic pro-rata scenarios are all negative after gas/ops, adverse risk, and opportunity cost at `$50`, `$100`, `$250`, `$500`, `$1,000`, and `$5,000`.
 - Best pessimistic market by EV is still negative: France 2026 FIFA World Cup, pro-rata reward `$0.3333/day`, gas `$5.7600/day`, net EV `$-5.4485/day`, low confidence.
 - Formula verification remains incomplete because official docs/UI timed out; live reward farming remains **NO-GO**.
-- Current final recommendation: **VERIFY FORMULA FIRST** before further reward-farming work; if formula remains inaccessible, pivot to cross-venue pricing research.
+- Primary-source retry on 2026-06-25 completed. The current official SDK/API verifies that reward-market configuration and account reward-percentage endpoints exist, but does not publish the current scoring or payout equation. The historical official liquidity-mining repository used a score/allocation calculation, but was last updated in 2023 and cannot be treated as the current program rule.
+- Current live API data confirms daily-rate, minimum-size, maximum-spread, and competitiveness fields only. It does not define whether the daily rate is a total pool, a per-maker entitlement, or how score/payout is calculated.
+- Current final recommendation: **PIVOT TO CROSS-VENUE PRICING RESEARCH**. Reward farming remains paper-only and **NO-GO** because the formula gate failed; no full reward capture is assumed.

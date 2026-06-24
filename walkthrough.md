@@ -148,5 +148,6 @@ Current reward-track conclusion:
 - Treat the Phase 3C collector error rate (`161/346`, `46.5%`) as an operational blocker for latency-sensitive strategies.
 - Latest read-only reliability probe improved vs collector: `0.00%` error rate over 40 requests, but p95 latency `1861ms` still fails latency-sensitive gate.
 - Reward simulator conclusion: small account reward farming is not realistically positive EV under 0.01%/0.05%/0.10% pro-rata share assumptions after gas/ops, adverse risk, and opportunity cost.
-- Current final recommendation: **VERIFY FORMULA FIRST**; if formula cannot be verified, pivot to cross-venue pricing research.
+- Formula verification retry (2026-06-25): current official SDK/API evidence verifies reward-market metadata and private reward-percentage endpoints, but not the current scoring/payout equation. The official 2023 liquidity-mining implementation was score/allocation based, but is historical and cannot be used as the current formula.
+- Current final recommendation: **PIVOT TO CROSS-VENUE PRICING RESEARCH**. Keep reward farming paper-only and do not infer full reward capture from advertised daily-rate fields.
 - Key reports: `reports/data_path_reliability_report.md`, `reports/reward_simulator/capital_sweep.md`, `reports/reward_simulator/market_ranking.md`, `reports/reward_simulator/formula_verification.md`, `reports/reward_simulator/reward_farming_paper_go_no_go.md`.
