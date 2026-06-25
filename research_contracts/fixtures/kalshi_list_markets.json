@@ -1,0 +1,19 @@
+{
+  "markets": [
+    {
+      "ticker": "KXFRANCE-26",
+      "event_ticker": "KXFRANCE",
+      "series_ticker": "KXWC",
+      "title": "France to win FIFA World Cup in 2026?",
+      "close_time": "2026-07-20T00:00:00Z"
+    },
+    {
+      "ticker": "KXBRAZIL-26",
+      "event_ticker": "KXBRAZIL",
+      "series_ticker": "KXWC",
+      "yes_sub_title": "Brazil to win FIFA World Cup in 2026?",
+      "close_time": "2026-07-20T00:00:00Z"
+    }
+  ],
+  "cursor": null
+}

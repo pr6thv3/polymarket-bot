@@ -48,7 +48,7 @@ A GitHub Actions workflow also exists at `.github/workflows/research-contract-li
 
 The mapping catalog is `research_mappings/catalog.yaml`. It is intentionally empty until manually reviewed mappings are added.
 
-Candidate generation is handled by the standalone script `tools/generate_candidates.py`. It uses public Polymarket Gamma and Kalshi Trade API market listings, Jaccard token similarity, one-to-one greedy deduplication, and stable hash-based IDs. It writes `research_mappings/candidates.yaml` only; every semantic review field remains null.
+Candidate generation is handled by the standalone script `tools/generate_candidates.py`. It uses public Polymarket Gamma and Kalshi Trade API market listings, Jaccard token similarity, one-to-one greedy deduplication, and stable hash-based IDs. It validates each paginated raw listing page against source contracts before aggregating markets. It writes `research_mappings/candidates.yaml` only; every semantic review field remains null.
 
 Only `status: approved` mappings enter replay. Each approved mapping must include:
 

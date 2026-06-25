@@ -1,12 +1,45 @@
+from pathlib import Path
+
+import pytest
+
+import tools.generate_candidates as generator
+from research.contracts import DEFAULT_CONTRACT_DIR, SourceContractError, load_contracts
 from tools.generate_candidates import (
     build_candidate,
+    fetch_kalshi,
+    fetch_polymarket,
     jaccard,
     norm_kalshi,
     norm_polymarket,
+    run,
     score_and_select,
     stable_id,
     tokenise,
 )
+
+
+class FakeResponse:
+    def __init__(self, payload):
+        self.payload = payload
+
+    def json(self):
+        return self.payload
+
+
+class FakeTransport:
+    def __init__(self, pages=None):
+        self.pages = list(pages or [])
+        self.calls = []
+        self.closed = False
+
+    def request(self, method, url, params=None):
+        self.calls.append((method, url, params))
+        if not self.pages:
+            raise AssertionError("no fake page queued")
+        return FakeResponse(self.pages.pop(0))
+
+    def close(self):
+        self.closed = True
 
 
 def pm_market(condition_id: str, question: str) -> dict:
@@ -136,3 +169,83 @@ def test_score_and_select_is_one_to_one_best_match():
     assert len(candidates) == 2
     assert len({candidate["polymarket"]["condition_id"] for candidate in candidates}) == 2
     assert len({candidate["kalshi"]["market_ticker"] for candidate in candidates}) == 2
+
+
+def test_polymarket_fetch_validates_each_page_before_aggregation():
+    contracts = load_contracts(DEFAULT_CONTRACT_DIR)
+    valid_item = {
+        "conditionId": "0xcondition",
+        "question": "Will France win the 2026 FIFA World Cup?",
+        "tokens": [
+            {"outcome": "Yes", "token_id": "0xyes"},
+            {"outcome": "No", "token_id": "0xno"},
+        ],
+    }
+    first_page = [dict(valid_item, conditionId=f"0xcondition{i}") for i in range(100)]
+    malformed_second_page = [
+        {
+            "conditionId": "0xbroken",
+            "question": "Broken page without token fields",
+        }
+    ]
+    transport = FakeTransport([first_page, malformed_second_page])
+
+    with pytest.raises(SourceContractError, match="polymarket_token_format"):
+        fetch_polymarket(transport, 101, contracts["polymarket_gamma_v1"])
+
+    assert len(transport.calls) == 2
+
+
+def test_kalshi_fetch_validates_each_cursor_page_before_aggregation():
+    contracts = load_contracts(DEFAULT_CONTRACT_DIR)
+    first_page = {
+        "markets": [
+            {
+                "ticker": f"KXFRANCE-{index}",
+                "event_ticker": "KXFRANCE",
+                "title": "France to win FIFA World Cup in 2026?",
+                "close_time": "2026-07-20T00:00:00Z",
+            }
+            for index in range(100)
+        ],
+        "cursor": "next-page",
+    }
+    malformed_second_page = {
+        "markets": [
+            {
+                "ticker": "KXBROKEN",
+                "event_ticker": "KXBROKEN",
+                "close_time": "2026-07-20T00:00:00Z",
+            }
+        ],
+        "cursor": None,
+    }
+    transport = FakeTransport([first_page, malformed_second_page])
+
+    with pytest.raises(SourceContractError, match="kalshi_title_field"):
+        fetch_kalshi(transport, 101, contracts["kalshi_trade_api_v1"])
+
+    assert len(transport.calls) == 2
+
+
+def test_run_writes_no_candidates_when_page_validation_fails(monkeypatch, tmp_path: Path):
+    output = tmp_path / "candidates.yaml"
+
+    def fail_fetch(*args, **kwargs):
+        raise SourceContractError("malformed listing page")
+
+    monkeypatch.setattr(generator, "ReadOnlyTransport", lambda *args, **kwargs: FakeTransport())
+    monkeypatch.setattr(generator, "fetch_polymarket", fail_fetch)
+
+    with pytest.raises(SourceContractError, match="malformed listing page"):
+        run(
+            limit=10,
+            threshold=0.25,
+            fetch_limit=10,
+            output=output,
+            dry_run=False,
+            timeout_seconds=1.0,
+            contract_dir=DEFAULT_CONTRACT_DIR,
+        )
+
+    assert not output.exists()

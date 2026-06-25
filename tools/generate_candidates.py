@@ -24,6 +24,7 @@ ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from research.contracts import DEFAULT_CONTRACT_DIR, load_contracts, validate_payload  # noqa: E402
 from research.transport import ReadOnlyTransport  # noqa: E402
 
 
@@ -170,7 +171,11 @@ def _normalise_polymarket_tokens(raw: dict[str, Any]) -> list[dict[str, str]]:
     return normalized
 
 
-def fetch_polymarket(transport: ReadOnlyTransport, fetch_limit: int) -> list[dict[str, Any]]:
+def fetch_polymarket(
+    transport: ReadOnlyTransport,
+    fetch_limit: int,
+    contract: dict[str, Any],
+) -> list[dict[str, Any]]:
     """Paginate Gamma markets for active, open Polymarket listings."""
     markets: list[dict[str, Any]] = []
     page_size = min(100, max(1, fetch_limit))
@@ -186,6 +191,7 @@ def fetch_polymarket(transport: ReadOnlyTransport, fetch_limit: int) -> list[dic
                 "offset": str(offset),
             },
         )
+        validate_payload(contract, "list_markets", data)
         batch = data if isinstance(data, list) else data.get("markets", [])
         if not isinstance(batch, list) or not batch:
             break
@@ -196,7 +202,11 @@ def fetch_polymarket(transport: ReadOnlyTransport, fetch_limit: int) -> list[dic
     return markets[:fetch_limit]
 
 
-def fetch_kalshi(transport: ReadOnlyTransport, fetch_limit: int) -> list[dict[str, Any]]:
+def fetch_kalshi(
+    transport: ReadOnlyTransport,
+    fetch_limit: int,
+    contract: dict[str, Any],
+) -> list[dict[str, Any]]:
     """Cursor-paginate Kalshi public Trade API markets."""
     markets: list[dict[str, Any]] = []
     cursor: str | None = None
@@ -206,6 +216,7 @@ def fetch_kalshi(transport: ReadOnlyTransport, fetch_limit: int) -> list[dict[st
         if cursor:
             params["cursor"] = cursor
         data = _get(transport, f"{KALSHI_TRADE_API_BASE}/markets", params=params)
+        validate_payload(contract, "list_markets", data)
         if not isinstance(data, dict):
             break
         batch = data.get("markets", [])
@@ -406,15 +417,19 @@ def run(
     output: Path,
     dry_run: bool,
     timeout_seconds: float,
+    contract_dir: Path,
 ) -> list[dict[str, Any]]:
+    contracts = load_contracts(contract_dir)
+    polymarket_contract = contracts["polymarket_gamma_v1"]
+    kalshi_contract = contracts["kalshi_trade_api_v1"]
     transport = ReadOnlyTransport(ALLOWED_HOSTS, timeout_seconds=timeout_seconds)
     try:
         print(f"Fetching up to {fetch_limit} Polymarket markets...")
-        polymarket_raw = fetch_polymarket(transport, fetch_limit)
+        polymarket_raw = fetch_polymarket(transport, fetch_limit, polymarket_contract)
         print(f"  {len(polymarket_raw)} fetched")
 
         print(f"Fetching up to {fetch_limit} Kalshi markets...")
-        kalshi_raw = fetch_kalshi(transport, fetch_limit)
+        kalshi_raw = fetch_kalshi(transport, fetch_limit, kalshi_contract)
         print(f"  {len(kalshi_raw)} fetched")
     finally:
         transport.close()
@@ -474,6 +489,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--timeout-seconds", type=float, default=30.0)
+    parser.add_argument("--contract-dir", type=Path, default=DEFAULT_CONTRACT_DIR)
     return parser.parse_args()
 
 
@@ -486,6 +502,7 @@ def main() -> None:
         output=args.output,
         dry_run=args.dry_run,
         timeout_seconds=args.timeout_seconds,
+        contract_dir=args.contract_dir,
     )
 
 

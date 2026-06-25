@@ -1,0 +1,129 @@
+{
+  "contract_id": "polymarket_gamma_v1",
+  "venue": "polymarket",
+  "status": "fixture_pinned_requires_manual_promotion",
+  "retrieved_at": "2026-06-25T13:10:38Z",
+  "official_sources": [
+    "https://docs.polymarket.com/api-reference/markets/list-markets",
+    "https://docs.polymarket.com/market-data/fetching-markets"
+  ],
+  "changelog_reference": "https://docs.polymarket.com/changelog",
+  "manual_review_required": true,
+  "notes": [
+    "Candidate generation validates each paginated Gamma listing page before aggregating market rows.",
+    "Rows are candidates only and are never replay eligible until manually promoted to the approved mapping catalog."
+  ],
+  "endpoints": {
+    "list_markets": {
+      "method": "GET",
+      "url": "https://gamma-api.polymarket.com/markets?active=true&closed=false&limit={limit}&offset={offset}",
+      "source_url": "https://docs.polymarket.com/api-reference/markets/list-markets",
+      "fixture": "fixtures/polymarket_gamma_list_markets.json",
+      "root_types": [
+        "array",
+        "object"
+      ],
+      "item_array_paths": [
+        "$",
+        "markets"
+      ],
+      "array_item_alternative_groups": [
+        {
+          "name": "polymarket_question_field",
+          "alternatives": [
+            [
+              {
+                "path": "question",
+                "types": [
+                  "string"
+                ]
+              }
+            ],
+            [
+              {
+                "path": "title",
+                "types": [
+                  "string"
+                ]
+              }
+            ]
+          ]
+        },
+        {
+          "name": "polymarket_condition_field",
+          "alternatives": [
+            [
+              {
+                "path": "conditionId",
+                "types": [
+                  "string"
+                ]
+              }
+            ],
+            [
+              {
+                "path": "condition_id",
+                "types": [
+                  "string"
+                ]
+              }
+            ],
+            [
+              {
+                "path": "conditionID",
+                "types": [
+                  "string"
+                ]
+              }
+            ]
+          ]
+        },
+        {
+          "name": "polymarket_token_format",
+          "alternatives": [
+            [
+              {
+                "path": "tokens",
+                "types": [
+                  "array"
+                ]
+              }
+            ],
+            [
+              {
+                "path": "outcomes",
+                "types": [
+                  "array",
+                  "string"
+                ]
+              },
+              {
+                "path": "clobTokenIds",
+                "types": [
+                  "array",
+                  "string"
+                ]
+              }
+            ],
+            [
+              {
+                "path": "outcomes",
+                "types": [
+                  "array",
+                  "string"
+                ]
+              },
+              {
+                "path": "clob_token_ids",
+                "types": [
+                  "array",
+                  "string"
+                ]
+              }
+            ]
+          ]
+        }
+      ]
+    }
+  }
+}

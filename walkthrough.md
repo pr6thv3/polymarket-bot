@@ -50,6 +50,8 @@ Preview without writing:
 .venv/Scripts/python.exe tools/generate_candidates.py --dry-run --fetch-limit 50
 ```
 
+The generator validates each Polymarket Gamma offset page and each Kalshi cursor page against `research_contracts/` before adding rows to the in-memory market list. If any page violates the contract, the run fails closed and writes no candidate file.
+
 The generator writes `research_mappings/candidates.yaml`. These rows remain `status: candidate`, use stable hash-based IDs, and keep every semantic review field null. Candidates are not replay eligible.
 
 ## Capture baseline

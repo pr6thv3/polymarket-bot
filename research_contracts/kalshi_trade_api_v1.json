@@ -102,6 +102,84 @@
           ]
         }
       ]
+    },
+    "list_markets": {
+      "method": "GET",
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets?limit={limit}&status=open&cursor={cursor}",
+      "source_url": "https://docs.kalshi.com/api-reference/market/get-markets",
+      "fixture": "fixtures/kalshi_list_markets.json",
+      "root_types": [
+        "object"
+      ],
+      "required_fields": [
+        {
+          "path": "markets",
+          "types": [
+            "array"
+          ]
+        },
+        {
+          "path": "cursor",
+          "types": [
+            "string",
+            "null"
+          ]
+        }
+      ],
+      "item_array_paths": [
+        "markets"
+      ],
+      "array_item_required_fields": [
+        {
+          "path": "ticker",
+          "types": [
+            "string"
+          ]
+        },
+        {
+          "path": "event_ticker",
+          "types": [
+            "string"
+          ]
+        },
+        {
+          "path": "close_time",
+          "types": [
+            "string"
+          ]
+        }
+      ],
+      "array_item_alternative_groups": [
+        {
+          "name": "kalshi_title_field",
+          "alternatives": [
+            [
+              {
+                "path": "title",
+                "types": [
+                  "string"
+                ]
+              }
+            ],
+            [
+              {
+                "path": "yes_sub_title",
+                "types": [
+                  "string"
+                ]
+              }
+            ],
+            [
+              {
+                "path": "subtitle",
+                "types": [
+                  "string"
+                ]
+              }
+            ]
+          ]
+        }
+      ]
     }
   },
   "fee_model": {
