@@ -1,0 +1,10 @@
+{
+  "series_fee_change_arr": [
+    {
+      "id": "fixture-fee-change",
+      "series_ticker": "KX-FIXTURE",
+      "fee_multiplier": 1,
+      "scheduled_ts": "2026-06-25T13:10:38Z"
+    }
+  ]
+}

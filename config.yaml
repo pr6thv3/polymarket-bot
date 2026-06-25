@@ -23,7 +23,7 @@ rebate_rates:
 
 strategies:
   market_making:
-    enabled: true
+    enabled: false
     min_spread_bps: 100
     max_spread_bps: 400
     base_spread_bps: 200
@@ -38,7 +38,7 @@ strategies:
       - finance
       - politics
     holding_rewards:
-      enabled: true
+      enabled: false
       min_days_to_resolution: 14
       target_apy: 0.04
     midpoint_move_threshold_bps: 50
@@ -131,6 +131,25 @@ strategies:
       api_key_env: OPENAI_API_KEY
       max_tokens: 500
       temperature: 0.0
+
+research:
+  mode: read_only
+  allowed_hosts:
+    - clob.polymarket.com
+    - external-api.kalshi.com
+    - api.elections.kalshi.com
+  source_contract_dir: research_contracts
+  mapping_catalog: research_mappings/catalog.yaml
+  output_dir: data/research_runs
+  quality:
+    max_pair_skew_ms: 1000
+    max_quote_age_ms: 1000
+  baseline:
+    duration_hours: 24
+  validation:
+    duration_days: 14
+    min_approved_mappings: 10
+    evaluation_unit: opportunity_episodes
 
 execution:
   rate_limit_per_min: 55

@@ -1,0 +1,81 @@
+{
+  "contract_id": "polymarket_clob_v1",
+  "venue": "polymarket",
+  "status": "fixture_pinned_requires_manual_promotion",
+  "retrieved_at": "2026-06-25T13:10:38Z",
+  "official_sources": [
+    "https://docs.polymarket.com/api-reference/market-data/get-order-book",
+    "https://docs.polymarket.com/trading/fees",
+    "https://docs.polymarket.com/v2-migration"
+  ],
+  "changelog_reference": "https://docs.polymarket.com/changelog",
+  "manual_review_required": true,
+  "notes": [
+    "The adapter consumes token-level order-book asks directly. It must not use midpoint, last-trade, or complement shortcuts for Polymarket.",
+    "Fee economics require per-market match-time fee metadata. Replay rejects missing or unverified fee rules."
+  ],
+  "endpoints": {
+    "get_order_book": {
+      "method": "GET",
+      "url": "https://clob.polymarket.com/book?token_id={token_id}",
+      "source_url": "https://docs.polymarket.com/api-reference/market-data/get-order-book",
+      "fixture": "fixtures/polymarket_get_order_book.json",
+      "required_fields": [
+        {
+          "path": "market",
+          "types": [
+            "string"
+          ]
+        },
+        {
+          "path": "asset_id",
+          "types": [
+            "string"
+          ]
+        },
+        {
+          "path": "timestamp",
+          "types": [
+            "string"
+          ]
+        },
+        {
+          "path": "hash",
+          "types": [
+            "string"
+          ]
+        },
+        {
+          "path": "bids",
+          "types": [
+            "array"
+          ]
+        },
+        {
+          "path": "asks",
+          "types": [
+            "array"
+          ]
+        },
+        {
+          "path": "min_order_size",
+          "types": [
+            "string",
+            "number"
+          ]
+        }
+      ]
+    }
+  },
+  "fee_model": {
+    "source_url": "https://docs.polymarket.com/trading/fees",
+    "formula": "fee = C * feeRate * p * (1 - p)",
+    "maker_fee": "0",
+    "dynamic_inputs_required": [
+      "per-market fee enabled state",
+      "per-market feeRate",
+      "match-time taker/maker role"
+    ],
+    "replay_default": "missing_fee_data"
+  }
+}

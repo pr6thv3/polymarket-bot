@@ -28,6 +28,7 @@ logs/
 
 # State files
 state/*.json
+data/research_runs/
 
 # IDE
 .vscode/

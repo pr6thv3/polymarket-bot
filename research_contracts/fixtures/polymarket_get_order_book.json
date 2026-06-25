@@ -1,0 +1,22 @@
+{
+  "market": "0xconditionfixture",
+  "asset_id": "0xyestokenfixture",
+  "timestamp": "1782583838000",
+  "hash": "fixturehash",
+  "bids": [
+    {
+      "price": "0.45",
+      "size": "100"
+    }
+  ],
+  "asks": [
+    {
+      "price": "0.46",
+      "size": "150"
+    }
+  ],
+  "min_order_size": "1",
+  "tick_size": "0.01",
+  "neg_risk": false,
+  "last_trade_price": "0.45"
+}

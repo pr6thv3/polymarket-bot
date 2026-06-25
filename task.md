@@ -1,6 +1,25 @@
-# Task Status — Polymarket Bot Phase 3C Clean Targeted Validation
+# Task Status — Polymarket Bot Research Safety
 
-Updated: 2026-06-23T18:50Z
+Updated: 2026-06-25T13:10:38Z
+
+## Current status — cross-venue research kernel
+
+- Live trading remains **NO-GO**.
+- Passive market-making remains **PAUSED**.
+- Reward farming live deployment remains **NO-GO**.
+- `execution.dry_run: true` remains set.
+- All configured `strategies.*.enabled` flags are now false.
+- Added a separate read-only `research` package and `tools/cross_venue_research.py` entrypoint.
+- The research entrypoint is guarded by import-policy tests and must not import bot execution clients, strategy classes, or `main.py`.
+- Source-contract artifacts exist for Polymarket and Kalshi under `research_contracts/`.
+- The manual mapping catalog exists at `research_mappings/catalog.yaml` and is intentionally empty until semantic review approves mappings.
+- No approved mappings means no v1 capture/replay claim should be made yet.
+
+See `reports/cross_venue_research_kernel.md` for the current kernel scope and controls.
+
+---
+
+# Previous Task Status — Polymarket Bot Phase 3C Clean Targeted Validation
 
 ## Mission constraints
 

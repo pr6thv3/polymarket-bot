@@ -1,4 +1,76 @@
-# Walkthrough — Phase 3C Clean Targeted Polymarket Validation
+# Walkthrough — Read-Only Cross-Venue Research Kernel
+
+## v1 safety invariants
+
+1. Keep `execution.dry_run: true`.
+2. Keep every `strategies.*.enabled` flag false.
+3. Use `tools/cross_venue_research.py` for research capture/replay only.
+4. Do not import or call `core.executor`, `core.client`, `main.py`, paper/live executors, or strategy classes from research code.
+5. Use only public REST `GET`/`HEAD` through `ReadOnlyTransport`.
+6. Do not include request bodies, signing headers, wallet keys, API keys, or trading credentials in research processes.
+7. Treat missing fee data, stale quotes, excessive pair skew, missing depth, mapping mismatch, and non-positive edge as recorded rejections.
+8. Count rebates, maker programs, and incentives as zero until their current official rules are independently verified.
+
+## Validate pinned source contracts
+
+Fixture-only deterministic check:
+
+```powershell
+.venv/Scripts/python.exe tools/cross_venue_research.py verify-contracts
+```
+
+Manual/scheduled live read-only check:
+
+```powershell
+.venv/Scripts/python.exe tools/cross_venue_research.py verify-contracts --live `
+  --polymarket-token-id <TOKEN_ID> `
+  --kalshi-ticker <MARKET_TICKER> `
+  --kalshi-series-ticker <SERIES_TICKER>
+```
+
+Live contract promotion requires manual review of source URLs, consumed fields, and sanitized fixtures.
+
+## Mapping catalog
+
+Mappings live in `research_mappings/catalog.yaml`.
+
+Only `status: approved` entries are replay eligible. Each approved mapping must include Polymarket condition/token IDs, Kalshi event/market/series tickers, canonical proposition, YES predicate, resolution source, UTC cutoff, timezone, payout convention, invalidation behavior, review evidence, reviewer, and review time.
+
+An empty catalog is intentional until semantic equivalence is reviewed manually.
+
+## Capture baseline
+
+Capture is public REST only and writes append-only logs under `data/research_runs/`:
+
+```powershell
+.venv/Scripts/python.exe tools/cross_venue_research.py capture `
+  --config config.yaml `
+  --mapping-catalog research_mappings/catalog.yaml `
+  --duration-hours 24 `
+  --interval-seconds 60
+```
+
+The first 24-hour run is only a data-quality baseline. It measures quote age, pair skew, missing-depth rate, rejection stability, and concentration. It does not assert profitability.
+
+## Replay evidence pack
+
+```powershell
+.venv/Scripts/python.exe tools/cross_venue_research.py replay `
+  --run-dir data/research_runs/<RUN_ID> `
+  --mapping-catalog research_mappings/catalog.yaml `
+  --output reports/cross_venue_research/<RUN_ID>_evidence_pack.json
+```
+
+Replay evaluates both routes from executable asks:
+
+- Polymarket YES + Kalshi NO;
+- Kalshi YES + Polymarket NO.
+
+The engine applies depth-limited quantity, venue minimums, verified dynamic fee rules, fee rounding, and separate capital lockup. Missing or unverified fee data rejects the route.
+
+---
+
+# Previous Walkthrough — Phase 3C Clean Targeted Polymarket Validation
 
 ## Safety invariants
 

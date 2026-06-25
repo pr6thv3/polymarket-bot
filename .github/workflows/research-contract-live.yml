@@ -1,0 +1,47 @@
+name: Research live source-contract probe
+
+on:
+  workflow_dispatch:
+    inputs:
+      polymarket_token_id:
+        description: "Read-only Polymarket token ID for /book contract probe"
+        required: true
+      kalshi_ticker:
+        description: "Read-only Kalshi market ticker for market/orderbook contract probe"
+        required: true
+      kalshi_series_ticker:
+        description: "Optional Kalshi series ticker for fee_changes contract probe"
+        required: false
+  schedule:
+    - cron: "17 9 * * *"
+
+jobs:
+  verify-live-contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Resolve contract-probe inputs
+        id: inputs
+        shell: bash
+        run: |
+          POLY_TOKEN="${{ github.event.inputs.polymarket_token_id || vars.POLYMARKET_CONTRACT_TEST_TOKEN_ID }}"
+          KALSHI_TICKER="${{ github.event.inputs.kalshi_ticker || vars.KALSHI_CONTRACT_TEST_TICKER }}"
+          KALSHI_SERIES="${{ github.event.inputs.kalshi_series_ticker || vars.KALSHI_CONTRACT_TEST_SERIES }}"
+          if [[ -z "$POLY_TOKEN" || -z "$KALSHI_TICKER" ]]; then
+            echo "Missing POLYMARKET_CONTRACT_TEST_TOKEN_ID or KALSHI_CONTRACT_TEST_TICKER." >&2
+            exit 1
+          fi
+          echo "poly_token=$POLY_TOKEN" >> "$GITHUB_OUTPUT"
+          echo "kalshi_ticker=$KALSHI_TICKER" >> "$GITHUB_OUTPUT"
+          echo "kalshi_series=$KALSHI_SERIES" >> "$GITHUB_OUTPUT"
+      - name: Verify live read-only source contracts
+        run: |
+          python tools/cross_venue_research.py verify-contracts --live \
+            --polymarket-token-id "${{ steps.inputs.outputs.poly_token }}" \
+            --kalshi-ticker "${{ steps.inputs.outputs.kalshi_ticker }}" \
+            --kalshi-series-ticker "${{ steps.inputs.outputs.kalshi_series }}"

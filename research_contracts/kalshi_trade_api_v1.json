@@ -1,0 +1,119 @@
+{
+  "contract_id": "kalshi_trade_api_v1",
+  "venue": "kalshi",
+  "status": "fixture_pinned_requires_manual_promotion",
+  "retrieved_at": "2026-06-25T13:10:38Z",
+  "official_sources": [
+    "https://docs.kalshi.com/api-reference/market/get-market",
+    "https://docs.kalshi.com/api-reference/market/get-market-orderbook",
+    "https://docs.kalshi.com/getting_started/orderbook_responses",
+    "https://docs.kalshi.com/api-reference/exchange/get-series-fee-changes",
+    "https://kalshi.com/docs/kalshi-fee-schedule.pdf"
+  ],
+  "changelog_reference": "https://docs.kalshi.com/changelog",
+  "manual_review_required": true,
+  "notes": [
+    "Kalshi order books return bids only. The adapter consumes yes_ask_dollars/no_ask_dollars from market payloads when present; otherwise it derives a reciprocal ask only from the opposite-side bid in the same orderbook snapshot.",
+    "Fee economics require schedule metadata and rounding inputs for each observation. Rebates and incentive programs are zero-credit until independently verified."
+  ],
+  "endpoints": {
+    "get_market": {
+      "method": "GET",
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/{ticker}",
+      "source_url": "https://docs.kalshi.com/api-reference/market/get-market",
+      "fixture": "fixtures/kalshi_get_market.json",
+      "required_fields": [
+        {
+          "path": "market",
+          "types": [
+            "object"
+          ]
+        },
+        {
+          "path": "market.ticker",
+          "types": [
+            "string"
+          ]
+        },
+        {
+          "path": "market.event_ticker",
+          "types": [
+            "string"
+          ]
+        },
+        {
+          "path": "market.yes_ask_dollars",
+          "types": [
+            "string",
+            "null"
+          ]
+        },
+        {
+          "path": "market.no_ask_dollars",
+          "types": [
+            "string",
+            "null"
+          ]
+        },
+        {
+          "path": "market.updated_time",
+          "types": [
+            "string"
+          ]
+        }
+      ]
+    },
+    "get_market_orderbook": {
+      "method": "GET",
+      "url": "https://external-api.kalshi.com/trade-api/v2/markets/{ticker}/orderbook",
+      "source_url": "https://docs.kalshi.com/api-reference/market/get-market-orderbook",
+      "fixture": "fixtures/kalshi_get_market_orderbook.json",
+      "required_fields": [
+        {
+          "path": "orderbook_fp",
+          "types": [
+            "object"
+          ]
+        },
+        {
+          "path": "orderbook_fp.yes_dollars",
+          "types": [
+            "array"
+          ]
+        },
+        {
+          "path": "orderbook_fp.no_dollars",
+          "types": [
+            "array"
+          ]
+        }
+      ]
+    },
+    "get_series_fee_changes": {
+      "method": "GET",
+      "url": "https://external-api.kalshi.com/trade-api/v2/series/fee_changes?series_ticker={series_ticker}",
+      "source_url": "https://docs.kalshi.com/api-reference/exchange/get-series-fee-changes",
+      "fixture": "fixtures/kalshi_get_series_fee_changes.json",
+      "required_fields": [
+        {
+          "path": "series_fee_change_arr",
+          "types": [
+            "array"
+          ]
+        }
+      ]
+    }
+  },
+  "fee_model": {
+    "source_url": "https://kalshi.com/docs/kalshi-fee-schedule.pdf",
+    "general_taker_formula": "round up(0.07 * C * P * (1-P)) to the next cent",
+    "general_maker_formula": "round up(0.0175 * C * P * (1-P)) to the next cent",
+    "dynamic_inputs_required": [
+      "series fee changes",
+      "product-specific schedule applicability",
+      "match-time taker/maker role",
+      "fee rounding inputs"
+    ],
+    "replay_default": "missing_fee_data"
+  }
+}
