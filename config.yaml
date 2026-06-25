@@ -136,6 +136,7 @@ research:
   mode: read_only
   allowed_hosts:
     - clob.polymarket.com
+    - gamma-api.polymarket.com
     - external-api.kalshi.com
     - api.elections.kalshi.com
   source_contract_dir: research_contracts

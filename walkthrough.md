@@ -38,6 +38,20 @@ Only `status: approved` entries are replay eligible. Each approved mapping must 
 
 An empty catalog is intentional until semantic equivalence is reviewed manually.
 
+Candidate generation is separate from the approved catalog:
+
+```powershell
+.venv/Scripts/python.exe tools/generate_candidates.py --limit 50 --threshold 0.25
+```
+
+Preview without writing:
+
+```powershell
+.venv/Scripts/python.exe tools/generate_candidates.py --dry-run --fetch-limit 50
+```
+
+The generator writes `research_mappings/candidates.yaml`. These rows remain `status: candidate`, use stable hash-based IDs, and keep every semantic review field null. Candidates are not replay eligible.
+
 ## Capture baseline
 
 Capture is public REST only and writes append-only logs under `data/research_runs/`:

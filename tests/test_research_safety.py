@@ -75,7 +75,10 @@ def test_read_only_config_requires_dry_run_and_disabled_strategies():
 
 def test_research_package_and_cli_have_no_execution_imports():
     banned_roots = {"core", "strategies", "main", "data"}
-    files = list(Path("research").glob("*.py")) + [Path("tools/cross_venue_research.py")]
+    files = list(Path("research").glob("*.py")) + [
+        Path("tools/cross_venue_research.py"),
+        Path("tools/generate_candidates.py"),
+    ]
     offenders = []
     for path in files:
         tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
