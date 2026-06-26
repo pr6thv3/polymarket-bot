@@ -34,7 +34,7 @@ The active roadmap warns that stale phase ordering can make Codex duplicate comp
 
 ## Human-owned decisions still blocking later phases
 
-Do not ask Codex to implement the following until the missing spec is supplied:
+Do not ask Codex to implement the following until the missing spec is supplied. Use `reports/block0_decision_inputs.md` as the manual input template:
 
 1. Fill-probability calibration methodology and Jon Becker dataset schema for `research/calibrate_fill_probability.py`.
 2. Replacement binary-outcome market-making theory, including the exact spread/inventory formula for any `market_making_v2.py` implementation.
