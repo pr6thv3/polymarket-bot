@@ -20,7 +20,7 @@ Current market making is **unproven**. It has no demonstrated positive EV equati
 
 ### Execution
 
-POST_ONLY intent exists, but live execution remains no-go until exchange reconciliation and amend/cancel edge cases are tested. The amend fallback contains a material bug risk: `core/executor.py` uses `record.market_id` as `token_id` for replacement order creation.
+POST_ONLY intent exists, and the local amend cancel+replace token-ID bug is fixed in current code with regression tests. Live execution remains no-go until exchange reconciliation and live amend/cancel edge cases are tested against the actual venue path.
 
 ### Economics
 
@@ -43,7 +43,7 @@ Top issues by expected profit impact:
 |Issue|Category|Priority|Why it matters|
 |---|---|---|---|
 |No proven real-data maker edge / zero fills|Market making|P0|Current real-data backtest: 1078 quotes, 0 trades, -$5.36|
-|Unrealistic/random paper fill model|Simulation|P0|Paper executor still uses `fill_probability` after touch-through|
+|Unrealistic/random paper fill model|Simulation|P0|Paper executor still uses placeholder/random `fill_probability` after touch-through; this is not calibrated live evidence|
 |Market scanner selects sticky/no-flow books|Data|P0|Collected markets show <2.1% opportunity and toxic markouts|
 |Adverse selection markout high/unmeasured|Market making|P0|Markout diagnostic shows 100–200% toxicity vs gross edge|
 |No queue-position/traded-volume fill model|Simulation|P0|Current snapshots infer touch-through, not queue depletion|
@@ -66,7 +66,7 @@ Top issues by expected profit impact:
 4. **P1:** Verify or exclude rebates and holding rewards.
 5. **P1:** Measure proxy latency/stale quote rate.
 6. **P1:** Implement and drill restart/open-order reconciliation.
-7. **P1:** Fix amend fallback token_id bug before live amendment usage.
+7. **P1:** Rehearse amend/cancel and restart reconciliation against the real venue path before any live amendment usage.
 8. **P2:** Only after MM is falsified or validated, run cross-arb research spike.
 
 ## Go/No-Go Framework
