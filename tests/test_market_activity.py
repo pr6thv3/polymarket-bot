@@ -7,6 +7,7 @@ from data.market_activity import (
     compute_market_activity,
     quote_fill_markouts,
     quote_fill_opportunities,
+    quote_fill_pnl_by_adverse_selection,
 )
 from tools.phase3b_diagnostics import load_jsonl_snapshots, rank_market_candidates
 
@@ -85,6 +86,83 @@ def test_quote_fill_markouts_measure_adverse_selection_after_fill():
     assert result.fill_rate_pct == 50.0
     assert result.average_adverse_markout[60] > 0
     assert result.adverse_markout_pct_of_gross[60] > 100.0
+
+
+def test_quote_fill_pnl_breakdown_classifies_adverse_buy_fill():
+    snapshots = [
+        BookSnapshot(timestamp=0.0, best_bid=0.50, best_ask=0.52, mid=0.51),
+        BookSnapshot(timestamp=10.0, best_bid=0.48, best_ask=0.50, mid=0.49),
+        BookSnapshot(timestamp=70.0, best_bid=0.46, best_ask=0.48, mid=0.47),
+    ]
+
+    result = quote_fill_pnl_by_adverse_selection(
+        snapshots=snapshots,
+        spread_bps=200,
+        quote_interval_sec=999,
+        ttl_sec=120,
+        horizon_sec=60,
+        size=10.0,
+        tick_size=0.005,
+    )
+
+    assert result.quotes_generated == 2
+    assert result.observed_fills == 1
+    assert result.classified_fills == 1
+    assert result.unclassified_fills == 0
+    assert result.adverse_fills == 1
+    assert result.non_adverse_fills == 0
+    assert result.adverse_pnl < 0
+    assert result.total_pnl == result.adverse_pnl
+    assert result.adverse_fill_rate_pct == 100.0
+
+
+def test_quote_fill_pnl_breakdown_classifies_favorable_sell_fill():
+    snapshots = [
+        BookSnapshot(timestamp=0.0, best_bid=0.50, best_ask=0.52, mid=0.51),
+        BookSnapshot(timestamp=10.0, best_bid=0.53, best_ask=0.55, mid=0.54),
+        BookSnapshot(timestamp=70.0, best_bid=0.47, best_ask=0.51, mid=0.49),
+    ]
+
+    result = quote_fill_pnl_by_adverse_selection(
+        snapshots=snapshots,
+        spread_bps=200,
+        quote_interval_sec=999,
+        ttl_sec=120,
+        horizon_sec=60,
+        size=10.0,
+        tick_size=0.005,
+    )
+
+    assert result.observed_fills == 1
+    assert result.classified_fills == 1
+    assert result.adverse_fills == 0
+    assert result.non_adverse_fills == 1
+    assert result.non_adverse_pnl > 0
+    assert result.total_pnl == result.non_adverse_pnl
+    assert result.adverse_fill_rate_pct == 0.0
+
+
+def test_quote_fill_pnl_breakdown_leaves_missing_horizon_unclassified():
+    snapshots = [
+        BookSnapshot(timestamp=0.0, best_bid=0.50, best_ask=0.52, mid=0.51),
+        BookSnapshot(timestamp=10.0, best_bid=0.48, best_ask=0.50, mid=0.49),
+    ]
+
+    result = quote_fill_pnl_by_adverse_selection(
+        snapshots=snapshots,
+        spread_bps=200,
+        quote_interval_sec=999,
+        ttl_sec=120,
+        horizon_sec=60,
+        size=10.0,
+        tick_size=0.005,
+    )
+
+    assert result.observed_fills == 1
+    assert result.classified_fills == 0
+    assert result.unclassified_fills == 1
+    assert result.total_pnl == 0.0
+    assert result.adverse_fill_rate_pct == 0.0
 
 
 def test_load_jsonl_snapshots_skips_invalid_rows(tmp_path):

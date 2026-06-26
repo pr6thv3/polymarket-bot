@@ -61,6 +61,30 @@ class FillMarkoutMetrics:
     adverse_markout_pct_of_gross: dict[int, float]
 
 
+@dataclass(frozen=True)
+class AdverseSelectionPnLBreakdown:
+    """P&L split by whether a maker fill was adverse at a future horizon.
+
+    `observed_fills` counts hypothetical maker fills whose quote was
+    touched/traded-through inside TTL. `classified_fills` counts the subset
+    with a future midpoint at `fill_ts + horizon_sec`; only classified fills
+    contribute to P&L buckets.
+    """
+
+    quotes_generated: int
+    observed_fills: int
+    classified_fills: int
+    unclassified_fills: int
+    adverse_fills: int
+    non_adverse_fills: int
+    adverse_pnl: float
+    non_adverse_pnl: float
+    total_pnl: float
+    adverse_fill_rate_pct: float
+    average_adverse_pnl: float
+    average_non_adverse_pnl: float
+
+
 def _first_snapshot_at_or_after(
     snapshots: Sequence[BookSnapshot],
     start_index: int,
@@ -248,3 +272,110 @@ def quote_fill_markouts(
         average_adverse_markout=avg_adverse,
         adverse_markout_pct_of_gross=adverse_pct,
     )
+
+def quote_fill_pnl_by_adverse_selection(
+    snapshots: Sequence[BookSnapshot],
+    spread_bps: float,
+    quote_interval_sec: float,
+    ttl_sec: float,
+    horizon_sec: int = 60,
+    size: float = 1.0,
+    tick_size: float = 0.005,
+) -> AdverseSelectionPnLBreakdown:
+    """Split hypothetical maker-fill P&L by adverse vs non-adverse fills.
+
+    The fill detector intentionally matches `quote_fill_markouts(...)`: a BUY
+    quote fills when a later best ask touches/trades through the bid, and a SELL
+    quote fills when a later best bid touches/trades through the ask.
+
+    P&L is marked to the first midpoint at or after `fill_ts + horizon_sec`.
+    BUY P&L is `(future_mid - fill_price) * size`; SELL P&L is
+    `(fill_price - future_mid) * size`. Negative P&L is classified adverse.
+    """
+    if size < 0:
+        raise ValueError("size must be non-negative")
+
+    quotes_generated = 0
+    observed_fills = 0
+    unclassified_fills = 0
+    adverse_fills = 0
+    non_adverse_fills = 0
+    adverse_pnl = 0.0
+    non_adverse_pnl = 0.0
+    last_quote_ts = -1e30
+
+    for i, snapshot in enumerate(snapshots):
+        if snapshot.timestamp - last_quote_ts < quote_interval_sec:
+            continue
+        last_quote_ts = snapshot.timestamp
+
+        half_spread = spread_bps / 20000.0
+        bid = min(_round_tick(snapshot.mid * (1 - half_spread), tick_size), snapshot.best_bid)
+        ask = max(_round_tick(snapshot.mid * (1 + half_spread), tick_size), snapshot.best_ask)
+        quotes_generated += 2
+        end_ts = snapshot.timestamp + ttl_sec
+
+        quote_fills: list[tuple[str, float, int]] = []
+        buy_filled = False
+        sell_filled = False
+        for later_index, later in enumerate(snapshots[i + 1:], start=i + 1):
+            if later.timestamp > end_ts:
+                break
+            if not buy_filled and later.best_ask <= bid:
+                quote_fills.append(("BUY", bid, later_index))
+                buy_filled = True
+            if not sell_filled and later.best_bid >= ask:
+                quote_fills.append(("SELL", ask, later_index))
+                sell_filled = True
+            if buy_filled and sell_filled:
+                break
+
+        for side, fill_price, fill_index in quote_fills:
+            observed_fills += 1
+            fill_ts = snapshots[fill_index].timestamp
+            future = _first_snapshot_at_or_after(
+                snapshots,
+                fill_index,
+                fill_ts + horizon_sec,
+            )
+            if future is None:
+                unclassified_fills += 1
+                continue
+
+            if side == "BUY":
+                pnl = (future.mid - fill_price) * size
+            else:
+                pnl = (fill_price - future.mid) * size
+
+            if pnl < 0:
+                adverse_fills += 1
+                adverse_pnl += pnl
+            else:
+                non_adverse_fills += 1
+                non_adverse_pnl += pnl
+
+    classified_fills = adverse_fills + non_adverse_fills
+    total_pnl = adverse_pnl + non_adverse_pnl
+    adverse_fill_rate = (
+        adverse_fills / classified_fills * 100.0 if classified_fills else 0.0
+    )
+    average_adverse = adverse_pnl / adverse_fills if adverse_fills else 0.0
+    average_non_adverse = (
+        non_adverse_pnl / non_adverse_fills if non_adverse_fills else 0.0
+    )
+
+    return AdverseSelectionPnLBreakdown(
+        quotes_generated=quotes_generated,
+        observed_fills=observed_fills,
+        classified_fills=classified_fills,
+        unclassified_fills=unclassified_fills,
+        adverse_fills=adverse_fills,
+        non_adverse_fills=non_adverse_fills,
+        adverse_pnl=adverse_pnl,
+        non_adverse_pnl=non_adverse_pnl,
+        total_pnl=total_pnl,
+        adverse_fill_rate_pct=adverse_fill_rate,
+        average_adverse_pnl=average_adverse,
+        average_non_adverse_pnl=average_non_adverse,
+    )
+

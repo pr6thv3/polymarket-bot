@@ -10,6 +10,7 @@ The current fill evidence is **not sufficient to deploy real capital**. The real
 - `core/paper_executor.py:473-482` applies random fill probability and random partial-fill sizing after a touch/trade-through condition.
 - `core/backtest.py:374-391` only fills in immediate placement if quote crosses current best bid/ask; with POST_ONLY enabled this generally rejects rather than models resting queue fills.
 - `data/market_activity.py` now includes `quote_fill_markouts(...)`, a conservative diagnostic that counts fills only after later snapshots touch/trade through and measures midpoint markout after fill.
+- `data/market_activity.py` also includes `quote_fill_pnl_by_adverse_selection(...)`, which splits hypothetical maker-fill P&L into adverse and non-adverse buckets using future midpoint markout at a specified horizon.
 
 ## Current real-data markout diagnostics
 
