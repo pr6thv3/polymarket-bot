@@ -77,6 +77,22 @@ class TestExecutor:
         assert call_kwargs.kwargs.get("post_only", True) is True
 
     @pytest.mark.asyncio
+    async def test_place_order_records_token_id(self, sample_config, mock_portfolio):
+        executor, _, order_store, _ = self._make_executor(sample_config, mock_portfolio)
+
+        await executor.place_order(
+            market_id="m1",
+            token_id="token-1",
+            side="BUY",
+            price=0.50,
+            size=10.0,
+        )
+
+        record = order_store.get("order-123")
+        assert record is not None
+        assert record.token_id == "token-1"
+
+    @pytest.mark.asyncio
     async def test_place_order_rejected_by_risk(self, sample_config, mock_portfolio):
         executor, client, _, risk_manager = self._make_executor(sample_config, mock_portfolio)
 
@@ -169,6 +185,60 @@ class TestExecutor:
         result = await executor.amend_order("order-amend", 0.55, 15.0)
         assert result is True
         client.amend_order.assert_called_once_with("order-amend", 0.55, 15.0)
+
+    @pytest.mark.asyncio
+    async def test_amend_order_cancel_replace_uses_record_token_id(self, sample_config, mock_portfolio):
+        executor, client, order_store, _ = self._make_executor(sample_config, mock_portfolio)
+        client.amend_order = AsyncMock(return_value=False)
+        client.create_order = AsyncMock(return_value="replacement-order")
+
+        record = OrderRecord(
+            order_id="order-amend-fallback",
+            market_id="m1",
+            side="BUY",
+            price=0.50,
+            size=10.0,
+            token_id="token-1",
+            state=OrderState.OPEN,
+        )
+        await order_store.add(record)
+
+        result = await executor.amend_order("order-amend-fallback", 0.55, 15.0)
+
+        assert result is True
+        client.cancel_order.assert_called_once_with("order-amend-fallback")
+        client.create_order.assert_called_once_with(
+            token_id="token-1",
+            side="BUY",
+            price=0.55,
+            size=15.0,
+            post_only=True,
+        )
+        replacement = order_store.get("replacement-order")
+        assert replacement is not None
+        assert replacement.token_id == "token-1"
+
+    @pytest.mark.asyncio
+    async def test_amend_order_cancel_replace_fails_closed_without_token_id(self, sample_config, mock_portfolio):
+        executor, client, order_store, _ = self._make_executor(sample_config, mock_portfolio)
+        client.amend_order = AsyncMock(return_value=False)
+
+        record = OrderRecord(
+            order_id="order-amend-missing-token",
+            market_id="m1",
+            side="BUY",
+            price=0.50,
+            size=10.0,
+            state=OrderState.OPEN,
+        )
+        await order_store.add(record)
+
+        result = await executor.amend_order("order-amend-missing-token", 0.55, 15.0)
+
+        assert result is False
+        client.cancel_order.assert_not_called()
+        client.create_order.assert_not_called()
+        assert order_store.get("order-amend-missing-token").state == OrderState.OPEN
 
     @pytest.mark.asyncio
     async def test_place_quote_pair(self, sample_config, mock_portfolio):

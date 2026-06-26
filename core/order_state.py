@@ -54,6 +54,7 @@ class OrderRecord:
     side: str  # "BUY" or "SELL"
     price: float
     size: float
+    token_id: str = ""
     filled_size: float = 0.0
     state: OrderState = OrderState.PENDING
     created_at: float = field(default_factory=time.monotonic)

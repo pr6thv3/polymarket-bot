@@ -150,6 +150,7 @@ class Executor:
                 side=side,
                 price=price,
                 size=size,
+                token_id=token_id,
                 state=OrderState.REJECTED,
             )
             await self.order_store.add(record)
@@ -162,6 +163,7 @@ class Executor:
             side=side,
             price=price,
             size=size,
+            token_id=token_id,
             state=OrderState.OPEN,
         )
         await self.order_store.add(record)
@@ -277,6 +279,14 @@ class Executor:
             logger.error("Cannot cancel+replace: order not found in store", order_id=order_id)
             return False
 
+        if not record.token_id:
+            logger.error(
+                "Cannot cancel+replace: token_id missing from order record",
+                order_id=order_id,
+                market_id=record.market_id,
+            )
+            return False
+
         cancelled = await self.client.cancel_order(order_id)
         if not cancelled:
             logger.error("Cancel failed in cancel+replace fallback", order_id=order_id)
@@ -290,7 +300,7 @@ class Executor:
 
         # Place replacement order
         new_id = await self.client.create_order(
-            token_id=record.market_id,  # Note: we'd need token_id here
+            token_id=record.token_id,
             side=record.side,
             price=new_price,
             size=new_size,
@@ -304,6 +314,7 @@ class Executor:
                 side=record.side,
                 price=new_price,
                 size=new_size,
+                token_id=record.token_id,
                 state=OrderState.OPEN,
             )
             await self.order_store.add(new_record)
