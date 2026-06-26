@@ -184,6 +184,26 @@ class TestPaperPortfolio:
         expected_rebate = 0.50 * 10.0 * 0.05 * 0.30
         assert abs(rebate_usd - expected_rebate) < 1e-8
 
+    def test_process_fill_rejects_sell_without_inventory(self):
+        pp = self._make_portfolio()
+
+        with pytest.raises(ValueError, match="Cannot paper-sell"):
+            pp.process_fill("m1", "SELL", 0.60, 10.0, "finance")
+
+        assert pp.usdc == 1000.0
+        assert pp.realized_pnl == 0.0
+        assert pp.positions == {}
+
+    def test_process_fill_sell_realizes_only_against_existing_inventory(self):
+        pp = self._make_portfolio()
+        pp.lock_usdc(5.50)
+        pp.process_fill("m1", "BUY", 0.55, 10.0, "finance")
+
+        pp.process_fill("m1", "SELL", 0.60, 10.0, "finance")
+
+        assert "m1" not in pp.positions
+        assert pp.realized_pnl == pytest.approx(0.50)
+
 
 class TestPaperTrade:
     """Test PaperTrade data structure."""
@@ -427,3 +447,79 @@ class TestPaperExecutorFillLogic:
         filled_count = await executor.process_open_orders()
         assert filled_count == 1
         assert order.status == "filled"
+
+
+    @pytest.mark.asyncio
+    async def test_naked_sell_order_is_rejected_without_false_pnl(self, setup_executor):
+        """A paper SELL cannot create proceeds/P&L without existing inventory."""
+        executor, orderbook = setup_executor
+
+        from core.orderbook import OrderBookSnapshot, BookLevel
+        snapshot = OrderBookSnapshot(
+            market_id="m1",
+            token_id="t1",
+            bids=[BookLevel(price=0.49, size=100)],
+            asks=[BookLevel(price=0.51, size=100)],
+            last_update=100.0,
+        )
+        orderbook.get_snapshot.return_value = snapshot
+
+        with pytest.raises(OrderRejectedByRisk, match="Insufficient inventory"):
+            await executor.place_order(
+                market_id="m1",
+                token_id="t1",
+                side="SELL",
+                price=0.48,
+                size=10.0,
+                category="finance",
+                post_only=False,
+            )
+
+        assert executor._orders == {}
+        assert executor._total_fills == 0
+        assert executor._total_rejected == 1
+        assert executor.paper_portfolio.usdc == 1000.0
+        assert executor.paper_portfolio.total_value == 1000.0
+        assert executor.paper_portfolio.realized_pnl == 0.0
+
+    @pytest.mark.asyncio
+    async def test_sell_order_reserves_existing_inventory_until_cancelled(self, setup_executor):
+        executor, orderbook = setup_executor
+        executor.paper_portfolio.lock_usdc(5.0)
+        executor.paper_portfolio.process_fill("m1", "BUY", 0.50, 10.0, "finance")
+
+        from core.orderbook import OrderBookSnapshot, BookLevel
+        snapshot = OrderBookSnapshot(
+            market_id="m1",
+            token_id="t1",
+            bids=[BookLevel(price=0.49, size=100)],
+            asks=[BookLevel(price=0.51, size=100)],
+            last_update=100.0,
+        )
+        orderbook.get_snapshot.return_value = snapshot
+
+        order_id = await executor.place_order(
+            market_id="m1",
+            token_id="t1",
+            side="SELL",
+            price=0.60,
+            size=10.0,
+            category="finance",
+            post_only=True,
+        )
+
+        assert order_id is not None
+        assert executor.paper_portfolio.available_position("m1") == 0.0
+        with pytest.raises(OrderRejectedByRisk, match="Insufficient inventory"):
+            await executor.place_order(
+                market_id="m1",
+                token_id="t1",
+                side="SELL",
+                price=0.61,
+                size=1.0,
+                category="finance",
+                post_only=True,
+            )
+
+        assert await executor.cancel_order(order_id) is True
+        assert executor.paper_portfolio.available_position("m1") == pytest.approx(10.0)

@@ -97,6 +97,7 @@ class PaperPortfolio:
         self.usdc = starting_capital
         self.locked_usdc = 0.0
         self.positions: Dict[str, Dict[str, float]] = {}  # market_id -> {size, avg_price, category}
+        self.locked_positions: Dict[str, float] = defaultdict(float)
         self.total_fees_paid: float = 0.0
         self.total_rebates_earned: float = 0.0
         self.realized_pnl: float = 0.0
@@ -157,6 +158,35 @@ class PaperPortfolio:
         """Unlock USDC."""
         self.locked_usdc = max(0.0, self.locked_usdc - amount)
 
+    def position_size(self, market_id: str) -> float:
+        """Return current long inventory for a market."""
+        return self.positions.get(market_id, {}).get("size", 0.0)
+
+    def available_position(self, market_id: str) -> float:
+        """Return inventory not already reserved for open sell orders."""
+        locked = self.locked_positions.get(market_id, 0.0)
+        return max(0.0, self.position_size(market_id) - locked)
+
+    def lock_position(self, market_id: str, size: float) -> bool:
+        """Reserve long inventory for a virtual sell order."""
+        if size <= 0:
+            return True
+        if size > self.available_position(market_id) + 1e-8:
+            return False
+        self.locked_positions[market_id] += size
+        return True
+
+    def unlock_position(self, market_id: str, size: float) -> None:
+        """Release inventory previously reserved for a virtual sell order."""
+        if size <= 0:
+            return
+        locked = self.locked_positions.get(market_id, 0.0)
+        remaining = max(0.0, locked - size)
+        if remaining <= 1e-8:
+            self.locked_positions.pop(market_id, None)
+        else:
+            self.locked_positions[market_id] = remaining
+
     def process_fill(
         self,
         market_id: str,
@@ -207,17 +237,24 @@ class PaperPortfolio:
             pos["category"] = category
 
         else:  # SELL
+            pos = self.positions.get(market_id)
+            if not pos or pos.get("size", 0.0) + 1e-8 < size:
+                raise ValueError(
+                    f"Cannot paper-sell {size:.8f} shares for {market_id}: "
+                    f"only {self.position_size(market_id):.8f} available"
+                )
+
             proceeds = price * size - fee_usd
             self.usdc += proceeds
 
-            if market_id in self.positions:
-                pos = self.positions[market_id]
-                entry_cost = pos["avg_price"] * size
-                self.realized_pnl += proceeds - entry_cost
-                pos["size"] -= size
+            entry_cost = pos["avg_price"] * size
+            self.realized_pnl += proceeds - entry_cost
+            pos["size"] -= size
+            self.unlock_position(market_id, size)
 
-                if abs(pos["size"]) < 1e-8:
-                    del self.positions[market_id]
+            if abs(pos["size"]) < 1e-8:
+                del self.positions[market_id]
+                self.locked_positions.pop(market_id, None)
 
         # Track fees and rebates
         self.total_fees_paid += fee_usd
@@ -299,6 +336,20 @@ class PaperExecutor:
         self._total_cancelled = 0
         self._total_rejected = 0
 
+    def _lock_order_resources(self, market_id: str, side: str, price: float, size: float) -> bool:
+        """Reserve virtual resources required for an open paper order."""
+        if side == "BUY":
+            return self.paper_portfolio.lock_usdc(price * size)
+        return self.paper_portfolio.lock_position(market_id, size)
+
+    def _release_order_resources(self, order: PaperOrder, size: Optional[float] = None) -> None:
+        """Release virtual resources reserved by a paper order."""
+        release_size = order.size if size is None else size
+        if order.side == "BUY":
+            self.paper_portfolio.unlock_usdc(order.price * release_size)
+        else:
+            self.paper_portfolio.unlock_position(order.market_id, release_size)
+
     # ── Order placement ───────────────────────────────────────────────
 
     async def place_order(
@@ -349,20 +400,33 @@ class PaperExecutor:
             self._total_rejected += 1
             raise OrderRejectedByRisk(risk_reason)
 
-        # ── Check USDC availability ──
-        order_cost = price * size if side == "BUY" else size * (1.0 - price)
-        if not self.paper_portfolio.lock_usdc(order_cost):
+        # ── Check virtual resource availability ──
+        if not self._lock_order_resources(market_id, side, price, size):
+            self._total_rejected += 1
+            if side == "BUY":
+                order_cost = price * size
+                logger.warning(
+                    f"{PAPER_TAG} Insufficient virtual USDC",
+                    market_id=market_id,
+                    side=side,
+                    cost=order_cost,
+                    free_usdc=self.paper_portfolio.free_usdc,
+                )
+                raise OrderRejectedByRisk(
+                    f"Insufficient USDC (paper): need {order_cost:.2f}, "
+                    f"have {self.paper_portfolio.free_usdc:.2f}"
+                )
+
             logger.warning(
-                f"{PAPER_TAG} Insufficient virtual USDC",
+                f"{PAPER_TAG} Insufficient virtual inventory",
                 market_id=market_id,
                 side=side,
-                cost=order_cost,
-                free_usdc=self.paper_portfolio.free_usdc,
+                size=size,
+                available=self.paper_portfolio.available_position(market_id),
             )
-            self._total_rejected += 1
             raise OrderRejectedByRisk(
-                f"Insufficient USDC (paper): need {order_cost:.2f}, "
-                f"have {self.paper_portfolio.free_usdc:.2f}"
+                f"Insufficient inventory (paper): need {size:.2f}, "
+                f"have {self.paper_portfolio.available_position(market_id):.2f}"
             )
 
         # ── Get current snapshot timestamp ──
@@ -432,7 +496,7 @@ class PaperExecutor:
                 if snapshot.best_ask and order.price >= snapshot.best_ask:
                     if order.post_only:
                         order.status = "rejected"
-                        self.paper_portfolio.unlock_usdc(order.price * order.size)
+                        self._release_order_resources(order)
                         logger.debug(
                             f"{PAPER_TAG} POST_ONLY rejected (would take)",
                             order_id=order.order_id,
@@ -444,7 +508,7 @@ class PaperExecutor:
                 if snapshot.best_bid and order.price <= snapshot.best_bid:
                     if order.post_only:
                         order.status = "rejected"
-                        self.paper_portfolio.unlock_usdc(order.price * order.size)
+                        self._release_order_resources(order)
                         logger.debug(
                             f"{PAPER_TAG} POST_ONLY rejected (would take)",
                             order_id=order.order_id,
@@ -494,13 +558,26 @@ class PaperExecutor:
             order.status = "filled"
 
         # Process in paper portfolio
-        fee_usd, rebate_usd = self.paper_portfolio.process_fill(
-            market_id=order.market_id,
-            side=order.side,
-            price=fill_price,
-            size=fill_size,
-            category=order.category,
-        )
+        try:
+            fee_usd, rebate_usd = self.paper_portfolio.process_fill(
+                market_id=order.market_id,
+                side=order.side,
+                price=fill_price,
+                size=fill_size,
+                category=order.category,
+            )
+        except ValueError as exc:
+            order.status = "rejected"
+            self._release_order_resources(order, fill_size)
+            self._total_rejected += 1
+            logger.error(
+                f"{PAPER_TAG} Fill rejected by virtual inventory check",
+                order_id=order.order_id,
+                market_id=order.market_id,
+                side=order.side,
+                error=str(exc),
+            )
+            return False
 
         # Record fill
         self._fills_log.append({
@@ -575,7 +652,7 @@ class PaperExecutor:
             return True
 
         order.status = "cancelled"
-        self.paper_portfolio.unlock_usdc(order.price * order.size)
+        self._release_order_resources(order)
         self._total_cancelled += 1
 
         logger.debug(
@@ -591,7 +668,7 @@ class PaperExecutor:
         for order in self._orders.values():
             if order.market_id == market_id and order.is_open:
                 order.status = "cancelled"
-                self.paper_portfolio.unlock_usdc(order.price * order.size)
+                self._release_order_resources(order)
                 count += 1
 
         self._total_cancelled += count
@@ -608,14 +685,13 @@ class PaperExecutor:
         if order is None or order.is_terminal:
             return False
 
-        # Unlock old amount, lock new
-        old_cost = order.price * order.size
-        new_cost = new_price * new_size
-
-        self.paper_portfolio.unlock_usdc(old_cost)
-        if not self.paper_portfolio.lock_usdc(new_cost):
-            # Can't afford amendment — keep original
-            self.paper_portfolio.lock_usdc(old_cost)
+        # Unlock old resources, then reserve resources for the amended order.
+        old_price = order.price
+        old_size = order.size
+        self._release_order_resources(order)
+        if not self._lock_order_resources(order.market_id, order.side, new_price, new_size):
+            # Can't afford amendment — keep original reservation.
+            self._lock_order_resources(order.market_id, order.side, old_price, old_size)
             return False
 
         order.price = new_price
@@ -635,7 +711,7 @@ class PaperExecutor:
         for order in self._orders.values():
             if order.is_open:
                 order.status = "cancelled"
-                self.paper_portfolio.unlock_usdc(order.price * order.size)
+                self._release_order_resources(order)
                 count += 1
 
         logger.warning(f"{PAPER_TAG} Emergency cancel all", count=count)
