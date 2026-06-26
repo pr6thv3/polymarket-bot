@@ -4,6 +4,7 @@ signal evaluation, order placement, and position management."""
 import asyncio
 import time
 from collections import deque
+from types import SimpleNamespace
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -546,3 +547,49 @@ class TestPositionEdgeCases:
                     market_id=f"mkt-{i}", token_id=f"tok-{i}",
                 )
         assert len(positions) == max_pos
+
+
+@pytest.mark.asyncio
+async def test_place_signal_trade_records_metrics_with_declared_signature(monkeypatch):
+    """_place_signal_trade must call metrics with the declared wrapper signature."""
+    strategy = AISignalsStrategy.__new__(AISignalsStrategy)
+    strategy.min_confidence = 0.3
+    strategy._compute_position_size = lambda signal: 10.0
+    strategy.scanner = MagicMock()
+    strategy.scanner.get_market_info.return_value = MarketInfo(
+        market_id="mkt-metrics",
+        token_id="tok-1",
+        question="Will this metric path work?",
+        category="politics",
+        days_to_resolution=30,
+    )
+    strategy.risk_manager = MagicMock()
+    strategy.risk_manager.allow_order = AsyncMock(return_value=(True, ""))
+    strategy.executor = MagicMock()
+    strategy.executor.place_order = AsyncMock(return_value="order-1")
+    strategy._compute_stop_loss = lambda price, direction: 0.40
+    strategy._compute_take_profit = lambda price, direction: 0.75
+    strategy.default_max_hold_sec = 86400
+    strategy._positions = {}
+    strategy._trades_placed = 0
+    strategy._state = SimpleNamespace(orders_placed=0)
+
+    calls = []
+    monkeypatch.setattr(
+        "strategies.ai_signals.m.record_signal_generated",
+        lambda **kwargs: calls.append(kwargs),
+    )
+
+    signal = Signal(
+        market_id="mkt-metrics",
+        estimated_prob=0.70,
+        market_prob=0.50,
+        confidence=0.8,
+    )
+
+    await strategy._place_signal_trade(signal)
+
+    assert len(calls) == 1
+    assert calls[0]["market_id"] == "mkt-metrics"
+    assert calls[0]["direction"] == "YES"
+    assert calls[0]["edge_usd"] == pytest.approx(signal.edge * 10.0)

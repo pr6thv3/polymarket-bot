@@ -402,3 +402,38 @@ class TestCrossPlatformArbStrategy:
         assert strategy._completed_count == 0
         assert strategy._failed_count == 0
         assert strategy._total_pnl == 0.0
+
+
+    @pytest.mark.asyncio
+    async def test_run_cycle_records_opportunity_count_metric(self, mock_deps, monkeypatch):
+        """run_cycle should use the concrete arb opportunity gauge helper."""
+        strategy = CrossPlatformArbStrategy(
+            client=mock_deps["client"],
+            orderbook=mock_deps["orderbook"],
+            portfolio=mock_deps["portfolio"],
+            risk_manager=mock_deps["risk_manager"],
+            executor=mock_deps["executor"],
+            order_store=mock_deps["order_store"],
+            kalshi_client=mock_deps["kalshi_client"],
+            config=mock_deps["config"],
+        )
+        mock_deps["kalshi_client"].refresh_markets = AsyncMock()
+        stale_opp = ArbOpportunity(
+            polymarket_id="poly-metrics",
+            kalshi_ticker="KXMETRICS",
+            detected_at=time.monotonic() - 10.0,
+        )
+        strategy._scan_opportunities = AsyncMock(return_value=[stale_opp])
+        strategy._execute_opportunity = AsyncMock(
+            side_effect=AssertionError("stale opportunity should not execute")
+        )
+        observed = []
+        monkeypatch.setattr(
+            "strategies.cross_platform_arb.m.update_arb_opportunities_found",
+            lambda count: observed.append(count),
+        )
+
+        await strategy.run_cycle()
+
+        assert observed == [1]
+        strategy._execute_opportunity.assert_not_called()

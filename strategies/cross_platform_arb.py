@@ -246,7 +246,7 @@ class CrossPlatformArbStrategy(Strategy):
         if opportunities:
             logger.info("Arb opportunities found", count=len(opportunities))
             # Record in metrics
-            m.gauge("arb_opportunities_found", len(opportunities))
+            m.update_arb_opportunities_found(len(opportunities))
 
         # 3. Execute best opportunities
         for opp in opportunities:

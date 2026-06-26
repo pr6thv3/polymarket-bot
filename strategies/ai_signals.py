@@ -545,8 +545,9 @@ class AISignalsStrategy(Strategy):
 
         # Record metrics
         m.record_signal_generated(
-            edge=signal.edge,
-            confidence=signal.confidence,
+            market_id=signal.market_id,
+            direction=signal.direction,
+            edge_usd=signal.edge * size_usd,
         )
 
     def _compute_position_size(self, signal: Signal) -> float:

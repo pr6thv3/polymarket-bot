@@ -75,6 +75,16 @@ pnl_usd_total = Gauge(
     "Current total P&L in USD",
 )
 
+arb_opportunities_found = Gauge(
+    "polymarket_arb_opportunities_found",
+    "Current number of cross-platform arbitrage opportunities found",
+)
+
+arb_pnl_usd_total = Gauge(
+    "polymarket_arb_pnl_usd_total",
+    "Cumulative cross-platform arbitrage P&L in USD",
+)
+
 
 _metrics_server_started = False
 _metrics_lock = threading.Lock()
@@ -151,6 +161,23 @@ def update_fill_rate(rate_pct: float) -> None:
 def update_pnl(amount_usd: float) -> None:
     """Update the total P&L gauge."""
     pnl_usd_total.set(amount_usd)
+
+
+def update_arb_opportunities_found(count: int) -> None:
+    """Update current cross-platform arbitrage opportunity count."""
+    arb_opportunities_found.set(count)
+
+
+def record_arb_pnl(amount_usd: float) -> None:
+    """Record realized cross-platform arbitrage P&L.
+
+    Uses a gauge because realized P&L can be positive or negative.
+    """
+    if amount_usd >= 0:
+        arb_pnl_usd_total.inc(amount_usd)
+    else:
+        arb_pnl_usd_total.dec(abs(amount_usd))
+
 
 
 def record_signal_generated(market_id: str, direction: str, edge_usd: float = 0.0) -> None:
