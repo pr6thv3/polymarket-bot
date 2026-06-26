@@ -234,6 +234,53 @@ class TestOrderStore:
         assert store.get("o-timeout").state == OrderState.OPEN
 
     @pytest.mark.asyncio
+    async def test_get_recently_filled_returns_each_fill_once(self):
+        store = OrderStore()
+        record = OrderRecord(
+            order_id="o-filled-once",
+            market_id="m1",
+            side="BUY",
+            price=0.50,
+            size=10.0,
+            state=OrderState.OPEN,
+        )
+        await store.add(record)
+        await store.transition("o-filled-once", OrderState.FILLED, filled_size=10.0)
+
+        first_poll = store.get_recently_filled()
+        second_poll = store.get_recently_filled()
+
+        assert [order.order_id for order in first_poll] == ["o-filled-once"]
+        assert second_poll == []
+
+    def test_get_recently_filled_since_filter_does_not_advance_cursor(self):
+        store = OrderStore()
+        older = OrderRecord(
+            order_id="older-fill",
+            market_id="m1",
+            side="BUY",
+            price=0.50,
+            size=10.0,
+            filled_size=10.0,
+            state=OrderState.FILLED,
+        )
+        newer = OrderRecord(
+            order_id="newer-fill",
+            market_id="m2",
+            side="SELL",
+            price=0.60,
+            size=5.0,
+            filled_size=5.0,
+            state=OrderState.FILLED,
+        )
+        older.updated_at = 100.0
+        newer.updated_at = 200.0
+        store._orders = {older.order_id: older, newer.order_id: newer}
+
+        assert [order.order_id for order in store.get_recently_filled(since=150.0)] == ["newer-fill"]
+        assert [order.order_id for order in store.get_recently_filled()] == ["older-fill", "newer-fill"]
+
+    @pytest.mark.asyncio
     async def test_remove_terminal(self):
         store = OrderStore()
         # Add a terminal order with old timestamp

@@ -104,6 +104,7 @@ class OrderStore:
         self._orders: Dict[str, OrderRecord] = {}
         self._pending_timeout = pending_timeout_sec
         self._lock = asyncio.Lock()
+        self._last_filled_scan_at: float = 0.0
 
     async def add(self, record: OrderRecord) -> None:
         """Add a new order to the store.
@@ -250,6 +251,37 @@ class OrderStore:
                 if market_id is None or record.market_id == market_id:
                     results.append(record)
             return results
+
+    def get_recently_filled(self, since: Optional[float] = None) -> List[OrderRecord]:
+        """Get orders filled after a monotonic timestamp.
+
+        The live bot's fill-processing loop calls this synchronously to notify
+        strategies about newly filled orders. When ``since`` is omitted, the
+        store advances an internal cursor so each filled order is returned at
+        most once to that polling loop.
+
+        Args:
+            since: Optional ``time.monotonic()`` timestamp. If provided, return
+                matching filled orders without advancing the internal cursor.
+
+        Returns:
+            Filled OrderRecords sorted by update time.
+        """
+        cursor = self._last_filled_scan_at if since is None else since
+        results = [
+            record
+            for record in self._orders.values()
+            if record.state == OrderState.FILLED and record.updated_at > cursor
+        ]
+        results.sort(key=lambda record: record.updated_at)
+
+        if since is None:
+            if results:
+                self._last_filled_scan_at = max(record.updated_at for record in results)
+            else:
+                self._last_filled_scan_at = max(self._last_filled_scan_at, time.monotonic())
+
+        return results
 
     async def remove_terminal(self, max_age_sec: float = 3600.0) -> int:
         """Remove old terminal orders from the store to prevent memory growth.
