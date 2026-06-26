@@ -313,6 +313,7 @@ def build_candidate(
         "timezone": None,
         "payout_convention": None,
         "invalidation_behavior": None,
+        "resolution_risk_checklist": None,
         "review_evidence": None,
         "reviewer": None,
         "reviewed_at": None,

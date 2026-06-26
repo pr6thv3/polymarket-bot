@@ -27,6 +27,10 @@ mappings:
     timezone: "UTC"
     payout_convention: "Binary YES pays 1.00 if true, else 0.00."
     invalidation_behavior: "Reject if either venue changes or voids the contract."
+    resolution_risk_checklist:
+      - "Compared Polymarket and Kalshi contract wording for equivalent outcome."
+      - "Compared resolution source and cutoff timing; no known divergence."
+      - "Compared payout and void/invalidation behavior; reject if either differs."
     review_evidence:
       - "https://example.invalid/polymarket-rule"
       - "https://example.invalid/kalshi-rule"
@@ -55,6 +59,7 @@ mappings:
     assert len(catalog.mappings) == 1
     assert catalog.mappings[0].mapping_id == "france-world-cup-fixture"
     assert len(catalog.mappings[0].digest) == 64
+    assert len(catalog.mappings[0].resolution_risk_checklist) == 3
 
 
 def test_approved_mapping_requires_semantic_review_fields(tmp_path: Path):
@@ -76,4 +81,32 @@ def test_duplicate_approved_mapping_ids_are_rejected(tmp_path: Path):
     )
 
     with pytest.raises(MappingValidationError, match="duplicate"):
+        MappingCatalog.load(catalog_path)
+
+
+def test_approved_mapping_requires_resolution_risk_checklist(tmp_path: Path):
+    catalog_path = tmp_path / "bad-risk.yaml"
+    catalog_path.write_text(
+        approved_mapping_yaml().replace(
+            '    resolution_risk_checklist:\n      - "Compared Polymarket and Kalshi contract wording for equivalent outcome."\n      - "Compared resolution source and cutoff timing; no known divergence."\n      - "Compared payout and void/invalidation behavior; reject if either differs."\n',
+            "",
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(MappingValidationError, match="resolution_risk_checklist"):
+        MappingCatalog.load(catalog_path)
+
+
+def test_approved_mapping_rejects_empty_resolution_risk_checklist(tmp_path: Path):
+    catalog_path = tmp_path / "empty-risk.yaml"
+    catalog_path.write_text(
+        approved_mapping_yaml().replace(
+            '    resolution_risk_checklist:\n      - "Compared Polymarket and Kalshi contract wording for equivalent outcome."\n      - "Compared resolution source and cutoff timing; no known divergence."\n      - "Compared payout and void/invalidation behavior; reject if either differs."\n',
+            "    resolution_risk_checklist: []\n",
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(MappingValidationError, match="resolution_risk_checklist"):
         MappingCatalog.load(catalog_path)

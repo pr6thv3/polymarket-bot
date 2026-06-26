@@ -145,6 +145,7 @@ def test_candidate_review_fields_are_explicitly_null():
         "timezone",
         "payout_convention",
         "invalidation_behavior",
+        "resolution_risk_checklist",
         "review_evidence",
         "reviewer",
         "reviewed_at",

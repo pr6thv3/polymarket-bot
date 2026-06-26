@@ -59,6 +59,7 @@ Only `status: approved` mappings enter replay. Each approved mapping must includ
 - UTC cutoff and timezone;
 - payout convention;
 - invalidation behavior;
+- resolution-risk checklist covering wording equivalence, resolution source/timing divergence, payout divergence, and void/invalidation divergence;
 - review evidence, reviewer, and review time.
 
 Title similarity and auto-discovery are not replay-eligible.

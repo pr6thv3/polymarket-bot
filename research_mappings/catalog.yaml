@@ -2,5 +2,5 @@ version: 1
 description: >
   Manual Polymarket/Kalshi mapping catalog for the read-only research kernel.
   Candidate mappings may be recorded here, but only status: approved entries
-  with full semantic review fields are replay eligible.
+  with full semantic review fields and resolution-risk checklist are replay eligible.
 mappings: []

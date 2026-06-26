@@ -25,6 +25,7 @@ APPROVED_REQUIRED_FIELDS = (
     "timezone",
     "payout_convention",
     "invalidation_behavior",
+    "resolution_risk_checklist",
     "review_evidence",
     "reviewer",
     "reviewed_at",
@@ -49,6 +50,7 @@ class ContractMapping:
     timezone: str
     payout_convention: str
     invalidation_behavior: str
+    resolution_risk_checklist: tuple[str, ...]
     review_evidence: tuple[str, ...]
     reviewer: str
     reviewed_at: str
@@ -80,6 +82,7 @@ class ContractMapping:
             "timezone": self.timezone,
             "payout_convention": self.payout_convention,
             "invalidation_behavior": self.invalidation_behavior,
+            "resolution_risk_checklist": list(self.resolution_risk_checklist),
             "review_evidence": list(self.review_evidence),
             "reviewer": self.reviewer,
             "reviewed_at": self.reviewed_at,
@@ -105,6 +108,9 @@ class ContractMapping:
         absent = [key for key, value in nested.items() if not value]
         if absent:
             raise MappingValidationError("approved mapping missing: " + ", ".join(absent))
+        checklist = data["resolution_risk_checklist"]
+        if not isinstance(checklist, list) or not checklist or any(not str(item).strip() for item in checklist):
+            raise MappingValidationError("resolution_risk_checklist must be a non-empty list")
         evidence = data["review_evidence"]
         if not isinstance(evidence, list) or not evidence:
             raise MappingValidationError("review_evidence must be a non-empty list")
@@ -125,6 +131,7 @@ class ContractMapping:
             timezone=str(data["timezone"]),
             payout_convention=str(data["payout_convention"]),
             invalidation_behavior=str(data["invalidation_behavior"]),
+            resolution_risk_checklist=tuple(str(item) for item in checklist),
             review_evidence=tuple(str(item) for item in evidence),
             reviewer=str(data["reviewer"]),
             reviewed_at=str(data["reviewed_at"]),

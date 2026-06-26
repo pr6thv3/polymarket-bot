@@ -26,6 +26,11 @@ def mapping() -> ContractMapping:
         timezone="UTC",
         payout_convention="Binary",
         invalidation_behavior="Reject on mismatch",
+        resolution_risk_checklist=(
+            "Contract wording compared",
+            "Resolution timing compared",
+            "Payout and invalidation behavior compared",
+        ),
         review_evidence=("https://example.invalid",),
         reviewer="test",
         reviewed_at="2026-06-25T13:10:38Z",
