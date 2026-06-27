@@ -6,6 +6,23 @@ This template exists because the current roadmap explicitly says Codex implement
 
 Live trading remains **NO-GO**. This document does not approve live orders, deposits, authenticated endpoints, WebSockets, or any call to `core/client.py create_order`.
 
+
+## Preflight usage
+
+Run this checker before asking Codex to implement any task gated by this file:
+
+```powershell
+.venv\Scripts\python.exe tools\block0_decision_check.py
+```
+
+To check only one section, pass the exact section heading:
+
+```powershell
+.venv\Scripts\python.exe tools\block0_decision_check.py --section "1. Fill-probability calibration spec for Task 3.2"
+```
+
+Expected behavior while this template is incomplete: the checker exits non-zero and prints every unchecked or checked-but-empty input. A checked item ending in `:` still needs a concrete value.
+
 ## 1. Fill-probability calibration spec for Task 3.2
 
 Required before creating `research/calibrate_fill_probability.py`.

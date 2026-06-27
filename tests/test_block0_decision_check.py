@@ -1,4 +1,4 @@
-from tools.block0_decision_check import find_decision_issues, format_issues
+from tools.block0_decision_check import find_decision_issues, format_issues, main
 
 
 def test_unchecked_decision_inputs_fail_closed():
@@ -78,3 +78,49 @@ def test_format_issues_includes_path_line_section_and_reason(tmp_path):
 
     assert "Block 0 decision inputs incomplete" in rendered
     assert "3: [Section] unchecked: Missing input:" in rendered
+
+
+def test_cli_returns_nonzero_for_incomplete_template(tmp_path, capsys):
+    template = tmp_path / "block0.md"
+    template.write_text("## Section\n\n- [ ] Missing input:\n", encoding="utf-8")
+
+    exit_code = main(["--template", str(template)])
+
+    captured = capsys.readouterr()
+    assert exit_code == 1
+    assert "Block 0 decision inputs incomplete" in captured.out
+    assert "unchecked: Missing input:" in captured.out
+
+
+def test_cli_returns_zero_for_complete_template(tmp_path, capsys):
+    template = tmp_path / "block0.md"
+    template.write_text("## Section\n\n- [x] Supplied input: value\n", encoding="utf-8")
+
+    exit_code = main(["--template", str(template)])
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    assert "Block 0 decision inputs complete" in captured.out
+
+
+def test_cli_section_filter_allows_incremental_preflight(tmp_path, capsys):
+    template = tmp_path / "block0.md"
+    template.write_text(
+        "## Incomplete Section\n\n"
+        "- [ ] Missing input:\n\n"
+        "## Complete Section\n\n"
+        "- [x] Supplied input: value\n",
+        encoding="utf-8",
+    )
+
+    exit_code = main([
+        "--template",
+        str(template),
+        "--section",
+        "Complete Section",
+    ])
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    assert "Block 0 decision inputs complete" in captured.out
+
