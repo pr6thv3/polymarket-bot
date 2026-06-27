@@ -78,6 +78,7 @@ def test_research_package_and_cli_have_no_execution_imports():
     files = list(Path("research").glob("*.py")) + [
         Path("tools/cross_venue_research.py"),
         Path("tools/generate_candidates.py"),
+        Path("tools/block0_decision_check.py"),
     ]
     offenders = []
     for path in files:
