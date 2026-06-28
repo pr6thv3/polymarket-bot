@@ -387,6 +387,44 @@ class TestCrossPlatformArbStrategy:
         assert strategy.max_concurrent_positions == 5
         assert strategy.kalshi_taker_fee_bps == 100
 
+    def test_reads_current_cross_arb_config_alias(self, mock_deps):
+        """Current config.yaml uses strategies.cross_arb, not cross_platform_arb."""
+        config = {
+            "strategies": {
+                "cross_arb": {
+                    "enabled": True,
+                    "min_profit_bps": 75,
+                    "position_limits": {"max_single_arb_usd": 55.0},
+                    "max_concurrent_positions": 3,
+                    "stale_opportunity_sec": 2.5,
+                    "execution_mode": "favor_poly",
+                    "kalshi_taker_fee_bps": 25,
+                    "cycle_interval_sec": 11.0,
+                    "max_consecutive_errors": 4,
+                }
+            }
+        }
+        strategy = CrossPlatformArbStrategy(
+            client=mock_deps["client"],
+            orderbook=mock_deps["orderbook"],
+            portfolio=mock_deps["portfolio"],
+            risk_manager=mock_deps["risk_manager"],
+            executor=mock_deps["executor"],
+            order_store=mock_deps["order_store"],
+            kalshi_client=mock_deps["kalshi_client"],
+            config=config,
+        )
+
+        assert strategy.is_enabled is True
+        assert strategy.min_profit_bps == 75
+        assert strategy.max_position_size_usd == 55.0
+        assert strategy.max_concurrent_positions == 3
+        assert strategy.stale_opportunity_sec == 2.5
+        assert strategy.execution_mode == "FAVOR_POLY"
+        assert strategy.kalshi_taker_fee_bps == 25
+        assert strategy.cycle_interval_sec == 11.0
+        assert strategy.max_consecutive_errors == 4
+
     def test_position_tracking_initialized(self, mock_deps):
         """Strategy initializes empty position tracking state."""
         strategy = CrossPlatformArbStrategy(

@@ -158,7 +158,8 @@ class PolymarketBot:
 
     def _init_cross_platform_arb(self, config: dict) -> None:
         """Initialize the cross-platform arbitrage strategy if enabled."""
-        arb_cfg = config.get("strategies", {}).get("cross_arb", {})
+        strategies_cfg = config.get("strategies", {})
+        arb_cfg = strategies_cfg.get("cross_arb") or strategies_cfg.get("cross_platform_arb", {})
         if arb_cfg.get("enabled", False):
             try:
                 from strategies.cross_platform_arb import CrossPlatformArbStrategy

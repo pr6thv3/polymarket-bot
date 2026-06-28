@@ -108,16 +108,21 @@ class KalshiClient:
         """Initialize the Kalshi client.
 
         Args:
-            config: Full config dict (reads from data_feeds.kalshi section).
+            config: Full config dict. Supports legacy data_feeds.kalshi
+                and current strategies.cross_arb.kalshi aliases.
         """
         self.config = config
-        kalshi_cfg = config.get("data_feeds", {}).get("kalshi", {})
+        strategies_cfg = config.get("strategies", {})
+        arb_cfg = strategies_cfg.get("cross_arb") or strategies_cfg.get("cross_platform_arb", {})
+        strategy_kalshi_cfg = arb_cfg.get("kalshi", {})
+        legacy_kalshi_cfg = config.get("data_feeds", {}).get("kalshi", {})
+        kalshi_cfg = {**strategy_kalshi_cfg, **legacy_kalshi_cfg}
 
         self.api_key = kalshi_cfg.get("api_key", "")
         self.api_secret = kalshi_cfg.get("api_secret", "")
-        self.rest_url = kalshi_cfg.get("rest_url", KALSHI_REST_URL)
+        self.rest_url = kalshi_cfg.get("rest_url", kalshi_cfg.get("base_url", KALSHI_REST_URL))
         self.ws_url = kalshi_cfg.get("ws_url", KALSHI_WS_URL)
-        self.enabled = kalshi_cfg.get("enabled", False)
+        self.enabled = kalshi_cfg.get("enabled", arb_cfg.get("enabled", False))
 
         # Session management
         self._session: Optional[aiohttp.ClientSession] = None
@@ -136,7 +141,11 @@ class KalshiClient:
         self._cache_ttl = kalshi_cfg.get("cache_ttl_sec", 30.0)
 
         # Market mapping: Polymarket slug -> Kalshi ticker (loaded from config)
-        self._market_map: Dict[str, str] = kalshi_cfg.get("market_map", {})
+        mapping_cfg = arb_cfg.get("market_mapping", {})
+        self._market_map: Dict[str, str] = kalshi_cfg.get(
+            "market_map",
+            mapping_cfg.get("market_map", {}),
+        )
 
         # Callbacks for WebSocket events
         self._on_price_update = None

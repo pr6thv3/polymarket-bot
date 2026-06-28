@@ -10,7 +10,7 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from data.kalshi_client import KalshiMarket, KalshiOrderBook
+from data.kalshi_client import KalshiClient, KalshiMarket, KalshiOrderBook
 from data.whale_tracker import WhaleProfile, MIN_TRADES_FOR_TRACKING
 from data.market_scanner import (
     MarketInfo,
@@ -192,6 +192,68 @@ class TestKalshiOrderBook:
             last_update=time.monotonic(),
         )
         assert ob.best_ask_cents == 60
+
+
+class TestKalshiClientConfig:
+    """KalshiClient config aliases used by the legacy cross-arb runtime."""
+
+    def test_reads_current_cross_arb_kalshi_alias(self):
+        config = {
+            "strategies": {
+                "cross_arb": {
+                    "enabled": True,
+                    "kalshi": {
+                        "api_key": "strategy-key",
+                        "api_secret": "strategy-secret",
+                        "base_url": "https://example.test/trade-api/v2",
+                    },
+                    "market_mapping": {
+                        "market_map": {"poly-condition": "KXTEST-26"},
+                    },
+                }
+            }
+        }
+
+        client = KalshiClient(config)
+
+        assert client.enabled is True
+        assert client.api_key == "strategy-key"
+        assert client.api_secret == "strategy-secret"
+        assert client.rest_url == "https://example.test/trade-api/v2"
+        assert client.get_mapped_markets() == {"poly-condition": "KXTEST-26"}
+
+    def test_legacy_data_feeds_kalshi_overrides_strategy_alias(self):
+        config = {
+            "strategies": {
+                "cross_arb": {
+                    "enabled": False,
+                    "kalshi": {
+                        "api_key": "strategy-key",
+                        "base_url": "https://strategy.example/trade-api/v2",
+                    },
+                    "market_mapping": {
+                        "market_map": {"poly-condition": "KXSTRATEGY"},
+                    },
+                }
+            },
+            "data_feeds": {
+                "kalshi": {
+                    "enabled": True,
+                    "api_key": "feed-key",
+                    "api_secret": "feed-secret",
+                    "rest_url": "https://feed.example/trade-api/v2",
+                    "market_map": {"poly-condition": "KXFEED"},
+                }
+            },
+        }
+
+        client = KalshiClient(config)
+
+        assert client.enabled is True
+        assert client.api_key == "feed-key"
+        assert client.api_secret == "feed-secret"
+        assert client.rest_url == "https://feed.example/trade-api/v2"
+        assert client.get_mapped_markets() == {"poly-condition": "KXFEED"}
 
 
 # ── WhaleProfile ────────────────────────────────────────────────────────

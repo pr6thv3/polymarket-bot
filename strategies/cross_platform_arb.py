@@ -177,16 +177,22 @@ class CrossPlatformArbStrategy(Strategy):
         )
         self.kalshi = kalshi_client
 
-        arb_cfg = self._strategy_config
+        strategies_cfg = config.get("strategies", {})
+        arb_cfg = strategies_cfg.get("cross_platform_arb") or strategies_cfg.get("cross_arb", {})
+        self._strategy_config = arb_cfg
+        position_limits_cfg = arb_cfg.get("position_limits", {})
 
         # ── Thresholds ──
         self.min_profit_bps = arb_cfg.get("min_profit_bps", 50)  # 0.5% minimum
-        self.max_position_size_usd = arb_cfg.get("max_position_size_usd", 100.0)
+        self.max_position_size_usd = arb_cfg.get(
+            "max_position_size_usd",
+            position_limits_cfg.get("max_single_arb_usd", 100.0),
+        )
         self.max_concurrent_positions = arb_cfg.get("max_concurrent_positions", 5)
         self.stale_opportunity_sec = arb_cfg.get("stale_opportunity_sec", 5.0)
 
         # ── Execution ──
-        self.execution_mode = arb_cfg.get("execution_mode", "FAVOR_POLY")
+        self.execution_mode = str(arb_cfg.get("execution_mode", "FAVOR_POLY")).upper()
         self.kalshi_taker_fee_bps = arb_cfg.get("kalshi_taker_fee_bps", 100)  # 1%
 
         # ── Position tracking ──
