@@ -27,6 +27,7 @@ The active roadmap warns that stale phase ordering can make Codex duplicate comp
 | Task 2.3: `amend_order()` replacement token ID | Done | `tests/test_executor.py` covers cancel-replace using the stored record token ID and failing closed when token ID is missing. |
 | Task 2.4: metrics/signature mismatches | Done | Metrics call-path tests pass, and `RiskManager.calculate_rebate_value(...)` now exists as a compatibility wrapper for the legacy fill-processing metric call. |
 | Task 2.5: paper executor false-P&L bug | Done | Paper SELL without inventory is rejected; inventory reservation tests cover sell-order locking and release. |
+| AI strategy constructor/config drift | Done | `AISignalsStrategy` accepts the `signal_model` injected by `main.py` and reads both legacy test keys and current `config.yaml` aliases for edge, confidence, and order sizing. |
 | Task 3.1: placeholder fill-probability model | Done | `research/fill_probability.py` exposes `estimate_fill_prob(distance_from_mid_cents, depth_at_best, arrival_latency_ms) -> float` with placeholder coefficients and monotonic tests. |
 | Adverse-selection P&L split diagnostic | Done | `data/market_activity.py` exposes `quote_fill_pnl_by_adverse_selection(...)` and tests classify adverse, non-adverse, and unclassified fills. |
 | Cross-venue resolution-risk checklist | Done | `research/mapping.py` requires non-empty `resolution_risk_checklist` for approved mappings; candidate output leaves it null for manual review. |

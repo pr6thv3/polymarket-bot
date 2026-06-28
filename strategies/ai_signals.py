@@ -142,6 +142,7 @@ class AISignalsStrategy(Strategy):
         news_fetcher: NewsFetcher,
         scanner: MarketScanner,
         config: dict,
+        signal_model: Optional[SignalModel] = None,
     ) -> None:
         super().__init__(
             client=client,
@@ -154,18 +155,22 @@ class AISignalsStrategy(Strategy):
         )
         self.news_fetcher = news_fetcher
         self.scanner = scanner
-        self.signal_model = SignalModel(config.get("strategies", {}).get("ai_signals", {}))
+        self.signal_model = signal_model or SignalModel(
+            config.get("strategies", {}).get("ai_signals", {})
+        )
 
         ai_cfg = self._strategy_config
 
         # ── Signal thresholds ──
-        self.min_edge = ai_cfg.get("min_edge_to_trade", 0.05)
-        self.min_confidence = ai_cfg.get("min_confidence", 0.3)
+        self.min_edge = ai_cfg.get("min_edge_to_trade", ai_cfg.get("min_edge_vs_market", 0.05))
+        self.min_confidence = ai_cfg.get(
+            "min_confidence", ai_cfg.get("min_signal_confidence", 0.3)
+        )
         self.max_concurrent_positions = ai_cfg.get("max_concurrent_positions", 5)
 
         # ── Position sizing ──
-        self.base_order_usd = ai_cfg.get("base_order_usd", 25.0)
-        self.max_order_usd = ai_cfg.get("max_order_usd", 100.0)
+        self.base_order_usd = ai_cfg.get("base_order_usd", ai_cfg.get("order_size_usd", 25.0))
+        self.max_order_usd = ai_cfg.get("max_order_usd", ai_cfg.get("max_order_size_usd", 100.0))
         self.confidence_size_scale = ai_cfg.get("confidence_size_scale", 1.5)
 
         # ── Exit parameters ──

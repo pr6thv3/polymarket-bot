@@ -268,6 +268,50 @@ class TestAISignalsStrategyConfig:
         ai_cfg = ai_config["strategies"]["ai_signals"]
         assert ai_cfg.get("min_confidence", 0.3) == 0.3
 
+    def test_constructor_accepts_injected_signal_model(self, ai_config):
+        signal_model = MagicMock()
+
+        strategy = AISignalsStrategy(
+            client=MagicMock(),
+            orderbook=MagicMock(),
+            portfolio=MagicMock(),
+            risk_manager=MagicMock(),
+            executor=MagicMock(),
+            order_store=MagicMock(),
+            news_fetcher=MagicMock(),
+            scanner=MagicMock(),
+            signal_model=signal_model,
+            config=ai_config,
+        )
+
+        assert strategy.signal_model is signal_model
+
+    def test_constructor_reads_current_config_aliases(self, ai_config):
+        ai_config["strategies"]["ai_signals"] = {
+            "enabled": True,
+            "min_edge_vs_market": 0.07,
+            "min_signal_confidence": 0.60,
+            "order_size_usd": 10.0,
+            "max_order_size_usd": 50.0,
+        }
+
+        strategy = AISignalsStrategy(
+            client=MagicMock(),
+            orderbook=MagicMock(),
+            portfolio=MagicMock(),
+            risk_manager=MagicMock(),
+            executor=MagicMock(),
+            order_store=MagicMock(),
+            news_fetcher=MagicMock(),
+            scanner=MagicMock(),
+            signal_model=MagicMock(),
+            config=ai_config,
+        )
+
+        assert strategy.min_edge == pytest.approx(0.07)
+        assert strategy.min_confidence == pytest.approx(0.60)
+        assert strategy.base_order_usd == pytest.approx(10.0)
+        assert strategy.max_order_usd == pytest.approx(50.0)
 
 # ── Market filtering logic ────────────────────────────────────────────
 
