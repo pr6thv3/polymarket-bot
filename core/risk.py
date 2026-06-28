@@ -290,6 +290,19 @@ class RiskManager:
         rebate_rate = self.get_rebate_rate(category)
         return notional * taker_fee * rebate_rate
 
+    def calculate_rebate_value(
+        self,
+        notional: float,
+        category: str,
+    ) -> float:
+        """Compatibility wrapper for legacy fill-processing metrics.
+
+        This delegates to ``calculate_expected_rebate`` so older call sites do
+        not raise at runtime. It is still a static, expected rebate estimate;
+        it is not a verified current reward or incentive entitlement.
+        """
+        return self.calculate_expected_rebate(notional=notional, category=category)
+
     def get_size_multiplier(self) -> float:
         """Get the current time-of-day size multiplier.
 

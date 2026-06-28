@@ -7,6 +7,7 @@ Covers:
 """
 
 import time
+from types import SimpleNamespace
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
@@ -403,6 +404,27 @@ class TestCrossPlatformArbStrategy:
         assert strategy._failed_count == 0
         assert strategy._total_pnl == 0.0
 
+    def test_get_token_id_uses_orderbook_snapshot_not_private_markets(self, mock_deps):
+        """Token lookup must use OrderBookManager's public snapshot API."""
+        class SnapshotOrderBook:
+            def get_snapshot(self, market_id):
+                assert market_id == "poly-m1"
+                return SimpleNamespace(token_id="token-yes")
+
+        orderbook = SnapshotOrderBook()
+        assert not hasattr(orderbook, "_markets")
+        strategy = CrossPlatformArbStrategy(
+            client=mock_deps["client"],
+            orderbook=orderbook,
+            portfolio=mock_deps["portfolio"],
+            risk_manager=mock_deps["risk_manager"],
+            executor=mock_deps["executor"],
+            order_store=mock_deps["order_store"],
+            kalshi_client=mock_deps["kalshi_client"],
+            config=mock_deps["config"],
+        )
+
+        assert strategy._get_token_id("poly-m1") == "token-yes"
 
     @pytest.mark.asyncio
     async def test_run_cycle_records_opportunity_count_metric(self, mock_deps, monkeypatch):

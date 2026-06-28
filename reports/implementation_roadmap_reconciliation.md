@@ -22,10 +22,10 @@ The active roadmap warns that stale phase ordering can make Codex duplicate comp
 | Page-level listing contract validation | Done | `fetch_polymarket(...)` and `fetch_kalshi(...)` call `validate_payload(...)` inside each pagination loop before extending market arrays. |
 | Task 1.3: `POLY_TIMESTAMP` call-site audit | Stale in this checkout | `rg` finds only the read-only denied header name in `research/safety.py`; no trading timestamp call sites are present under `core/`, `data/`, `strategies/`, `tools/`, `research/`, or `tests/`. |
 | Section 14/15 stale fee-model reconciliation | Stale in this checkout | No `polymarket_fee_model.py` or stale “build fee/rebate module” checklist exists in the current worktree. Current fee/reward formula remains unverified for live reward farming. |
-| Task 2.1: `OrderBookManager` `_books` / `_markets` mismatch | Done | `core/orderbook.py` consistently uses `_books` for order book state; `_markets` belongs to scanner/client caches elsewhere. |
+| Task 2.1: `OrderBookManager` `_books` / `_markets` mismatch | Done | Legacy strategy token lookup now uses `OrderBookManager.get_snapshot(...)` and no longer reads a private `_markets` attribute; tests cover cross-platform arb and whale-tracking lookups. |
 | Task 2.2: `OrderStore.get_recently_filled()` | Done | `core/order_state.py` implements `get_recently_filled(since: Optional[float] = None)` and tests cover one-shot polling plus since-filter behavior. |
 | Task 2.3: `amend_order()` replacement token ID | Done | `tests/test_executor.py` covers cancel-replace using the stored record token ID and failing closed when token ID is missing. |
-| Task 2.4: metrics signature mismatches | Done | Metrics call-path tests pass in the full suite. |
+| Task 2.4: metrics/signature mismatches | Done | Metrics call-path tests pass, and `RiskManager.calculate_rebate_value(...)` now exists as a compatibility wrapper for the legacy fill-processing metric call. |
 | Task 2.5: paper executor false-P&L bug | Done | Paper SELL without inventory is rejected; inventory reservation tests cover sell-order locking and release. |
 | Task 3.1: placeholder fill-probability model | Done | `research/fill_probability.py` exposes `estimate_fill_prob(distance_from_mid_cents, depth_at_best, arrival_latency_ms) -> float` with placeholder coefficients and monotonic tests. |
 | Adverse-selection P&L split diagnostic | Done | `data/market_activity.py` exposes `quote_fill_pnl_by_adverse_selection(...)` and tests classify adverse, non-adverse, and unclassified fills. |

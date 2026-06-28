@@ -665,14 +665,16 @@ class CrossPlatformArbStrategy(Strategy):
 
     def _get_token_id(self, market_id: str) -> Optional[str]:
         """Get the token ID for a Polymarket market."""
-        # Check if orderbook manager has the mapping
-        markets = self.orderbook._markets  # type: ignore
-        if market_id in markets:
-            info = markets[market_id]
-            if hasattr(info, "token_id"):
-                return info.token_id
-            if isinstance(info, dict):
-                return info.get("token_id")
+        get_snapshot = getattr(self.orderbook, "get_snapshot", None)
+        if callable(get_snapshot):
+            snapshot = get_snapshot(market_id)
+            if snapshot is not None:
+                if isinstance(snapshot, dict):
+                    token_id = snapshot.get("token_id")
+                else:
+                    token_id = getattr(snapshot, "token_id", None)
+                if isinstance(token_id, str) and token_id:
+                    return token_id
         return market_id  # Fallback: use market_id as token_id
 
     def _get_book_depth(self, market_id: str, snapshot) -> float:

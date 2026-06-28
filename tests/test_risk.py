@@ -30,6 +30,14 @@ class TestRiskManager:
         rebate = rm.calculate_expected_rebate(notional=1000.0, category="finance")
         assert rebate == pytest.approx(5.0, abs=0.01)
 
+    def test_calculate_rebate_value_matches_expected_rebate(self, sample_config, mock_portfolio):
+        rm = self._make_risk_manager(mock_portfolio, sample_config)
+
+        assert rm.calculate_rebate_value(
+            notional=1000.0,
+            category="finance",
+        ) == pytest.approx(rm.calculate_expected_rebate(1000.0, "finance"))
+
     def test_expected_rebate_geopolitics(self, sample_config, mock_portfolio):
         rm = self._make_risk_manager(mock_portfolio, sample_config)
         # Geopolitics: taker fee 0%, rebate 20% → expected rebate = 0
