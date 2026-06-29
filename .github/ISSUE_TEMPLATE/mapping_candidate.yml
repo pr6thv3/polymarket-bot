@@ -1,0 +1,24 @@
+name: Mapping candidate review
+description: Propose a Polymarket/Kalshi mapping candidate for manual review.
+title: "[Mapping]: "
+labels: ["mapping", "needs-review"]
+body:
+  - type: input
+    id: polymarket
+    attributes:
+      label: Polymarket condition/token evidence
+    validations:
+      required: true
+  - type: input
+    id: kalshi
+    attributes:
+      label: Kalshi event/market evidence
+    validations:
+      required: true
+  - type: textarea
+    id: semantic
+    attributes:
+      label: Semantic equivalence evidence
+      description: Include YES predicate, resolution source, cutoff, timezone, payout, and invalidation behavior.
+    validations:
+      required: true

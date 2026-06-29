@@ -1,92 +1,77 @@
-# Contributing to polymarket-bot
+# Contributing
 
-Thanks for your interest! This guide covers how to contribute effectively.
+Thanks for helping improve the prediction-market research lab. The supported public
+project is read-only research and paper evidence. Live trading is not an accepted
+contribution target unless a future governance decision explicitly opens that gate.
 
----
-
-## Development Setup
+## Development setup
 
 ```bash
 git clone https://github.com/pr6thv3/polymarket-bot.git
 cd polymarket-bot
 python -m venv .venv
-source .venv/bin/activate   # Linux/macOS
-# .venv\Scripts\activate    # Windows
+.venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-Copy `.env.example` to `.env` and fill in your credentials. **Never commit `.env`.**
+Do not add trading credentials to `.env` for normal development. The fixture and test
+workflow must run without secrets.
 
-## Running Tests
+## Required checks
 
 ```bash
-# Full suite — must be green before any PR
-python -m pytest tests/ -v
-
-# Individual modules
-python -m pytest tests/test_market_making.py -v
-python -m pytest tests/test_news_fetcher.py -v
-python -m pytest tests/test_signal_model.py -v
-python -m pytest tests/test_ai_signals.py -v
+.venv\Scripts\python.exe tools/cross_venue_research.py verify-contracts
+.venv\Scripts\python.exe -m pytest tests/ -q
+.venv\Scripts\python.exe tools/software_health_report.py
 ```
 
-**All 407 tests must pass.** No exceptions.
+All checks must pass before a pull request is ready.
 
-## Code Style
+## Contribution areas
 
-- **Python 3.11+** — use modern syntax (match statements, type unions, etc.)
-- **Type hints** on all public functions and class attributes
-- **Docstrings** on all public classes and methods (Google style)
-- **async/await** for all I/O-bound operations (API calls, WebSocket handling)
-- **Max line length**: 100 characters
-- **Imports**: stdlib → third-party → local, grouped with blank lines
+Good contributions:
 
-## Project Structure
+- source-contract fixtures and validation improvements;
+- mapping-candidate tooling;
+- manual mapping-review evidence;
+- replay/evidence-pack quality;
+- docs, examples, and contributor experience;
+- tests that strengthen the read-only safety boundary.
 
+Gated contributions:
+
+- strategy economics;
+- fee/reward crediting;
+- live execution;
+- authenticated trading surfaces;
+- WebSocket trading integrations.
+
+These require the proof gates in `docs/proof_standard.md`.
+
+## Safety rules
+
+- Never commit `.env`, private keys, API secrets, wallet mnemonics, or account data.
+- Research tools must not import `core`, `strategies`, `data`, or `main.py`.
+- Do not call `core/client.py create_order` or live paths in `core/executor.py`.
+- Keep `execution.dry_run: true`.
+- Keep execution-capable strategies disabled in `config.yaml`.
+- Do not describe a strategy as profitable without a Gate 2 evidence pack.
+
+## Pull request process
+
+1. Create a focused branch.
+2. Add tests for behavior changes.
+3. Update docs when public behavior or proof gates change.
+4. Run the required checks.
+5. Fill out the pull request safety checklist.
+
+## Commit messages
+
+Use clear, scoped commits. Conventional Commit prefixes are welcome:
+
+```text
+feat: add fixture-only replay example
+fix: reject incomplete mapping review evidence
+docs: clarify no-go live trading gate
+test: cover software health report output
 ```
-core/       → Order lifecycle, execution, risk management
-data/       → Market scanning, news fetching, signal modeling, whale tracking
-strategies/ → Trading strategies (base class + implementations)
-utils/      → Metrics, alerts, logging, helpers
-tests/      → Pytest test suite (conftest.py for shared fixtures)
-```
-
-## Adding a New Strategy
-
-1. Create `strategies/your_strategy.py` inheriting from `strategies.base.Strategy`
-2. Implement `async def run_cycle(self) -> StrategyResult`
-3. Add config section in `config.yaml` under `strategies:`
-4. Wire into `main.py` with an `_init_your_strategy()` method
-5. Add tests in `tests/test_your_strategy.py`
-6. Update `CHANGELOG.md` and `README.md`
-
-## Pull Request Process
-
-1. Create a feature branch: `git checkout -b feat/your-feature`
-2. Make changes with clear, atomic commits
-3. Ensure all 407+ tests pass
-4. Add tests for any new functionality
-5. Update documentation (README, CHANGELOG, config.yaml comments)
-6. Open a PR against `main` with a clear description
-
-## Commit Messages
-
-Follow [Conventional Commits](https://www.conventionalcommits.org/):
-
-```
-feat: add cross-exchange hedging strategy
-fix: correct order_store API call in ai_signals
-docs: update README with Phase 5 status
-test: add edge case tests for Brier score tracker
-refactor: extract common position sizing logic
-```
-
-## Security
-
-- **Never commit `.env`**, API keys, wallet private keys, or tokens
-- **Never log credentials** — use `***` masking in log output
-- **Report vulnerabilities** privately — see SECURITY.md
-
-## Questions?
-
-Open an issue with the `question` label.

@@ -1,0 +1,11 @@
+name: Documentation improvement
+description: Improve docs, examples, or contributor onboarding.
+title: "[Docs]: "
+labels: ["documentation"]
+body:
+  - type: textarea
+    id: doc
+    attributes:
+      label: What should change?
+    validations:
+      required: true

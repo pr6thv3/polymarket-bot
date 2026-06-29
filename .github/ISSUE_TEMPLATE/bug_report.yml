@@ -1,0 +1,26 @@
+name: Bug report
+description: Report a reproducible issue in the read-only research workflow.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What happened?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction steps
+      description: Include commands and fixture paths when possible.
+    validations:
+      required: true
+  - type: textarea
+    id: safety
+    attributes:
+      label: Safety impact
+      description: Did this touch credentials, order paths, or live endpoints?
+    validations:
+      required: true

@@ -1,0 +1,17 @@
+name: Source-contract update
+description: Propose or fix a pinned venue source contract.
+title: "[Contract]: "
+labels: ["source-contract", "needs-review"]
+body:
+  - type: input
+    id: source
+    attributes:
+      label: Official source URL
+    validations:
+      required: true
+  - type: textarea
+    id: fields
+    attributes:
+      label: Consumed fields and fixture evidence
+    validations:
+      required: true

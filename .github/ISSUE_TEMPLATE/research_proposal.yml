@@ -1,0 +1,19 @@
+name: Research proposal
+description: Propose a paper-only research improvement.
+title: "[Research]: "
+labels: ["research"]
+body:
+  - type: textarea
+    id: hypothesis
+    attributes:
+      label: Hypothesis
+      description: What would this test, and what evidence would prove or reject it?
+    validations:
+      required: true
+  - type: textarea
+    id: data
+    attributes:
+      label: Data and replay requirements
+      description: What logs, mappings, fees, or fixtures are needed?
+    validations:
+      required: true

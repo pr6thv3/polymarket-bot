@@ -1,0 +1,101 @@
+{
+  "checks": [
+    {
+      "detail": "validated 6 pinned source-contract fixtures",
+      "evidence": {
+        "validated": [
+          "kalshi_trade_api_v1:get_market",
+          "kalshi_trade_api_v1:get_market_orderbook",
+          "kalshi_trade_api_v1:get_series_fee_changes",
+          "kalshi_trade_api_v1:list_markets",
+          "polymarket_clob_v1:get_order_book",
+          "polymarket_gamma_v1:list_markets"
+        ]
+      },
+      "name": "source_contract_fixture_verification",
+      "status": "pass"
+    },
+    {
+      "detail": "execution.dry_run is true and execution-capable strategies are disabled",
+      "evidence": {
+        "disabled_strategies": [
+          "ai_signals",
+          "cross_arb",
+          "market_making",
+          "whale_tracking"
+        ],
+        "dry_run": true
+      },
+      "name": "read_only_config_safety",
+      "status": "pass"
+    },
+    {
+      "detail": "research/read-only tools do not import legacy execution-capable modules",
+      "evidence": {
+        "inspected": [
+          "research\\__init__.py",
+          "research\\adapters.py",
+          "research\\contracts.py",
+          "research\\event_log.py",
+          "research\\fees.py",
+          "research\\fill_probability.py",
+          "research\\mapping.py",
+          "research\\quotes.py",
+          "research\\replay.py",
+          "research\\safety.py",
+          "research\\transport.py",
+          "tools\\cross_venue_research.py",
+          "tools\\generate_candidates.py",
+          "tools\\software_health_report.py",
+          "tools\\gate_b_audit.py",
+          "tools\\block0_decision_check.py"
+        ]
+      },
+      "name": "research_import_policy",
+      "status": "pass"
+    },
+    {
+      "detail": "read-only transport rejects injected trading credentials before network use",
+      "evidence": {
+        "rejected_credentials": [
+          "POLYMARKET_PRIVATE_KEY",
+          "POLYMARKET_API_KEY",
+          "KALSHI_PRIVATE_KEY"
+        ]
+      },
+      "name": "credential_isolation",
+      "status": "pass"
+    },
+    {
+      "detail": "offline replay completed with poisoned order modules and injected credential",
+      "evidence": {
+        "accepted_route_count": 0,
+        "snapshot_count": 0
+      },
+      "name": "offline_replay_order_path_isolation",
+      "status": "pass"
+    },
+    {
+      "detail": "527 passed in 5.44s",
+      "evidence": {
+        "command": [
+          "C:\\Users\\Preethve\\polymarket-bot\\.venv\\Scripts\\python.exe",
+          "-m",
+          "pytest",
+          "tests/",
+          "-q"
+        ],
+        "returncode": 0,
+        "summary": "527 passed in 5.44s"
+      },
+      "name": "pytest_full_suite",
+      "status": "pass"
+    }
+  ],
+  "claim": "software infrastructure working",
+  "generated_at": "2026-06-29T17:48:14Z",
+  "live_trading_status": "NO-GO",
+  "next_profitability_gate": "approve mappings, run forward paper capture, and produce a profitability evidence pack",
+  "overall_status": "pass",
+  "profitability_claim": "not proven"
+}

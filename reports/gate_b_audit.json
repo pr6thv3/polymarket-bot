@@ -1,0 +1,49 @@
+{
+  "generated_at": "2026-06-29T17:48:06Z",
+  "interpretation": "Gate B is an audit gate only and does not approve live trading.",
+  "items": [
+    {
+      "detail": "requirements.lock pins py_clob_client==0.34.6",
+      "evidence": {
+        "version": "0.34.6"
+      },
+      "name": "current_sdk_lock",
+      "status": "pass"
+    },
+    {
+      "detail": "legacy client contains fields or nonce handling that require current API review",
+      "evidence": {
+        "found": {},
+        "nonce_line_count": 25
+      },
+      "name": "deprecated_execution_fields",
+      "status": "review"
+    },
+    {
+      "detail": "legacy auth/domain/signature assumptions need current official API verification",
+      "evidence": {
+        "hardcoded_chain_id_137": true,
+        "hardcoded_signature_type": true,
+        "uses_clob_host": false
+      },
+      "name": "auth_domain_signature_assumptions",
+      "status": "review"
+    },
+    {
+      "detail": "no current authenticated read-only probe is implemented for legacy execution audit",
+      "name": "read_only_authenticated_probe",
+      "status": "fail"
+    },
+    {
+      "detail": "legacy execution path does not document current RFQ/Combos implications",
+      "evidence": {
+        "combos": true,
+        "rfq": false
+      },
+      "name": "rfq_combos_awareness",
+      "status": "fail"
+    }
+  ],
+  "live_trading_status": "NO-GO",
+  "overall_status": "fail"
+}

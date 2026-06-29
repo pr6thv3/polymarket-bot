@@ -1,46 +1,49 @@
 # Security Policy
 
-## Reporting a Vulnerability
+## Reporting a vulnerability
 
-**Do not report security vulnerabilities through public GitHub issues.**
+Do not report security vulnerabilities through public GitHub issues.
 
-Instead, email **preethve.b@gmail.com** with:
+Email **preethve.b@gmail.com** with:
 
-- A description of the vulnerability
-- Steps to reproduce
-- Potential impact
-- Suggested fix (if available)
+- vulnerability description;
+- reproduction steps;
+- potential impact;
+- suggested fix, if available.
 
-You should receive a response within 48 hours. If the issue is confirmed, we will work on a fix and coordinate disclosure.
+## Current security posture
 
-## Sensitive Data Handling
+The supported public project is read-only research. Live trading remains `NO-GO`.
 
-This project handles highly sensitive data:
+The research runtime must not require or load:
 
-- **Polygon wallet private keys** — stored in `.env`, never committed
-- **Polymarket API credentials** — stored in `.env`, never committed
-- **OpenAI API keys** — stored in `.env`, never committed
-- **Telegram bot tokens** — stored in `.env`, never committed
+- wallet private keys;
+- exchange trading credentials;
+- authenticated trading endpoints;
+- live order paths;
+- deposit or withdrawal permissions.
 
-### Rules
+## Sensitive data rules
 
-1. **Never commit `.env`** — it is in `.gitignore` and must stay that way
-2. **Never log raw credentials** — all log output must mask secrets with `***`
-3. **Never hardcode credentials** in source code, config files, or test fixtures
-4. **`.env.example`** contains only placeholder values with descriptions — no real keys
+- Never commit `.env`.
+- Never commit private keys, wallet mnemonics, API secrets, passphrases, or account data.
+- Never log raw credentials.
+- Never add credentials to fixtures, docs, screenshots, issue bodies, or tests.
+- Keep `.env.example` research-safe.
+- Use `.env.live.example` only as a documented legacy warning surface.
 
-## Supported Versions
+## Read-only boundary
 
-| Version | Phase | Supported |
-|---------|-------|-----------|
-| 0.4.x | Phase 4 (current) | ✅ Active |
-| 0.3.x | Phase 3 | ✅ |
-| 0.2.x | Phase 2 | ✅ |
-| 0.1.x | Phase 1 | ✅ |
+Research code must stay isolated from:
 
-## Best Practices
+- `core/client.py create_order`;
+- live order paths in `core/executor.py`;
+- authenticated WebSocket or account endpoints;
+- strategy code that can place or amend orders.
 
-- Use `python-dotenv` to load environment variables — never read `.env` directly
-- Rotate API keys if they may have been exposed
-- Use minimal token scopes (e.g., `repo` only for GitHub, trade-only for Polymarket)
-- Keep `pip` dependencies updated: `pip install --upgrade -r requirements.txt`
+The safety boundary is verified by tests and `tools/software_health_report.py`.
+
+## Supported versions
+
+Until a formal release is cut, the `main` branch is the supported development line for
+read-only research tooling only.

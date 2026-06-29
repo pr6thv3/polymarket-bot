@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    name: Tests (${{ matrix.os }}, Python ${{ matrix.python-version }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python-version: ["3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+          python -m pip install ruff
+      - name: Lint
+        run: >
+          ruff check
+          research
+          tools/cross_venue_research.py
+          tools/generate_candidates.py
+          tools/software_health_report.py
+          tools/gate_b_audit.py
+          tests/test_research_safety.py
+          tests/test_research_cross_venue.py
+          tests/test_research_contracts.py
+          tests/test_generate_candidates.py
+          tests/test_software_health_report.py
+          tests/test_gate_b_audit.py
+      - name: Format check
+        run: >
+          ruff format --check
+          research
+          tools/cross_venue_research.py
+          tools/generate_candidates.py
+          tools/software_health_report.py
+          tools/gate_b_audit.py
+          tests/test_research_safety.py
+          tests/test_research_cross_venue.py
+          tests/test_research_contracts.py
+          tests/test_generate_candidates.py
+          tests/test_software_health_report.py
+          tests/test_gate_b_audit.py
+      - name: Verify source-contract fixtures
+        run: python tools/cross_venue_research.py verify-contracts
+      - name: Run tests
+        run: python -m pytest tests/ -q
+      - name: Generate software health report
+        run: python tools/software_health_report.py
