@@ -1,4 +1,4 @@
-"""CLOB client wrapper with rate limiting, circuit breaker, and nonce caching."""
+"""CLOB client wrapper with rate limiting, circuit breaker, and live-write guards."""
 
 import asyncio
 import os
@@ -9,6 +9,7 @@ from typing import Any, Optional
 import structlog
 from dotenv import load_dotenv
 
+from core.live_guard import LiveTradingBlocked, LiveTradingGuard
 from utils.helpers import TokenBucketRateLimiter, retry_async, load_config
 from utils import metrics as m
 
@@ -45,7 +46,7 @@ class ClobClient:
 
     Features:
     - Token bucket rate limiting (55 req/min default)
-    - Local EIP-712 nonce cache (increment locally, sync on error)
+    - Fail-closed live-write guard before any order/cancel/amend call
     - Circuit breaker: pause calls after N errors in a time window
     - Exponential backoff on 429/5xx responses
     - WebSocket management with auto-reconnect
@@ -62,11 +63,18 @@ class ClobClient:
         cb_cfg = exec_cfg.get("error_circuit_breaker", {})
 
         # API credentials from environment
-        self.api_key = os.environ.get("POLY_API_KEY", "")
-        self.api_secret = os.environ.get("POLY_API_SECRET", "")
-        self.api_passphrase = os.environ.get("POLY_PASSPHRASE", "")
-        self.private_key = os.environ.get("POLYGON_PRIVATE_KEY", "")
-        self.chain_id = 137  # Polygon mainnet
+        self.api_key = os.environ.get("POLYMARKET_API_KEY") or os.environ.get("POLY_API_KEY", "")
+        self.api_secret = os.environ.get("POLYMARKET_API_SECRET") or os.environ.get("POLY_API_SECRET", "")
+        self.api_passphrase = os.environ.get("POLYMARKET_API_PASSPHRASE") or os.environ.get("POLY_PASSPHRASE", "")
+        self.private_key = os.environ.get("POLYMARKET_PRIVATE_KEY") or os.environ.get("POLYGON_PRIVATE_KEY", "")
+        self.chain_id = int(exec_cfg.get("chain_id", 137))  # Polygon mainnet
+        self.clob_host = str(
+            exec_cfg.get("clob_host")
+            or os.environ.get("POLYMARKET_CLOB_HOST")
+            or "https://polymarket-proxy.nameispreeth.workers.dev"
+        ).rstrip("/")
+        self.signature_type = int(exec_cfg.get("signature_type", 0))
+        self.live_guard = LiveTradingGuard(config)
 
         # Rate limiter: 55 requests per minute = 0.9167/sec
         rate_per_sec = exec_cfg.get("rate_limit_per_min", 55) / 60.0
@@ -84,10 +92,6 @@ class ClobClient:
         self._cb_errors: deque = deque()  # timestamps of recent errors
         self._cb_open_until: float = 0.0  # monotonic time until CB is open
         self._cb_lock = asyncio.Lock()
-
-        # Nonce cache
-        self._nonce: Optional[int] = None
-        self._nonce_lock = asyncio.Lock()
 
         # Underlying sync client (lazy init)
         self._sync_client: Optional[Any] = None
@@ -121,11 +125,11 @@ class ClobClient:
             )
 
             self._sync_client = SyncClobClient(
-                host="https://polymarket-proxy.nameispreeth.workers.dev",
+                host=self.clob_host,
                 creds=api_creds,
                 key=self.private_key,
                 chain_id=self.chain_id,
-                signature_type=0,
+                signature_type=self.signature_type,
             )
             logger.info("CLOB sync client initialized")
             return self._sync_client
@@ -318,6 +322,23 @@ class ClobClient:
         Returns:
             Order ID string, or None on failure.
         """
+        try:
+            self.live_guard.assert_order_allowed(
+                price=price,
+                size=size,
+                post_only=post_only,
+            )
+        except LiveTradingBlocked as exc:
+            logger.warning(
+                "Live order blocked by guard",
+                token_id=token_id,
+                side=side,
+                price=price,
+                size=size,
+                reason=str(exc),
+            )
+            return None
+
         client = self._get_sync_client()
         if client is None:
             logger.info(
@@ -354,7 +375,7 @@ class ClobClient:
 
             # Place with post_only flag
             result = await self._call_with_protection(
-                client.post_order, signed_order, OrderType.GTD
+                client.post_order, signed_order, OrderType.GTD, post_only=post_only
             )
 
             order_id = result.get("orderID", result.get("id", ""))
@@ -392,6 +413,12 @@ class ClobClient:
         Returns:
             True if cancellation succeeded.
         """
+        try:
+            self.live_guard.assert_live_enabled()
+        except LiveTradingBlocked as exc:
+            logger.warning("Live cancel blocked by guard", order_id=order_id, reason=str(exc))
+            return False
+
         client = self._get_sync_client()
         if client is None:
             logger.info("Mock: would cancel order", order_id=order_id)
@@ -414,6 +441,16 @@ class ClobClient:
         Returns:
             Number of orders cancelled.
         """
+        try:
+            self.live_guard.assert_live_enabled()
+        except LiveTradingBlocked as exc:
+            logger.warning(
+                "Live batch cancel blocked by guard",
+                market_id=market_id,
+                reason=str(exc),
+            )
+            return 0
+
         client = self._get_sync_client()
         if client is None:
             logger.info("Mock: would cancel all orders for market", market_id=market_id)
@@ -443,6 +480,12 @@ class ClobClient:
         Returns:
             True if amendment succeeded.
         """
+        try:
+            self.live_guard.assert_live_enabled()
+        except LiveTradingBlocked as exc:
+            logger.warning("Live amend blocked by guard", order_id=order_id, reason=str(exc))
+            return False
+
         client = self._get_sync_client()
         if client is None:
             logger.info(
@@ -472,46 +515,6 @@ class ClobClient:
                 error=str(exc),
             )
             return False
-
-    # --- Nonce management ---
-
-    async def get_nonce(self) -> int:
-        """Get the next nonce for order signing.
-
-        Uses local cache to avoid round-trip. Syncs from chain on error.
-
-        Returns:
-            Next nonce integer.
-        """
-        async with self._nonce_lock:
-            if self._nonce is None:
-                # First call: fetch from chain
-                try:
-                    client = self._get_sync_client()
-                    if client:
-                        self._nonce = await asyncio.to_thread(
-                            client.get_next_nonce
-                        )
-                    else:
-                        self._nonce = 0
-                except Exception as exc:
-                    logger.error("Failed to fetch nonce from chain", error=str(exc))
-                    self._nonce = 0
-
-            nonce = self._nonce
-            self._nonce += 1
-            return nonce
-
-    async def sync_nonce(self) -> None:
-        """Force sync nonce from chain (called after errors)."""
-        async with self._nonce_lock:
-            try:
-                client = self._get_sync_client()
-                if client:
-                    self._nonce = await asyncio.to_thread(client.get_next_nonce)
-                    logger.info("Nonce synced from chain", nonce=self._nonce)
-            except Exception as exc:
-                logger.error("Failed to sync nonce", error=str(exc))
 
     # --- Health check ---
 

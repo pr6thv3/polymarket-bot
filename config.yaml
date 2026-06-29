@@ -153,6 +153,9 @@ research:
     evaluation_unit: opportunity_episodes
 
 execution:
+  clob_host: "https://polymarket-proxy.nameispreeth.workers.dev"
+  chain_id: 137
+  signature_type: 0
   rate_limit_per_min: 55
   retry_max_attempts: 100
   retry_backoff_base_sec: 2
@@ -165,6 +168,11 @@ execution:
     threshold: 10
     window_sec: 60
     pause_sec: 300
+  live:
+    approved_canary: false
+    max_order_notional_usd: 5.0
+    max_daily_loss_usd: 5.0
+    max_consecutive_network_errors: 3
 
 paper_trading:
   slippage_bps: 3.0

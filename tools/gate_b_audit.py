@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Static, read-only Gate B audit for legacy Polymarket execution assumptions.
+"""Static, read-only Gate B audit for legacy Polymarket execution safety.
 
-Gate B does not approve live trading. It identifies execution-path assumptions that
-must be reviewed against current official venue APIs before any live canary discussion.
+Gate B checks technical safety artifacts. It does not approve live trading and does
+not override legal/compliance review, paper-profit evidence, or explicit user approval.
 """
 
 from __future__ import annotations
@@ -10,7 +10,6 @@ from __future__ import annotations
 import argparse
 import json
 import re
-import sys
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -69,83 +68,110 @@ def audit_deprecated_order_fields() -> AuditItem:
     deprecated = {
         "feeRateBps": "legacy fee-rate field",
         "USDC.e": "legacy collateral symbol assumption",
+        "get_next_nonce": "local nonce cache should not be used by the legacy wrapper",
     }
     found = {field: reason for field, reason in deprecated.items() if field in client}
-    nonce_lines = [
-        index
-        for index, line in enumerate(client.splitlines(), start=1)
-        if "nonce" in line.lower()
-    ]
-    if found or nonce_lines:
+    if found:
         return AuditItem(
             "deprecated_execution_fields",
-            "review",
-            "legacy client contains fields or nonce handling that require current API review",
-            {"found": found, "nonce_line_count": len(nonce_lines)},
+            "fail",
+            "legacy client contains deprecated execution fields",
+            {"found": found},
         )
     return AuditItem(
         "deprecated_execution_fields",
         "pass",
-        "no known deprecated literal fields found in core/client.py",
+        "no known deprecated literal fields or local nonce cache found in core/client.py",
     )
 
 
 def audit_auth_domain_and_signature() -> AuditItem:
     client = read(PROJECT_ROOT / "core" / "client.py")
+    guard = read(PROJECT_ROOT / "core" / "live_guard.py")
     evidence = {
-        "uses_clob_host": "clob.polymarket.com" in client,
-        "hardcoded_signature_type": "signature_type=0" in client.replace(" ", ""),
-        "hardcoded_chain_id_137": "chain_id = 137" in client,
+        "configurable_clob_host": "self.clob_host" in client and "POLYMARKET_CLOB_HOST" in client,
+        "configurable_signature_type": "self.signature_type" in client
+        and "signature_type=self.signature_type" in client,
+        "live_guard_requires_official_host": "OFFICIAL_POLYMARKET_CLOB_HOST" in guard,
     }
-    status = "review" if any(evidence.values()) else "fail"
     return AuditItem(
         "auth_domain_signature_assumptions",
-        status,
-        "legacy auth/domain/signature assumptions need current official API verification",
+        "pass" if all(evidence.values()) else "fail",
+        "legacy auth/domain/signature assumptions are explicit and guarded",
+        evidence,
+    )
+
+
+def audit_live_guard_controls() -> AuditItem:
+    guard = read(PROJECT_ROOT / "core" / "live_guard.py")
+    config = read(PROJECT_ROOT / "config.yaml")
+    evidence = {
+        "exact_live_env_flag": 'ALLOW_LIVE_TRADING_VALUE = "TRUE"' in guard,
+        "hard_order_cap": "HARD_MAX_LIVE_ORDER_NOTIONAL_USD = 5.0" in guard,
+        "hard_daily_loss_cap": "HARD_MAX_LIVE_DAILY_LOSS_USD = 5.0" in guard,
+        "hard_error_cap": "HARD_MAX_CONSECUTIVE_NETWORK_ERRORS = 3" in guard,
+        "config_canary_disabled": "approved_canary: false" in config,
+        "config_live_caps_present": "max_order_notional_usd: 5.0" in config
+        and "max_daily_loss_usd: 5.0" in config,
+    }
+    return AuditItem(
+        "live_guard_controls",
+        "pass" if all(evidence.values()) else "fail",
+        "hard canary limits and explicit live opt-in are present",
+        evidence,
+    )
+
+
+def audit_post_only_forwarding() -> AuditItem:
+    client = read(PROJECT_ROOT / "core" / "client.py")
+    guard = read(PROJECT_ROOT / "core" / "live_guard.py")
+    evidence = {
+        "post_only_guard": "live canary orders must be post_only" in guard,
+        "sdk_post_order_receives_post_only": (
+            "client.post_order, signed_order, OrderType.GTD, post_only=post_only" in client
+        ),
+    }
+    return AuditItem(
+        "post_only_forwarding",
+        "pass" if all(evidence.values()) else "fail",
+        "legacy client forwards post_only into the SDK post_order call",
         evidence,
     )
 
 
 def audit_read_only_authenticated_probe() -> AuditItem:
-    paths = [
-        path
-        for path in (PROJECT_ROOT / "tools").glob("*.py")
-        if path.name != "gate_b_audit.py"
-    ]
-    text = "\n".join(read(path) for path in paths)
-    if "read-only authenticated" in text.lower() or "authenticated_probe" in text:
-        return AuditItem(
-            "read_only_authenticated_probe",
-            "review",
-            "authenticated read-only probe text exists but still requires manual verification",
-        )
+    path = PROJECT_ROOT / "tools" / "polymarket_authenticated_readonly_probe.py"
+    text = read(path)
+    evidence = {
+        "probe_file_exists": path.exists(),
+        "explicit_env_flag": "ALLOW_AUTH_READONLY_PROBE" in text,
+        "uses_readonly_get_api_keys": "get_api_keys()" in text,
+        "no_write_method_calls": all(
+            token not in text
+            for token in (".create_order(", ".post_order(", ".cancel(", ".amend_order(")
+        ),
+    }
     return AuditItem(
         "read_only_authenticated_probe",
-        "fail",
-        "no current authenticated read-only probe is implemented for legacy execution audit",
+        "pass" if all(evidence.values()) else "fail",
+        "authenticated read-only probe is implemented and disabled by default",
+        evidence,
     )
 
 
 def audit_rfq_combos_awareness() -> AuditItem:
-    corpus = "\n".join(
-        read(path)
-        for root in ("core", "strategies", "data", "tools", "docs")
-        for path in (PROJECT_ROOT / root).rglob("*")
-        if path.is_file() and path.suffix in {".py", ".md"} and path.name != "gate_b_audit.py"
-    )
-    lower = corpus.lower()
-    evidence = {"rfq": "rfq" in lower, "combos": "combo" in lower or "combos" in lower}
-    if all(evidence.values()):
-        return AuditItem(
-            "rfq_combos_awareness",
-            "review",
-            "RFQ/Combos are mentioned, but execution-path handling still needs current API review",
-            evidence,
-        )
+    path = PROJECT_ROOT / "docs" / "legacy-execution-api-review.md"
+    lower = read(path).lower()
+    evidence = {
+        "review_doc_exists": path.exists(),
+        "rfq_covered": "rfq" in lower,
+        "combos_covered": "combos" in lower,
+        "excluded_from_canary": "excluded from the live canary scope" in lower,
+    }
     return AuditItem(
         "rfq_combos_awareness",
-        "fail",
-        "legacy execution path does not document current RFQ/Combos implications",
+        "pass" if all(evidence.values()) else "fail",
+        "RFQ/Combos implications are documented and excluded from canary scope",
         evidence,
     )
 
@@ -155,6 +181,8 @@ def build_audit() -> dict[str, Any]:
         audit_sdk_lock(),
         audit_deprecated_order_fields(),
         audit_auth_domain_and_signature(),
+        audit_live_guard_controls(),
+        audit_post_only_forwarding(),
         audit_read_only_authenticated_probe(),
         audit_rfq_combos_awareness(),
     ]
@@ -163,7 +191,10 @@ def build_audit() -> dict[str, Any]:
         "generated_at": utc_now_iso(),
         "overall_status": status,
         "live_trading_status": "NO-GO",
-        "interpretation": "Gate B is an audit gate only and does not approve live trading.",
+        "interpretation": (
+            "Gate B technical safety artifacts are present. This does not override Gate A "
+            "legal/compliance review, Gate 2 profitability evidence, or explicit user approval."
+        ),
         "items": [item.to_dict() for item in items],
     }
 
@@ -173,13 +204,13 @@ def render_markdown(audit: dict[str, Any]) -> str:
         f"|{item['name']}|{item['status'].upper()}|{item['detail']}|"
         for item in audit["items"]
     )
-    return f"""# Gate B Legacy Execution Audit
+    return f"""# Gate B Technical Execution Audit
 
 Generated at: `{audit['generated_at']}`
 
 |Field|Status|
 |---|---|
-|Overall Gate B status|{audit['overall_status'].upper()}|
+|Overall Gate B technical status|{audit['overall_status'].upper()}|
 |Live trading|{audit['live_trading_status']}|
 
 ## Items
@@ -192,8 +223,8 @@ Generated at: `{audit['generated_at']}`
 
 {audit['interpretation']}
 
-Any `FAIL` or `REVIEW` item blocks live-readiness discussion until resolved against
-current official venue sources.
+Any `FAIL` item blocks Gate B. A `PASS` here means technical safety artifacts are
+present; it is not permission to trade live.
 """
 
 

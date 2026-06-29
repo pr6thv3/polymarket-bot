@@ -35,12 +35,15 @@ jobs:
           tools/generate_candidates.py
           tools/software_health_report.py
           tools/gate_b_audit.py
+          tools/polymarket_authenticated_readonly_probe.py
           tests/test_research_safety.py
           tests/test_research_cross_venue.py
           tests/test_research_contracts.py
           tests/test_generate_candidates.py
           tests/test_software_health_report.py
           tests/test_gate_b_audit.py
+          tests/test_authenticated_readonly_probe.py
+          tests/test_client_retries.py
       - name: Format check
         run: >
           ruff format --check
@@ -49,12 +52,15 @@ jobs:
           tools/generate_candidates.py
           tools/software_health_report.py
           tools/gate_b_audit.py
+          tools/polymarket_authenticated_readonly_probe.py
           tests/test_research_safety.py
           tests/test_research_cross_venue.py
           tests/test_research_contracts.py
           tests/test_generate_candidates.py
           tests/test_software_health_report.py
           tests/test_gate_b_audit.py
+          tests/test_authenticated_readonly_probe.py
+          tests/test_client_retries.py
       - name: Verify source-contract fixtures
         run: python tools/cross_venue_research.py verify-contracts
       - name: Run tests

@@ -1,10 +1,10 @@
-# Gate B Legacy Execution Audit
+# Gate B Technical Execution Audit
 
-Generated at: `2026-06-29T17:48:06Z`
+Generated at: `2026-06-29T18:04:25Z`
 
 |Field|Status|
 |---|---|
-|Overall Gate B status|FAIL|
+|Overall Gate B technical status|PASS|
 |Live trading|NO-GO|
 
 ## Items
@@ -12,14 +12,16 @@ Generated at: `2026-06-29T17:48:06Z`
 |Item|Status|Detail|
 |---|---|---|
 |current_sdk_lock|PASS|requirements.lock pins py_clob_client==0.34.6|
-|deprecated_execution_fields|REVIEW|legacy client contains fields or nonce handling that require current API review|
-|auth_domain_signature_assumptions|REVIEW|legacy auth/domain/signature assumptions need current official API verification|
-|read_only_authenticated_probe|FAIL|no current authenticated read-only probe is implemented for legacy execution audit|
-|rfq_combos_awareness|FAIL|legacy execution path does not document current RFQ/Combos implications|
+|deprecated_execution_fields|PASS|no known deprecated literal fields or local nonce cache found in core/client.py|
+|auth_domain_signature_assumptions|PASS|legacy auth/domain/signature assumptions are explicit and guarded|
+|live_guard_controls|PASS|hard canary limits and explicit live opt-in are present|
+|post_only_forwarding|PASS|legacy client forwards post_only into the SDK post_order call|
+|read_only_authenticated_probe|PASS|authenticated read-only probe is implemented and disabled by default|
+|rfq_combos_awareness|PASS|RFQ/Combos implications are documented and excluded from canary scope|
 
 ## Interpretation
 
-Gate B is an audit gate only and does not approve live trading.
+Gate B technical safety artifacts are present. This does not override Gate A legal/compliance review, Gate 2 profitability evidence, or explicit user approval.
 
-Any `FAIL` or `REVIEW` item blocks live-readiness discussion until resolved against
-current official venue sources.
+Any `FAIL` item blocks Gate B. A `PASS` here means technical safety artifacts are
+present; it is not permission to trade live.

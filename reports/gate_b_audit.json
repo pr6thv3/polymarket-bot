@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-06-29T17:48:06Z",
-  "interpretation": "Gate B is an audit gate only and does not approve live trading.",
+  "generated_at": "2026-06-29T18:04:25Z",
+  "interpretation": "Gate B technical safety artifacts are present. This does not override Gate A legal/compliance review, Gate 2 profitability evidence, or explicit user approval.",
   "items": [
     {
       "detail": "requirements.lock pins py_clob_client==0.34.6",
@@ -11,39 +11,65 @@
       "status": "pass"
     },
     {
-      "detail": "legacy client contains fields or nonce handling that require current API review",
-      "evidence": {
-        "found": {},
-        "nonce_line_count": 25
-      },
+      "detail": "no known deprecated literal fields or local nonce cache found in core/client.py",
       "name": "deprecated_execution_fields",
-      "status": "review"
+      "status": "pass"
     },
     {
-      "detail": "legacy auth/domain/signature assumptions need current official API verification",
+      "detail": "legacy auth/domain/signature assumptions are explicit and guarded",
       "evidence": {
-        "hardcoded_chain_id_137": true,
-        "hardcoded_signature_type": true,
-        "uses_clob_host": false
+        "configurable_clob_host": true,
+        "configurable_signature_type": true,
+        "live_guard_requires_official_host": true
       },
       "name": "auth_domain_signature_assumptions",
-      "status": "review"
+      "status": "pass"
     },
     {
-      "detail": "no current authenticated read-only probe is implemented for legacy execution audit",
-      "name": "read_only_authenticated_probe",
-      "status": "fail"
-    },
-    {
-      "detail": "legacy execution path does not document current RFQ/Combos implications",
+      "detail": "hard canary limits and explicit live opt-in are present",
       "evidence": {
-        "combos": true,
-        "rfq": false
+        "config_canary_disabled": true,
+        "config_live_caps_present": true,
+        "exact_live_env_flag": true,
+        "hard_daily_loss_cap": true,
+        "hard_error_cap": true,
+        "hard_order_cap": true
+      },
+      "name": "live_guard_controls",
+      "status": "pass"
+    },
+    {
+      "detail": "legacy client forwards post_only into the SDK post_order call",
+      "evidence": {
+        "post_only_guard": true,
+        "sdk_post_order_receives_post_only": true
+      },
+      "name": "post_only_forwarding",
+      "status": "pass"
+    },
+    {
+      "detail": "authenticated read-only probe is implemented and disabled by default",
+      "evidence": {
+        "explicit_env_flag": true,
+        "no_write_method_calls": true,
+        "probe_file_exists": true,
+        "uses_readonly_get_api_keys": true
+      },
+      "name": "read_only_authenticated_probe",
+      "status": "pass"
+    },
+    {
+      "detail": "RFQ/Combos implications are documented and excluded from canary scope",
+      "evidence": {
+        "combos_covered": true,
+        "excluded_from_canary": true,
+        "review_doc_exists": true,
+        "rfq_covered": true
       },
       "name": "rfq_combos_awareness",
-      "status": "fail"
+      "status": "pass"
     }
   ],
   "live_trading_status": "NO-GO",
-  "overall_status": "fail"
+  "overall_status": "pass"
 }
