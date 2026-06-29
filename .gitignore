@@ -1,5 +1,19 @@
 # Environment
 .env
+.env.*
+!.env.example
+!.env.live.example
+
+# Secrets / credentials
+*.pem
+*.key
+*.p12
+*.pfx
+*.keystore
+*.secret
+*private-key*
+*private_key*
+*mnemonic*
 
 # Python
 __pycache__/
@@ -29,6 +43,9 @@ logs/
 # State files
 state/*.json
 data/research_runs/
+data/backtest_runs/
+.phase3c_run_dir
+_inspect_api.py
 
 # IDE
 .vscode/
