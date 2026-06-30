@@ -53,6 +53,10 @@ research_contracts/            official source-contract artifacts and fixtures
 research_mappings/             candidate and approved mapping catalogs
 reports/                       generated evidence, audits, and go/no-go reports
 
+libs/, services/                proposal/risk/order-intent contracts for a future
+                                platform; non-transmitting and paper-only by default
+sql/                            schema sketches for future Postgres/ClickHouse split
+
 main.py, core/, data/, strategies/
                                 legacy execution-capable bot code; not live-ready
 ```
@@ -96,6 +100,7 @@ See [docs/proof_standard.md](docs/proof_standard.md) for the full standard.
 - [Architecture](docs/architecture.md)
 - [Safety model](docs/safety-model.md)
 - [Proof standard](docs/proof_standard.md)
+- [Proposal-driven strategy platform](docs/strategy-platform.md)
 - [Mapping review](docs/mapping-review.md)
 - [Source contracts](docs/source-contracts.md)
 - [Fee model](docs/fee-model.md)

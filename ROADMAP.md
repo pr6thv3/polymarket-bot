@@ -7,6 +7,8 @@
 - Generate software health reports.
 - Improve docs, examples, and contributor onboarding.
 - Produce mapping candidates without auto-promoting them.
+- Keep the new proposal/risk/order-intent platform contracts non-transmitting and
+  paper-only by default.
 
 ## Next: cross-venue evidence
 
@@ -18,6 +20,8 @@
 
 ## Later: gated strategy work
 
+- Promote the proposal-driven platform from contracts to services only after the
+  research kernel has approved mappings and forward paper evidence.
 - Rebuild maker-side liquidity only after fill/latency proof gates pass.
 - Reconsider reward/rebate economics only after primary-source rules are verified.
 - Admit AI/news or whale research only if it reuses append-only logs, provenance, replay,

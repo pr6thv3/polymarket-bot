@@ -1,6 +1,6 @@
 # Software Health Report
 
-Generated at: `2026-06-29T18:24:35Z`
+Generated at: `2026-06-30T05:34:06Z`
 
 |Field|Status|
 |---|---|
@@ -18,7 +18,7 @@ Generated at: `2026-06-29T18:24:35Z`
 |research_import_policy|PASS|research/read-only tools do not import legacy execution-capable modules|
 |credential_isolation|PASS|read-only transport rejects injected trading credentials before network use|
 |offline_replay_order_path_isolation|PASS|offline replay completed with poisoned order modules and injected credential|
-|pytest_full_suite|PASS|532 passed in 4.15s|
+|pytest_full_suite|PASS|547 passed in 10.48s|
 
 ## Interpretation
 

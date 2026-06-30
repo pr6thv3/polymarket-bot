@@ -30,6 +30,8 @@ jobs:
       - name: Lint
         run: >
           ruff check
+          libs
+          services
           research
           tools/cross_venue_research.py
           tools/generate_candidates.py
@@ -44,9 +46,15 @@ jobs:
           tests/test_gate_b_audit.py
           tests/test_authenticated_readonly_probe.py
           tests/test_client_retries.py
+          tests/test_platform_domain.py
+          tests/test_selector_risk_engine.py
+          tests/test_execution_gateway.py
+          tests/test_sizing_buckets.py
       - name: Format check
         run: >
           ruff format --check
+          libs
+          services
           research
           tools/cross_venue_research.py
           tools/generate_candidates.py
@@ -61,6 +69,10 @@ jobs:
           tests/test_gate_b_audit.py
           tests/test_authenticated_readonly_probe.py
           tests/test_client_retries.py
+          tests/test_platform_domain.py
+          tests/test_selector_risk_engine.py
+          tests/test_execution_gateway.py
+          tests/test_sizing_buckets.py
       - name: Verify source-contract fixtures
         run: python tools/cross_venue_research.py verify-contracts
       - name: Run tests

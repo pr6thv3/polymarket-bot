@@ -4,9 +4,9 @@ repos:
     hooks:
       - id: ruff
         args: [--fix]
-        files: ^(research/|tools/(cross_venue_research|generate_candidates|software_health_report|gate_b_audit|polymarket_authenticated_readonly_probe|block0_decision_check)\.py|tests/(test_research_.*|test_generate_candidates|test_software_health_report|test_gate_b_audit|test_authenticated_readonly_probe|test_client_retries|test_block0_decision_check)\.py)
+        files: ^(libs/|services/|research/|tools/(cross_venue_research|generate_candidates|software_health_report|gate_b_audit|polymarket_authenticated_readonly_probe|block0_decision_check)\.py|tests/(test_research_.*|test_generate_candidates|test_software_health_report|test_gate_b_audit|test_authenticated_readonly_probe|test_client_retries|test_block0_decision_check|test_platform_domain|test_selector_risk_engine|test_execution_gateway|test_sizing_buckets)\.py)
       - id: ruff-format
-        files: ^(research/|tools/(cross_venue_research|generate_candidates|software_health_report|gate_b_audit|polymarket_authenticated_readonly_probe|block0_decision_check)\.py|tests/(test_research_.*|test_generate_candidates|test_software_health_report|test_gate_b_audit|test_authenticated_readonly_probe|test_client_retries|test_block0_decision_check)\.py)
+        files: ^(libs/|services/|research/|tools/(cross_venue_research|generate_candidates|software_health_report|gate_b_audit|polymarket_authenticated_readonly_probe|block0_decision_check)\.py|tests/(test_research_.*|test_generate_candidates|test_software_health_report|test_gate_b_audit|test_authenticated_readonly_probe|test_client_retries|test_block0_decision_check|test_platform_domain|test_selector_risk_engine|test_execution_gateway|test_sizing_buckets)\.py)
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.6.0
     hooks:

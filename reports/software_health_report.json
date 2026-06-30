@@ -76,7 +76,7 @@
       "status": "pass"
     },
     {
-      "detail": "532 passed in 4.15s",
+      "detail": "547 passed in 10.48s",
       "evidence": {
         "command": [
           "C:\\Users\\Preethve\\polymarket-bot\\.venv\\Scripts\\python.exe",
@@ -86,14 +86,14 @@
           "-q"
         ],
         "returncode": 0,
-        "summary": "532 passed in 4.15s"
+        "summary": "547 passed in 10.48s"
       },
       "name": "pytest_full_suite",
       "status": "pass"
     }
   ],
   "claim": "software infrastructure working",
-  "generated_at": "2026-06-29T18:24:35Z",
+  "generated_at": "2026-06-30T05:34:06Z",
   "live_trading_status": "NO-GO",
   "next_profitability_gate": "approve mappings, run forward paper capture, and produce a profitability evidence pack",
   "overall_status": "pass",
